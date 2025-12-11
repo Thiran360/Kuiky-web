@@ -1,0 +1,711 @@
+/* Header.css - Enhanced UI with Better Action Buttons */
+
+/* =======================================================
+   1. HEADER CONTAINER & LAYOUT
+   ======================================================= */
+
+.header-container {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.875rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* =======================================================
+   2. LOGO SECTION
+   ======================================================= */
+
+.header-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.header-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  color: #4b5563;
+}
+
+.header-menu-btn:hover {
+  background-color: #f9fafb;
+}
+
+@media (min-width: 768px) {
+  .header-menu-btn {
+    display: none;
+  }
+}
+
+.header-logo-text {
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.05em;
+  color: #111827;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .header-logo-text {
+    font-size: 1.5rem;
+  }
+}
+
+.header-logo-accent {
+  color: #eab308;
+}
+
+.header-logo-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: #facc15;
+  border-radius: 50%;
+  margin-left: 0.25rem;
+  animation: softPulse 2s infinite;
+}
+
+@keyframes softPulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4); 
+  }
+  50% { 
+    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); 
+  }
+}
+
+/* =======================================================
+   3. SEARCH BAR
+   ======================================================= */
+
+.header-search-container {
+  flex: 1;
+  max-width: 600px;
+  position: relative;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .header-search-container {
+    display: block;
+  }
+}
+
+.header-search-input {
+  width: 100%;
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #111827;
+}
+
+.header-search-input:focus {
+  border-color: #facc15;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.1);
+}
+
+.header-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.header-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+/* Mobile Search Bar */
+.header-mobile-search {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem 0.75rem;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .header-mobile-search {
+    display: none;
+  }
+}
+
+.header-mobile-search-wrapper {
+  position: relative;
+}
+
+.header-mobile-search-input {
+  width: 100%;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #111827;
+}
+
+.header-mobile-search-input:focus {
+  border-color: #facc15;
+  background-color: #ffffff;
+}
+
+.header-mobile-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+/* =======================================================
+   4. HEADER ACTIONS - ENHANCED BUTTONS
+   ======================================================= */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .header-actions {
+    gap: 0.75rem;
+  }
+}
+
+/* Base Action Button Style */
+.header-action-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #4b5563;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+@media (min-width: 1024px) {
+  .header-action-btn {
+    padding: 0.625rem 1rem;
+  }
+}
+
+/* Icon Wrapper with Badge */
+.action-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Action Label (Desktop only) */
+.action-label {
+  display: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .action-label {
+    display: block;
+  }
+}
+
+/* Badge Styles */
+.action-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0 4px;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #ffffff;
+  animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* =======================================================
+   5. INDIVIDUAL BUTTON STYLES
+   ======================================================= */
+
+/* Wishlist Button */
+.header-wishlist-btn {
+  color: #6b7280;
+}
+
+.header-wishlist-btn:hover {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.wishlist-badge {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Cart Button */
+.header-cart-btn {
+  color: #6b7280;
+}
+
+.header-cart-btn:hover {
+  background-color: #fef3c7;
+  color: #facc15;
+}
+
+.cart-badge {
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+  color: #111827;
+}
+
+/* Profile Button */
+.header-profile-btn {
+  color: #6b7280;
+}
+
+.header-profile-btn:hover {
+  background-color: #f0fdf4;
+  color: #10b981;
+}
+
+.profile-name {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 1024px) {
+  .profile-name {
+    max-width: 120px;
+  }
+}
+
+/* Logout Button */
+.header-logout-btn {
+  color: #ef4444;
+}
+
+.header-logout-btn:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Login Button (Primary Style) */
+.header-login-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+  color: #111827;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(250, 204, 21, 0.3);
+  transition: all 0.2s ease;
+}
+
+.header-login-btn-primary:hover {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  box-shadow: 0 4px 12px rgba(250, 204, 21, 0.4);
+  transform: translateY(-2px);
+}
+
+.header-login-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Hide text labels on mobile */
+@media (max-width: 1023px) {
+  .header-action-btn {
+    padding: 0.5rem;
+  }
+  
+  .action-label {
+    display: none;
+  }
+}
+
+/* =======================================================
+   6. RESPONSIVE ADJUSTMENTS
+   ======================================================= */
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0.75rem 1rem;
+  }
+
+  .header-actions {
+    gap: 0.25rem;
+  }
+
+  .header-action-btn {
+    padding: 0.5rem;
+  }
+
+  .header-login-btn-primary {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .header-login-btn-primary span {
+    display: none;
+  }
+
+  @media (min-width: 480px) {
+    .header-login-btn-primary span {
+      display: inline;
+    }
+  }
+}
+
+/* =======================================================
+   7. ANIMATIONS & UTILITIES
+   ======================================================= */
+
+/* Smooth transitions for all interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Focus visible styles for accessibility */
+.header-action-btn:focus-visible,
+.header-login-btn-primary:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+}
+
+/* Active state feedback */
+.header-action-btn:active {
+  transform: scale(0.95);
+}
+
+.header-login-btn-primary:active {
+  transform: scale(0.98);
+}/* ===========================================================
+   HEADER — CLEAN, STABLE, NO DUPLICATES
+=========================================================== */
+
+/* Sticky Header Container */
+.header-container {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-white);
+  border-bottom: 1px solid #f3f4f6;
+  padding: 0.75rem 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Content Wrapper */
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ------------------ LOGO SECTION ------------------ */
+.header-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Menu button (mobile only) */
+.header-menu-btn {
+  display: block;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+}
+.header-menu-btn:hover {
+  background: var(--bg-off-white);
+}
+
+@media (min-width: 768px) {
+  .header-menu-btn {
+    display: none;
+  }
+}
+
+/* Logo Text */
+.header-logo-text {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  .header-logo-text {
+    font-size: 1.5rem;
+  }
+}
+
+.header-logo-accent {
+  color: var(--primary-yellow-hover);
+}
+
+.header-logo-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: 0.25rem;
+  border-radius: 50%;
+  background: var(--primary-yellow);
+  animation: softPulse 2s infinite;
+}
+
+/* ------------------ SEARCH BAR ------------------ */
+.header-search-container {
+  flex: 1;
+  max-width: 600px;
+  display: none;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .header-search-container {
+    display: block;
+  }
+}
+
+.header-search-input {
+  width: 100%;
+  background: var(--bg-white);
+  border: 2px solid var(--bg-gray-light);
+  border-radius: 9999px;
+  padding: 0.625rem 1rem 0.625rem 2.75rem;
+  font-size: 0.875rem;
+}
+
+.header-search-input:focus {
+  border-color: var(--primary-yellow);
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.1);
+}
+
+.header-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+/* ------------------ MOBILE SEARCH ------------------ */
+.header-mobile-search {
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .header-mobile-search {
+    display: none;
+  }
+}
+
+.header-mobile-search-wrapper {
+  position: relative;
+}
+
+.header-mobile-search-input {
+  width: 100%;
+  background: var(--bg-off-white);
+  border: 1px solid var(--border-light);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+}
+
+.header-mobile-search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+/* ------------------ ACTION BUTTONS ------------------ */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .header-actions {
+    gap: 1.25rem;
+  }
+}
+
+.header-wishlist-btn,
+.header-cart-btn,
+.header-user-btn,
+.header-logout-btn,
+.header-login-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Hover */
+.header-wishlist-btn:hover,
+.header-cart-btn:hover {
+  background-color: rgba(250, 204, 21, 0.1);
+}
+
+/* Wishlist Badge */
+.header-wishlist-badge,
+.header-cart-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* User Button */
+.header-user-btn {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-off-white);
+  border: 1px solid var(--border-medium);
+  border-radius: 9999px;
+}
+
+.header-user-btn:hover {
+  background: var(--bg-gray-light);
+  color: var(--primary-yellow-hover);
+}
+
+/* Logout Button */
+.header-logout-btn {
+  color: #ef4444;
+}
+.header-logout-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* Login Button */
+.header-login-btn {
+  background: var(--primary-yellow);
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+}
+.header-login-btn:hover {
+  background: var(--primary-yellow-hover);
+}
+@media (max-width: 768px) {
+  .header-login-btn span {
+    display: none;
+  }
+}
+.header-user-dropdown-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.header-dropdown-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  padding: 10px 0;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+  z-index: 9999;
+  min-width: 160px;
+}
+
+.header-dropdown-menu button {
+  width: 100%;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.header-dropdown-menu button:hover {
+  background: #f5f5f5;
+}

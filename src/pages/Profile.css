@@ -1,0 +1,306 @@
+/* Main Wrapper */
+.profile-wrapper {
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Main profile card */
+.profile-container {
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 25px 20px;
+  box-shadow: 0 8px 30px rgba(255, 191, 0, 0.25);
+  border: 2px solid #ffcc00;
+}
+
+/* Top section */
+.profile-top {
+  text-align: center;
+}
+
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  background: #ffcc00;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  box-shadow: 0px 5px 20px rgba(255, 204, 0, 0.5);
+}
+
+.profile-name {
+  font-size: 1.9rem;
+  margin-top: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.profile-role {
+  font-size: 0.9rem;
+  margin-top: 5px;
+  color: #ffcc00;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Profile info list */
+.profile-info {
+  margin-top: 30px;
+}
+
+.profile-item {
+  background: #fffdea;
+  border-left: 5px solid #ffcc00;
+  padding: 15px 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  transition: 0.2s ease;
+}
+
+.profile-item:hover {
+  background: #fff4b8;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(255, 191, 0, 0.3);
+}
+
+.item-icon {
+  background: #fff9d6;
+  padding: 10px;
+  border-radius: 50%;
+  color: #222;
+  border: 1px solid #ffcc00;
+}
+
+.item-label {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.item-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Empty state */
+.empty-profile {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-box {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid #ffcc00;
+  box-shadow: 0px 6px 20px rgba(255, 204, 0, 0.3);
+}
+
+.empty-icon {
+  color: #ffcc00;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 20px 15px;
+  }
+
+  .avatar-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-name {
+    font-size: 1.6rem;
+  }
+
+  .profile-item {
+    padding: 12px;
+  }
+
+  .item-value {
+    font-size: 1rem;
+  }
+}
+.profile-wrapper {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+.profile-container {
+  width: 100%;
+  max-width: 520px;
+  background: white;
+  border-radius: 22px;
+  padding: 25px 20px;
+  border: 2px solid #ffcc00;
+  box-shadow: 0 10px 30px rgba(255, 204, 0, 0.35);
+}
+
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  background: #ffcc00;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 12px;
+  color: black;
+  box-shadow: 0 6px 25px rgba(255, 204, 0, 0.6);
+}
+
+.profile-name {
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #222;
+  margin: 10px 0;
+}
+
+.profile-role {
+  text-align: center;
+  color: #ffcc00;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+/* BUTTONS */
+.edit-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #ffcc00;
+  background: #fff8d6;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-btn:hover,
+.cancel-btn:hover {
+  background: #ffcc00;
+  color: black;
+}
+
+/* VIEW MODE ITEMS */
+.profile-item {
+  background: #fff9df;
+  border-left: 5px solid #ffcc00;
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 16px;
+}
+
+.item-icon {
+  background: white;
+  padding: 10px;
+  border-radius: 50%;
+  border: 1px solid #ffcc00;
+}
+
+.item-label {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.item-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* EDIT MODE FORM */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.input-box {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #555;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  background: #fffef5;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #ffcc00;
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.3);
+}
+
+/* SAVE BUTTON */
+.save-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: #ffcc00;
+  color: black;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.save-btn:hover {
+  box-shadow: 0 10px 26px rgba(255, 204, 0, 0.8);
+}
+
