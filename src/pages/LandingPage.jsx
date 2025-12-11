@@ -77,10 +77,6 @@ const LandingPage = ({ searchTerm }) => {
             } else {
                 // Select this category for product filtering
                 setSelectedSubCategory(category);
-                
-                // If this sub-category was clicked, we still want its main parent highlighted
-                // NOTE: In a real app, 'category' needs a 'parent_id' field to correctly set selectedMainCategory.
-                // Since we don't have that, we rely on the sub-category being clicked from the visible sub-rail.
             }
         }
     };
@@ -101,8 +97,6 @@ const LandingPage = ({ searchTerm }) => {
             let matchesCategory = true;
             
             if (activeFilterId) {
-                // Filter by the most specific ID available (activeFilterId)
-                // We check both product.category_id and product.main_category_id for flexibility
                 matchesCategory = (product.category_id === activeFilterId || product.main_category_id === activeFilterId); 
             }
             
@@ -139,10 +133,7 @@ const LandingPage = ({ searchTerm }) => {
             {selectedMainCategory && selectedMainCategory.sub_categories && selectedMainCategory.sub_categories.length > 0 && (
                 <div className="sub-category-rail-wrapper mt-4">
                     <div className="category-header-wrapper">
-                        {/* Back button logic is handled inside the CategoryRail component, 
-                            but for the dual rail, we just provide the category list. 
-                            We can add a title here for clarity. 
-                        */}
+                        
                         <h3 className="rail-title-sub">Sub-Categories of **{selectedMainCategory.name}**</h3>
                     </div>
                     <CategoryRail 
@@ -153,13 +144,7 @@ const LandingPage = ({ searchTerm }) => {
                     />
                 </div>
             )}
-            
-            ---
-
-            {/* Hero Banner - Only show when no search/category filters active */}
             {!searchTerm && !activeFilter && <HeroBanner />}
-
-            ---
 
             {/* Product Grid Section */}
             <div className="page-content mt-6">

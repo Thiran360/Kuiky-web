@@ -1,11 +1,8 @@
 /* =======================================================
-   MERGED CSS: ProductCard.css and CheckoutPage.css
+   REVISED CSS (ProductCard.css & CheckoutPage styles)
    ======================================================= */
 
-/* ----------------------------------------
-   PRODUCT CARD CONTAINER (From ProductCard.css)
-   ---------------------------------------- */
-
+/* --- GENERAL CARD STRUCTURE --- */
 .product-card {
   position: relative;
   background-color: var(--bg-white);
@@ -30,29 +27,7 @@
   animation: fadeIn 0.4s ease-out;
 }
 
-/* ----------------------------------------
-   DISCOUNT BADGE
-   ---------------------------------------- */
-
-.product-discount-badge {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-  animation: bounce-in 0.5s ease-out;
-}
-
-/* ----------------------------------------
-   IMAGE SECTION
-   ---------------------------------------- */
-
+/* --- IMAGE SECTION --- */
 .product-image-container {
   position: relative;
   width: 100%;
@@ -72,6 +47,22 @@
 
 .product-card:hover .product-image {
   transform: scale(1.05);
+}
+
+/* Discount Badge */
+.product-discount-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: bounce-in 0.5s ease-out;
 }
 
 /* Wishlist Button */
@@ -141,7 +132,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.6em;
+  min-height: 2.6em; /* Ensure two lines */
 }
 
 /* Variation Dropdown */
@@ -403,45 +394,78 @@
   text-align: center;
 }
 
-/* ----------------------------------------
-   RESPONSIVE DESIGN (Product Card)
-   ---------------------------------------- */
+/* =======================================================
+   RESPONSIVE DESIGN (Product Card Refinements)
+   ======================================================= */
 
-/* Mobile Optimization */
+/* 1. Mobile Optimization (< 640px) */
 @media (max-width: 640px) {
   .product-card {
-    padding: 0.75rem;
+    padding: 0.75rem; /* More compact padding */
+    gap: 0.25rem; /* Reduce gap inside card */
   }
 
   .product-image-container {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem; /* Slightly less margin below image */
+  }
+  
+  .product-wishlist-btn {
+    width: 2.25rem; /* Smaller wishlist button */
+    height: 2.25rem;
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+  
+  .product-wishlist-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  
+  .product-details {
+    gap: 0.3rem;
   }
 
   .product-name {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* Smaller name font */
+    min-height: 2.4em; /* Adjust min height for smaller font */
   }
 
   .product-price {
-    font-size: 1.125rem;
+    font-size: 1.1rem; /* Smaller price font */
+  }
+
+  .product-original-price {
+    font-size: 0.8125rem;
+  }
+
+  .product-variation-select {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+  }
+
+  .product-variation-spacer {
+    height: 2.1rem; /* Adjust spacer height */
+  }
+
+  .product-actions {
+    gap: 0.3rem; /* Closer action buttons */
+    padding-top: 0.4rem;
   }
 
   .product-cart-btn,
   .product-buy-btn {
-    padding: 0.625rem 0.75rem;
-    font-size: 0.8125rem;
+    padding: 0.5rem 0.6rem; /* Smaller button padding */
+    font-size: 0.75rem; /* Smaller button text */
+    border-radius: 0.5rem;
   }
-
-  .product-quantity-control {
-    padding: 0.125rem;
-  }
-
-  .product-quantity-btn {
-    width: 1.75rem;
-    height: 1.75rem;
+  
+  .product-btn-icon {
+    width: 1rem;
+    height: 1rem;
   }
 }
 
-/* Tablet */
+/* 2. Tablet Optimization (768px and up) - Ensure standard look */
 @media (min-width: 768px) {
   .product-card {
     padding: 1.25rem;
@@ -558,7 +582,7 @@
 }
 
 /* =======================================================
-   CHECKOUT PAGE STYLES (From CheckoutPage.css)
+   CHECKOUT PAGE STYLES
    ======================================================= */
 
 /* Container and Layout */
@@ -999,7 +1023,7 @@
   transform: none;
 }
 
-/* Responsive Design */
+/* Responsive Design (Checkout) */
 @media (max-width: 768px) {
   .checkout-page {
     padding: 1rem 0.5rem;
@@ -1160,4 +1184,186 @@ textarea:focus-visible {
   .quantity-control {
     display: none;
   }
+}/* =======================================================
+   REVISED CSS (ProductCard.css & CheckoutPage styles)
+   ======================================================= */
+
+/* --- GENERAL CARD STRUCTURE --- */
+.product-card {
+  position: relative;
+  background-color: var(--bg-white);
+  border: 2px solid var(--border-light);
+  border-radius: 1rem;
+  padding: 0.75rem; /* Reduced padding */
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
+
+.product-card:hover {
+  border-color: var(--primary-yellow);
+  box-shadow: 0 10px 25px rgba(250, 204, 21, 0.15);
+  transform: translateY(-4px);
+}
+
+.product-card-animate {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* --- IMAGE SECTION --- */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: var(--bg-off-white);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem; /* Reduced margin */
+}
+/* ... (Image and Discount Badge styles remain the same) ... */
+
+/* Wishlist Button */
+.product-wishlist-btn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 2rem; /* Reduced size */
+  height: 2rem; /* Reduced size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-light); /* Reduced border */
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+.product-wishlist-icon {
+  width: 1rem; /* Reduced icon size */
+  height: 1rem;
+}
+/* ... (Wishlist hover/active states remain the same) ... */
+
+/* ----------------------------------------
+   PRODUCT DETAILS
+   ---------------------------------------- */
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem; /* Reduced gap */
+  flex-grow: 1;
+}
+
+.product-brand {
+  font-size: 0.7rem; /* Reduced font size */
+}
+
+.product-name {
+  font-size: 0.875rem; /* Reduced font size */
+  line-height: 1.2;
+  min-height: 2.2em; /* Ensure two lines (2 x 1.2) */
+}
+
+/* Variation Dropdown */
+.product-variation-select {
+  padding: 0.3rem 0.6rem; /* Reduced padding */
+  font-size: 0.8rem; /* Reduced font size */
+}
+
+.product-variation-spacer {
+  height: 1.8rem; /* Matches new select height */
+}
+
+/* Price Section */
+.product-price {
+  font-size: 1.1rem; /* Reduced font size */
+}
+
+.product-original-price {
+  font-size: 0.75rem; /* Reduced font size */
+}
+
+/* ----------------------------------------
+   ACTION BUTTONS
+   ---------------------------------------- */
+
+.product-actions {
+  display: flex;
+  gap: 0.4rem; /* Reduced gap */
+  margin-top: auto;
+  padding-top: 0.4rem; /* Reduced padding */
+}
+
+.product-cart-btn,
+.product-buy-btn {
+  padding: 0.5rem 0.6rem; /* Reduced padding */
+  font-size: 0.75rem; /* Reduced font size */
+  border-radius: 0.5rem; /* Reduced border radius */
+}
+
+.product-btn-icon {
+  width: 0.9rem; /* Reduced icon size */
+  height: 0.9rem;
+}
+
+/* =======================================================
+   RESPONSIVE DESIGN (Product Card Refinements)
+   ======================================================= */
+
+/* 1. Mobile Optimization (< 640px) - Base styles are now mobile-first. 
+      This block is mostly removed as the default styles handle the reduction. */
+@media (max-width: 640px) {
+  /* No overrides needed here since the default card size is already small */
+}
+
+/* 2. Tablet/Desktop Optimization (>= 768px) - Restore larger sizes for better screens */
+@media (min-width: 768px) {
+  .product-card {
+    padding: 1rem; 
+  }
+  .product-image-container {
+      margin-bottom: 1rem;
+  }
+  .product-wishlist-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  .product-wishlist-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .product-name {
+    font-size: 0.9375rem;
+    min-height: 2.6em;
+  }
+  .product-price {
+    font-size: 1.25rem;
+  }
+  .product-variation-select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  .product-variation-spacer {
+    height: 2.5rem;
+  }
+  .product-actions {
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+  }
+  .product-cart-btn, .product-buy-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  .product-btn-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+/* ... (Remaining Checkout Styles are omitted here for brevity, but you should keep them combined in your actual CSS file) ... */

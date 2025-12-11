@@ -1,0 +1,257 @@
+/* =======================================================
+   ProductDetailModal.css
+   ======================================================= */
+:root {
+  --primary-yellow: #facc15;
+  --primary-yellow-hover: #eab308;
+  --bg-white: #ffffff;
+  --bg-off-white: #f9fafb;
+  --border-light: #d1d5db;
+  --text-dark: #111827;
+  --text-light: #6b7280;
+  --error-red: #ef4444;
+}
+
+.product-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.product-modal-content {
+    background: var(--bg-white);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 800px;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-dark);
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+.modal-close-btn:hover {
+    background: var(--bg-off-white);
+}
+
+/* --- Modal Grid Layout --- */
+.modal-body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+/* --- Image and Zoom --- */
+.modal-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    cursor: crosshair;
+}
+
+.image-zoom-area {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.image-zoom-area .base-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+/* Zoom Effect: Use background image when zoomed */
+.image-zoom-area.zoomed .base-image {
+    opacity: 0;
+}
+
+.image-zoom-area.zoomed {
+    background-repeat: no-repeat;
+    background-size: 250% 250%; /* Zoom factor */
+    min-height: 350px;
+}
+
+
+/* --- Details Section --- */
+.modal-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal-product-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-dark);
+}
+
+.modal-product-brand {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+}
+
+.modal-discount-badge {
+    display: inline-block;
+    background: var(--error-red);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.modal-price-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.modal-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.modal-original-price {
+    font-size: 1rem;
+    color: var(--text-light);
+    text-decoration: line-through;
+}
+
+.modal-variation-select {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--bg-off-white);
+    border: 2px solid var(--border-light);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.modal-error-message {
+    color: var(--error-red);
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+}
+
+/* Action Buttons Bar */
+.modal-actions-bar {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-cart-btn, .modal-buy-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.modal-cart-btn {
+    background-color: var(--primary-yellow);
+    color: var(--text-dark);
+    border: none;
+}
+.modal-cart-btn:hover {
+    background-color: var(--primary-yellow-hover);
+}
+
+.modal-buy-btn {
+    background-color: var(--text-dark);
+    color: var(--primary-yellow);
+    border: 1px solid var(--text-dark);
+}
+.modal-buy-btn:hover {
+    background-color: transparent;
+    color: var(--text-dark);
+}
+
+.modal-wishlist-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-off-white);
+    border: 1px solid var(--border-light);
+    border-radius: 0.5rem;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-top: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.modal-wishlist-btn.wishlisted {
+    background: #fee2e2;
+    color: var(--error-red);
+    border-color: var(--error-red);
+}
+
+.modal-description {
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-top: 1rem;
+}
+
+/* --- Modal Responsive (Mobile) --- */
+@media (max-width: 640px) {
+    .product-modal-content {
+        padding: 1rem;
+        max-width: 95%;
+        width: 100%;
+    }
+
+    .modal-body-grid {
+        grid-template-columns: 1fr; /* Stack content vertically */
+        gap: 1rem;
+    }
+    
+    .modal-product-name {
+        font-size: 1.5rem;
+    }
+
+    .modal-price {
+        font-size: 1.5rem;
+    }
+
+    .image-zoom-area.zoomed {
+        min-height: 250px;
+    }
+
+    .modal-actions-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
