@@ -12,8 +12,7 @@ import {
 
 import AddressManager from "../Profile/AddressManager";
 
-
-// ============= CART ITEM ==================
+// ============= CART ITEM (No changes needed) ==================
 const CartItem = ({ item, onUpdateQuantity, onRemove, isProcessing }) => {
   const [localQty, setLocalQty] = useState(item.quantity);
 
@@ -57,7 +56,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isProcessing }) => {
 };
 
 
-// ============= ADDRESS MODAL ==================
+// ============= ADDRESS MODAL (No changes needed) ==================
 const AddressModal = ({ onClose }) => {
   return (
     <div className="address-overlay-modal">
@@ -71,6 +70,7 @@ const AddressModal = ({ onClose }) => {
 
         <div className="address-modal-body">
           <AddressManager />
+          {/* NOTE: AddressManager is assumed to handle address selection/loading */}
         </div>
       </div>
     </div>
@@ -80,7 +80,8 @@ const AddressModal = ({ onClose }) => {
 
 // ============= MAIN CART PAGE ==================
 const CartPage = () => {
-  const { cartItems, updateItemQuantity, removeFromCart, placeOrderFromCart } = useCart();
+  // All hooks must be called unconditionally at the top level
+  const { cartItems, updateItemQuantity, removeFromCart, placeOrderFromCart, placeOrderDirectly } = useCart();
   const { selectedAddress, loadAddresses } = useAddress();
 
   const navigate = useNavigate();
@@ -89,8 +90,28 @@ const CartPage = () => {
   const defaultAddress = selectedAddress || null;
 
 
+  // ⭐ FIX: Move useMemo calculation BEFORE the conditional return.
+  // This ensures the number of hooks is consistent across all renders.
+  const { subtotal, shipping, tax, total } = useMemo(() => {
+    const subtotal = cartItems.reduce((s, i) => {
+      const price = parseFloat(i.offer_price) || parseFloat(i.price) || 0;
+      return s + price * i.quantity;
+    }, 0);
+
+    const shipping = subtotal > 500 ? 0 : subtotal > 0 ? 40 : 0;
+    const tax = subtotal * 0.18;
+    // const total = subtotal + shipping + tax;
+      const total = subtotal + shipping ;
+
+
+    return { subtotal, shipping, tax, total };
+  }, [cartItems]);
+  // ============= END CART TOTALS =============
+
+
   // ============= QUANTITY UPDATE =============
   const handleQuantityUpdate = (item, qty) => {
+    // Assuming cart_item_id is the unique ID of the item in the cart, not product variant ID.
     if (!item.cart_item_id) return;
     updateItemQuantity(item.cart_item_id, qty);
   };
@@ -106,7 +127,7 @@ const CartPage = () => {
     }
 
     try {
-      // ⭐ FIXED: Send correct payload structure
+      // Ensure payload matches backend expectations (address_id is correct)
       const order = await placeOrderFromCart({
         address_id: defaultAddress.id
       });
@@ -114,12 +135,40 @@ const CartPage = () => {
       alert(`Order Placed! ID: ${order?.order_id}`);
       navigate("/orders");
     } catch (err) {
+      console.error("Order failed:", err);
       alert("Order failed.");
     }
   };
 
+//   const handlePlaceOrder = async () => {
+//     if (!defaultAddress) {
+//         // Still check if an address is selected, but this time to extract data
+//         setIsManagingAddresses(true);
+//         return;
+//     }
 
-  // ============= EMPTY CART UI =============
+//     try {
+//         // Construct the address data payload required for the direct order endpoint
+//         const addressDataPayload = {
+//             address: defaultAddress.address,
+//             pincode: defaultAddress.pincode,
+//             latitude: defaultAddress.latitude,
+//             longitude: defaultAddress.longitude,
+//         };
+        
+//         // Use the new context function
+//         const order = await placeOrderDirectly(addressDataPayload); 
+
+//         alert(`Order Placed! ID: ${order?.order_id}`);
+//         navigate("/orders");
+//     } catch (err) {
+//         console.error("Order failed:", err);
+//         alert(`Order failed: ${err.message || 'Unknown error'}`);
+//     }
+// };
+
+  // ============= EMPTY CART UI (Conditional Return) =============
+  // This MUST come after all hooks are called.
   if (!cartItems.length) {
     return (
       <div className="checkout-page">
@@ -133,21 +182,6 @@ const CartPage = () => {
       </div>
     );
   }
-
-
-  // ============= CART TOTALS =============
-  const { subtotal, shipping, tax, total } = useMemo(() => {
-    const subtotal = cartItems.reduce((s, i) => {
-      const price = parseFloat(i.offer_price) || parseFloat(i.price) || 0;
-      return s + price * i.quantity;
-    }, 0);
-
-    const shipping = subtotal > 500 ? 0 : subtotal > 0 ? 40 : 0;
-    const tax = subtotal * 0.18;
-    const total = subtotal + shipping + tax;
-
-    return { subtotal, shipping, tax, total };
-  }, [cartItems]);
 
 
   return (
@@ -217,13 +251,13 @@ const CartPage = () => {
 
             <div className="price-row">
               <span>Shipping</span>
-              <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
+              <span>{shipping === 0 ? "FREE" : `₹${shipping.toFixed(0)}`}</span>
             </div>
 
-            <div className="price-row">
+            {/* <div className="price-row">
               <span>GST (18%)</span>
               <span>₹{tax.toFixed(0)}</span>
-            </div>
+            </div> */}
 
             <div className="price-row total-row">
               <span>Total</span>
@@ -245,6 +279,7 @@ const CartPage = () => {
         <AddressModal
           onClose={() => {
             setIsManagingAddresses(false);
+            // Reload addresses after managing to update selectedAddress
             loadAddresses();
           }}
         />

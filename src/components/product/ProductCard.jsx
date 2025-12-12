@@ -1,4 +1,6 @@
 // src/components/ProductCard/ProductCard.js
+// Removed: import {fetchSubCategories} from "../../api/api";
+// This is not needed here
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Heart, ShoppingCart, Zap } from "lucide-react";
