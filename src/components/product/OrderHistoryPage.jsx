@@ -4,6 +4,9 @@ import { useAddress } from '../../context/AddressContext';
 import { ShoppingBag, Loader, AlertTriangle, Star, X } from 'lucide-react';
 import { getImageUrl } from '../../api/config';
 
+// -----------------------------------------------------------
+// 1. StarRating Component
+// -----------------------------------------------------------
 const StarRating = ({ value, onRate, disabled }) => {
     return (
         <div className="star-rating">
@@ -12,9 +15,11 @@ const StarRating = ({ value, onRate, disabled }) => {
                 return (
                     <Star
                         key={index}
-                        size={16}
+                        size={20} 
                         className={`star ${ratingValue <= value ? 'filled' : ''} ${disabled ? 'disabled' : ''}`}
                         onClick={() => !disabled && onRate(ratingValue)}
+                        fill={ratingValue <= value ? 'var(--color-primary, #ffd700)' : 'currentColor'}
+                        strokeWidth={0}
                     />
                 );
             })}
@@ -22,17 +27,29 @@ const StarRating = ({ value, onRate, disabled }) => {
     );
 };
 
-const ProductReviewModal = ({ product, orderId, userId, onClose, fetchOrders }) => {
-    const { addProductReview, updateProductReview, fetchProductReview } = useOrder();
+// -----------------------------------------------------------
+// 2. ProductReviewModal Component
+// -----------------------------------------------------------
+const ProductReviewModal = ({ product, onClose }) => { 
+    // Get all necessary functions from context
+    const { 
+        addProductReview, 
+        updateProductReview, 
+        fetchProductReview, 
+        fetchOrders 
+    } = useOrder(); 
 
     const [reviewId, setReviewId] = useState(null);
     const [initialLoading, setInitialLoading] = useState(true);
     const [rating, setRating] = useState(0);
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [alertMessage, setAlertMessage] = useState(null);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
     const isEditing = reviewId !== null;
 
+    // Load existing review on mount
     useEffect(() => {
         const loadReview = async () => {
             setInitialLoading(true);
@@ -46,47 +63,67 @@ const ProductReviewModal = ({ product, orderId, userId, onClose, fetchOrders }) 
                 }
             } catch (error) {
                 console.error("Failed to load existing review:", error);
+                // setAlertMessage("Could not load previous review data."); // Optional error message for load
             } finally {
                 setInitialLoading(false);
             }
         };
 
-        loadReview();
+        if (product.product_id) {
+            loadReview();
+        } else {
+             setInitialLoading(false);
+        }
+        
     }, [product.product_id, fetchProductReview]);
+
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
 
         if (rating === 0) {
-            alert("Please select a star rating.");
+            setAlertMessage("Please select a star rating.");
             return;
         }
 
         setIsSubmitting(true);
+        setAlertMessage(null);
+        setSubmitSuccess(false);
 
-        const data = { rating, description };
         let result;
 
         if (isEditing) {
-            result = await updateProductReview(reviewId, data);
+            // Payload for update
+            result = await updateProductReview(reviewId, { 
+                rating, 
+                description 
+            });
         } else {
-            // Include product_id in the data when adding a new review
+            // Payload for add (aligned with typical context function parameters)
             result = await addProductReview({ 
                 productId: product.product_id, 
-                product_id: product.product_id, // Make sure this is included
-                ...data 
+                review: rating,      
+                comment: description 
             });
         }
 
         if (result.success) {
-            alert(result.message);
+            setAlertMessage(result.message);
+            setSubmitSuccess(true);
+            
             if (result.review && !isEditing) {
                 setReviewId(result.review.id);
             }
-            if (fetchOrders) fetchOrders();
-            onClose();
+            
+            // ⭐️ IMPORTANT: Refresh the list of orders to update the 'Rate & Review' button status
+            if (fetchOrders) fetchOrders(); 
+            
+            // Close the modal after success
+            setTimeout(onClose, 1000); 
+            
         } else {
-            alert(`Action Failed: ${result.message}`);
+            setAlertMessage(`Action Failed: ${result.message}`);
+            setSubmitSuccess(false);
         }
         setIsSubmitting(false);
     };
@@ -94,21 +131,27 @@ const ProductReviewModal = ({ product, orderId, userId, onClose, fetchOrders }) 
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>
+                <button className="modal-close" onClick={onClose} disabled={isSubmitting}>
                     <X size={24} />
                 </button>
 
                 {initialLoading ? (
                     <div className="modal-loading">
                         <Loader size={24} className="spin" />
-                        <p>Loading review...</p>
+                        <p>Loading review status...</p>
                     </div>
                 ) : (
                     <form onSubmit={handleReviewSubmit}>
                         <h3 className="modal-title">{isEditing ? 'Update Your Review' : 'Rate & Review Product'}</h3>
+                        
+                        {alertMessage && (
+                            <div className={`alert-message ${submitSuccess ? 'success' : 'error'}`}>
+                                <AlertTriangle size={18} /> {alertMessage}
+                            </div>
+                        )}
 
                         <div className="modal-product-info">
-                            <p className="modal-product-name">{product.name}</p>
+                            <p className="modal-product-name">{product.name || product.product_name}</p>
                             <p className="modal-product-details">
                                 {product.color && `Color: ${product.color}`}
                                 {product.color && product.size && ' • '}
@@ -160,7 +203,10 @@ const ProductReviewModal = ({ product, orderId, userId, onClose, fetchOrders }) 
     );
 };
 
-const OrderItemCard = ({ product, userId, fetchOrders }) => {
+// -----------------------------------------------------------
+// 3. OrderItemCard Component
+// -----------------------------------------------------------
+const OrderItemCard = ({ product, userId }) => { 
     const [showReviewModal, setShowReviewModal] = useState(false);
 
     const formatDate = (dateString) => {
@@ -179,7 +225,6 @@ const OrderItemCard = ({ product, userId, fetchOrders }) => {
     const getStatusText = (status) => {
         const statusMap = {
             'delivered': 'Delivered',
-
             'shipped': 'Shipped',
             'processing': 'Processing',
             'pending': 'Pending',
@@ -198,7 +243,7 @@ const OrderItemCard = ({ product, userId, fetchOrders }) => {
         };
         return messageMap[status?.toLowerCase()] || 'Your order is being processed';
     };
-
+    
     return (
         <div className="order-item-wrapper">
             <div className="order-item-card">
@@ -243,6 +288,8 @@ const OrderItemCard = ({ product, userId, fetchOrders }) => {
                         </span>
                     </div>
                     <p className="status-message">{getStatusMessage(product.status)}</p>
+                    
+                    {/* Only show Review button if delivered */}
                     {product.status?.toLowerCase() === 'delivered' && (
                         <button
                             className="rate-review-btn"
@@ -258,20 +305,21 @@ const OrderItemCard = ({ product, userId, fetchOrders }) => {
             {showReviewModal && (
                 <ProductReviewModal
                     product={product}
-                    orderId={product.orderId}
-                    userId={userId}
                     onClose={() => setShowReviewModal(false)}
-                    fetchOrders={fetchOrders}
                 />
             )}
         </div>
     );
 };
 
+// -----------------------------------------------------------
+// 4. OrderHistoryPage Component (The main parent view)
+// -----------------------------------------------------------
 const OrderHistoryPage = ({ userId }) => {
+    // ⭐️ Retrieve data and fetchOrders function from context
     const { orders, loading, error, fetchOrders } = useOrder();
 
-    const flattenedOrders = orders.flatMap((order) => {
+    const flattenedOrders = orders?.flatMap((order) => {
         const orderItems = order.items || order.products || order.order_items || [];
         return orderItems.map((item) => ({
             ...item,
@@ -283,8 +331,9 @@ const OrderHistoryPage = ({ userId }) => {
             image: item.image || item.product_image || item.image_url,
             product_id: item.product_id || item.id
         }));
-    });
+    }) || [];
 
+    // --- Custom Styles (Inlined for completeness, but recommended to be external CSS) ---
     const customStyles = `
         * {
             box-sizing: border-box;
@@ -305,6 +354,22 @@ const OrderHistoryPage = ({ userId }) => {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             margin-top: 20px;
             margin-bottom: 40px;
+            padding-bottom: 40px; /* Added padding for bottom spacing */
+        }
+
+        /* Subtle divider line between list & top header */
+        .order-history-container::before {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, #ffd700, transparent);
+            margin-bottom: 18px;
+            border-radius: 6px;
+        }
+
+        .order-item-wrapper {
+            margin-bottom: 22px;
         }
 
         .order-item-card {
@@ -312,14 +377,19 @@ const OrderHistoryPage = ({ userId }) => {
             align-items: center;
             padding: 24px;
             background: #ffffff;
-            border-bottom: 1px solid #f0f0f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transition: all 0.35s ease;
             animation: fadeIn 0.5s ease-out;
             margin-bottom: 0;
         }
-
-        .order-item-card:last-child {
-            border-bottom: none;
+        
+        .order-item-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+            background: #fffef5;
+            border-color: #ffd700;
         }
 
         @keyframes fadeIn {
@@ -331,12 +401,6 @@ const OrderHistoryPage = ({ userId }) => {
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .order-item-card:hover {
-            background: #f9f9f9;
-            transform: translateX(8px);
-            box-shadow: -8px 0 0 #ffd700;
         }
 
         .product-image-name-container {
@@ -362,6 +426,7 @@ const OrderHistoryPage = ({ userId }) => {
         .order-item-card:hover .order-item-image {
             border-color: #ffd700;
             transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
         }
 
         .order-item-image img {
@@ -463,7 +528,7 @@ const OrderHistoryPage = ({ userId }) => {
             box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
         }
 
-        .status-dot[data-status="processing"] {
+        .status-dot[data-status="processing"], .status-dot[data-status="pending"] {
             background-color: #666666;
             animation: spin 1s linear infinite;
         }
@@ -473,12 +538,8 @@ const OrderHistoryPage = ({ userId }) => {
             to { transform: rotate(360deg); }
         }
 
-        .status-dot[data-status="pending"] {
-            background-color: #999999;
-        }
-
         .status-dot[data-status="cancelled"] {
-            background-color: #000000;
+            background-color: #ff3333;
         }
 
         .status-text {
@@ -524,6 +585,7 @@ const OrderHistoryPage = ({ userId }) => {
             color: #000000;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            animation: none;
         }
 
         .rate-review-btn svg {
@@ -531,6 +593,7 @@ const OrderHistoryPage = ({ userId }) => {
             color: #000000;
         }
 
+        /* --- Modal Styles --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -683,7 +746,7 @@ const OrderHistoryPage = ({ userId }) => {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .star:hover {
+        .star:hover:not(.disabled) {
             transform: scale(1.2);
             color: #ffd700 !important;
         }
@@ -694,10 +757,7 @@ const OrderHistoryPage = ({ userId }) => {
 
         .star.disabled {
             cursor: not-allowed;
-        }
-
-        .star.disabled:hover {
-            transform: none;
+            opacity: 0.7;
         }
 
         .modal-actions {
@@ -789,7 +849,34 @@ const OrderHistoryPage = ({ userId }) => {
             color: #666666;
             margin: 0 0 32px 0;
         }
+        
+        /* Alert Message inside Modal */
+        .alert-message {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .alert-message.error {
+            background-color: #ffebeb;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+        }
+        .alert-message.success {
+            background-color: #ebfff0;
+            border: 1px solid #00c853;
+            color: #00c853;
+        }
+        .alert-message svg {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
 
+
+        /* --- Media Queries --- */
         @media (max-width: 768px) {
             .order-item-card {
                 flex-wrap: wrap;
@@ -847,54 +934,9 @@ const OrderHistoryPage = ({ userId }) => {
                 justify-content: center;
             }
         }
-            /* ============================================
-   NEW UI ENHANCEMENTS (Safe to add anywhere below)
-   ============================================ */
-
-/* Add clean spacing between product list items */
-.order-item-wrapper {
-    margin-bottom: 22px;
-}
-
-/* Wrap each card inside a wrapper (non-breaking enhancement) */
-.order-item-wrapper .order-item-card {
-    border-radius: 14px;
-    background: #ffffff;
-    border: 1px solid rgba(255, 215, 0, 0.25);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    transition: all 0.35s ease;
-}
-
-/* Enhanced hover effect */
-.order-item-wrapper .order-item-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 22px rgba(0,0,0,0.12);
-    background: #fffef5;
-}
-
-/* Slight shadow glow on product image */
-.order-item-wrapper .order-item-card:hover .order-item-image {
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
-}
-
-/* Add bottom spacing for the full container */
-.order-history-container {
-    padding-bottom: 40px;
-}
-
-/* Subtle divider line between list & top header */
-.order-history-container::before {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 6px;
-    background: linear-gradient(to right, #ffd700, transparent);
-    margin-bottom: 18px;
-    border-radius: 6px;
-}
-
     `;
 
+    // --- Loading State ---
     if (loading) {
         return (
             <div className="order-history-page">
@@ -910,6 +952,7 @@ const OrderHistoryPage = ({ userId }) => {
         );
     }
 
+    // --- Error State ---
     if (error) {
         return (
             <div className="order-history-page">
@@ -919,12 +962,14 @@ const OrderHistoryPage = ({ userId }) => {
                         <AlertTriangle size={48} className="icon" />
                         <h2>An Error Occurred</h2>
                         <p>{error}</p>
+                         <button className="btn-yellow-outline" onClick={fetchOrders}>Try Again</button>
                     </div>
                 </div>
             </div>
         );
     }
 
+    // --- Empty State ---
     if (flattenedOrders.length === 0) {
         return (
             <div className="order-history-page">
@@ -934,22 +979,24 @@ const OrderHistoryPage = ({ userId }) => {
                         <ShoppingBag size={48} className="icon" />
                         <h2>No Orders Yet</h2>
                         <p>Looks like you haven't placed any orders.</p>
+                        <button className="btn-yellow-outline" onClick={fetchOrders}>Try Again</button>
                     </div>
                 </div>
             </div>
         );
     }
 
+    // --- Main Render (Showing Orders) ---
     return (
         <div className="order-history-page">
             <style>{customStyles}</style>
             <div className="order-history-container">
                 {flattenedOrders.map((product, index) => (
                     <OrderItemCard
-                        key={`${product.orderId}-${product.id || index}`}
+                        key={`${product.orderId}-${product.product_id || index}`}
                         product={product}
                         userId={userId}
-                        fetchOrders={fetchOrders}
+                        // fetchOrders is NOT drilled here, it's accessed by ProductReviewModal via context
                     />
                 ))}
             </div>
@@ -957,9 +1004,15 @@ const OrderHistoryPage = ({ userId }) => {
     );
 };
 
+// -----------------------------------------------------------
+// 5. OrderHistoryWrapper
+// -----------------------------------------------------------
 const OrderHistoryWrapper = () => {
+    // Mock for useAddress if it's not defined/available in this scope
     const mockUseAddress = () => ({ userId: localStorage.getItem("userId") || 4 });
-    const userId = (useAddress || mockUseAddress)().userId;
+    
+    // Fallback logic to determine userId
+    const userId = (useAddress ? useAddress() : mockUseAddress()).userId;
 
     return (
         <OrderProvider userId={userId}>

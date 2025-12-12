@@ -1,12 +1,14 @@
 // Example: src/services/api/searchService.js
 
 // Import constants from your configuration file
-import { API_BASE_URL, ECOM_API_PATH, COMMON_HEADERS } from "../config"; 
+import { API_BASE_URL, ECOM_API_PATH, COMMON_HEADERS } from "./config"; 
 
 // --- SEARCH API FUNCTION ---
-export const fetchProductsBySearch = async (query, lat, lon) => {
+export const fetchProductsBySearch = async (query) => {
     // Construct the full search endpoint using the defined constants
-    const searchPath = `/products/search?query=${encodeURIComponent(query)}&lat=${lat}&lon=${lon}`;
+    const lat = localStorage.getItem("latitude") || "0";
+    const lon = localStorage.getItem("longitude") || "0";
+    const searchPath = `/products/search?query=${query}&lat=${lat}&lon=${lon}`;
     
     const url = `${API_BASE_URL}${ECOM_API_PATH}${searchPath}`;
     

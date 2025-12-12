@@ -4,6 +4,7 @@ import { Search, User, ShoppingCart, LogOut, Heart, ChevronDown, Menu, X, } from
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { fetchProductsBySearch } from "../../api/searchService";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 const Header = ({ searchTerm = "", setSearchTerm = () => {} }) => {
@@ -31,15 +32,40 @@ const Header = ({ searchTerm = "", setSearchTerm = () => {} }) => {
         cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
     /** ---------- WISHLIST COUNT ---------- */
     const wishlistCount = Array.isArray(wishlist) ? wishlist.length : 0;
-    const handleSearch = useCallback(() => {
-        const trimmedQuery = searchTerm.trim();
-        if (trimmedQuery) {
-            const searchUrl = `/search/?query=${encodeURIComponent(trimmedQuery)}&lat=${STATIC_LATITUDE}&lon=${STATIC_LONGITUDE}`;            
-            setSearchTerm(encodeURIComponent); // Optional: Clear search input after navigation
-        }
-    }, [searchTerm, navigate]);
-    // Handles 'Enter' key press in the search inputs
-    const handleKeyPress = useCallback((e) => {
+const handleSearch = useCallback(async () => {
+    const trimmedQuery = searchTerm.trim();
+
+    if (!trimmedQuery) {
+        console.log("Search term is empty. Skipping search.");
+        return;
+    }
+
+    const encodedQuery = encodeURIComponent(trimmedQuery);
+    const searchUrl = `/search/?query=${encodedQuery}&lat=${STATIC_LATITUDE}&lon=${STATIC_LONGITUDE}`;            
+    
+    try {
+        // 🚨 THIS IS WHERE YOUR API FUNCTION IS CALLED! 🚨
+        const searchResults = await fetchProductsBySearch( 
+            encodedQuery, 
+            STATIC_LATITUDE, 
+            STATIC_LONGITUDE
+        );
+        console.log(`Successfully fetched ${searchResults.length} search results. Navigating...`);
+
+        // Navigation occurs AFTER the successful (or failed) API call
+        navigate(searchUrl);
+        setSearchTerm(""); 
+        
+    } catch (error) {
+        console.error("Search API failed but navigating to search results page anyway:", error.message);
+        // Navigation still happens so the search results page can display the error.
+        navigate(searchUrl);
+        setSearchTerm("");
+    }
+
+}, [searchTerm, navigate, setSearchTerm]);    // Handles 'Enter' key press in the search inputs
+    
+const handleKeyPress = useCallback((e) => {
         if (e.key === 'Enter') {
             handleSearch();
         }

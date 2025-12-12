@@ -13,7 +13,7 @@ const getAuthHeader = () => {
 
 export const orderApi = {
     // GET: Fetch all orders for a user
-    fetchOrders: async (userId) => {
+    fetchOrders: async () => {
         try {
             const response = await axios.get(
                 `${BASE_URL_ORDER}/user-orders/?user_id=${userId}`,
@@ -24,7 +24,7 @@ export const orderApi = {
 
             // ⭐ UNIVERSAL NORMALIZER (supports all backend variations)
             const possibleKeys = [
-                "orders", "order", "results", "data", "order_list", 
+                "orders", "order", "results", "data", "order_list",
                 "orders_list", "user_orders",
             ];
 
@@ -78,18 +78,18 @@ export const orderApi = {
      */
     addReview: async ({ productId, review, comment }) => {
         try {
-            const payload = { 
-                product_id: productId, 
-                rating: review, 
-                comment: comment 
+            const payload = {
+                product_id: productId,
+                rating: review,
+                comment: comment
             };
-            
+
             const response = await axios.post(
                 `${BASE_URL_ORDER}/reviews/add/`,
                 payload,
                 getAuthHeader()
             );
-            
+
 
             return response.data;
         } catch (error) {
@@ -105,9 +105,9 @@ export const orderApi = {
                 `${BASE_URL_ORDER}/reviews/${productId}/`,
                 getAuthHeader()
             );
-            
+
             const data = response.data;
-           
+
 
             // Assuming the backend returns an array of reviews (usually just one for the current user/product combo)
             if (Array.isArray(data) && data.length > 0) {
@@ -123,7 +123,7 @@ export const orderApi = {
     // ⭐️ PUT: Update an existing review ⭐️
     updateReview: async (reviewId, { rating, description }) => {
         try {
-            
+
             const payload = {
                 rating: rating,
                 comment: description

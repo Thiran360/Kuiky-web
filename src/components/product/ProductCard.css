@@ -713,3 +713,4 @@ Example usage in your page component:
         grid-template-columns: repeat(5, 1fr); /* Large: 5 cards */
     }
 }
+
