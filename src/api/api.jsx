@@ -9,10 +9,7 @@ const api = axios.create({
   baseURL: `${API_BASE_URL}${ECOM_API_PATH}`,
   headers: COMMON_HEADERS,
 });
-
-// Helper retrieves token
 const getAccessToken = () => localStorage.getItem("accessToken");
-
 // ===========================
 // 🔐 SAVE TOKEN + SYNC AXIOS
 // ===========================
@@ -62,9 +59,33 @@ export const fetchCategories = async () => {
   }
 };
 
-export const fetchSubCategories = async () => {
+/**
+ * Fetches subcategories with optional filtering based on the provided API structure.
+ * * Query Params Supported:
+ * 1. category_id: Filters subcategories belonging to a specific category.
+ * 2. parent_subcategory_id: Filters by parent ID. Use the string 'null' for top-level subcategories.
+ * * @param {number|string} [categoryId] - Filters subcategories by this category ID.
+ * @param {number|string|'null'} [parentSubcategoryId] - Filters by parent ID. Use the string 'null' for top-level subcategories.
+ * @returns {Promise<Array>} List of subcategories.
+ */
+export const fetchSubCategories = async (categoryId, parentSubcategoryId) => {
   try {
-    const res = await api.get("/subcategories/");
+    const params = {};
+
+    // 1. Handle category_id (Optional)
+    // Add only if explicitly provided (not undefined and not null)
+    if (categoryId !== undefined && categoryId !== null) {
+      params.category_id = categoryId;
+    }
+
+    // 2. Handle parent_subcategory_id (Optional, accepts 'null' string)
+    // Add only if explicitly provided (not undefined)
+    if (parentSubcategoryId !== undefined) {
+      params.parent_subcategory_id = parentSubcategoryId;
+    }
+
+    // Axios will automatically serialize the 'params' object into the correct query string
+    const res = await api.get("/subcategories/", { params });
     return res.data;
   } catch {
     return [];
@@ -137,12 +158,70 @@ export const cartService = {
   orderFromCart: async (orderData) => {
     try {
       const res = await api.post("/order-from-cart/", orderData);
+      // const res = await api.post("/place-order-directt/", orderData);
+
       return res.data;
     } catch (error) {
       if (error.response?.status === 401) {
         throw { message: "Unauthorized. Please log in again.", status: 401 };
       }
       throw error.response?.data || new Error("Order Submission Failed");
+    }
+  },
+
+  // RENAMED for clarity to match the direct order endpoint
+orderDirectly: async (orderData) => { 
+    try {
+        // USE THE NEW DIRECT ORDER ENDPOINT
+        const res = await api.post("/place-order-directt/", orderData); 
+
+        return res.data;
+    } catch (error) {
+        if (error.response?.status === 401) {
+            throw { message: "Unauthorized. Please log in again.", status: 401 };
+        }
+        throw error.response?.data || new Error("Direct Order Submission Failed");
+    }
+},
+
+/**
+   * Fetches a list of products, optionally filtered by category or search term.
+   * @param {Object} filters - An object containing filtering parameters.
+   * @param {number} [filters.categoryId] - ID of the category/subcategory to filter by.
+   * @param {string} [filters.search] - Search term for products.
+   * @returns {Promise<Array>} A list of products.
+   */
+  fetchProducts: async ({ categoryId, search, page = 1, pageSize = 20 }) => {
+    let url = "/products/"; // Assuming this is your base product endpoint
+    const params = new URLSearchParams();
+
+    if (categoryId) {
+      params.append("category_id", categoryId);
+    }
+
+    if (search) {
+      params.append("search", search);
+    }
+
+    if (page) {
+        params.append("page", page);
+    }
+
+    if (pageSize) {
+        params.append("page_size", pageSize);
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    try {
+      const res = await api.get(url);
+      // Assuming your product list is in res.data or res.data.results
+      return Array.isArray(res.data) ? res.data : res.data.results || []; 
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+      throw error;
     }
   },
 };

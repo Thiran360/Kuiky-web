@@ -7,7 +7,8 @@ import React, {
     useMemo,
 } from "react";
 
-import { cartService } from "../api/api";
+// 1. IMPORT fetchSubCategories here
+import { cartService, fetchSubCategories } from "../api/api";
 import { useUser } from "./UserContext";
 
 const CartContext = createContext();
@@ -19,6 +20,9 @@ export const CartProvider = ({ children }) => {
 
     const [cartItems, setCartItems] = useState([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
+
+    // 2. NEW STATE for Subcategories
+    const [subcategories, setSubcategories] = useState([]);
 
     // 🔒 Always treat cartItems as an array
     const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
@@ -35,7 +39,7 @@ export const CartProvider = ({ children }) => {
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
 
-    // --- AUTHENTICATED API HANDLERS ---
+    // --- AUTHENTICATED API HANDLERS (CART) ---
 
     /** Fetches current user's cart from backend and updates state. */
     const refreshCart = async () => {
@@ -55,11 +59,9 @@ export const CartProvider = ({ children }) => {
             } else if (Array.isArray(data.results)) {
                 items = data.results;
             }
-            // ⭐ ADDED CHECK: Handle the API response structure where items are inside 'cart'
             else if (Array.isArray(data.cart)) {
                 items = data.cart;
             }
-            // The final fallback if the cart array structure is completely unexpected
             else {
                 console.warn("Unexpected cart API shape, using empty array:", data);
                 items = [];
@@ -70,7 +72,6 @@ export const CartProvider = ({ children }) => {
             return items;
         } catch (error) {
             console.error("Failed to fetch cart:", error);
-            // Do NOT change cartItems here, just propagate the error
             throw error;
         }
     };
@@ -81,7 +82,7 @@ export const CartProvider = ({ children }) => {
             throw { message: "Authentication Required", status: 401 };
         }
         try {
-            await cartService.clearCart?.(); // only if you implemented clearCart in api
+            await cartService.clearCart?.();
             await refreshCart();
         } catch (error) {
             console.error("Failed to clear cart:", error);
@@ -89,7 +90,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    /** Adds/updates/removes an item via the API. */
+    /** Adds/updates an item via the API. */
     const addItemToCart = async (productVariantId, quantity = 1) => {
         if (!isAuthenticated) {
             throw { message: "Authentication Required", status: 401 };
@@ -108,19 +109,14 @@ export const CartProvider = ({ children }) => {
     };
 
     /** Submits an order from the current cart. */
-    // ⭐️ NEW FUNCTION: placeOrderFromCart
     const placeOrderFromCart = async (orderData) => {
         if (!isAuthenticated) {
             throw { message: "Authentication Required", status: 401 };
         }
 
         try {
-            // Call the new API service function
             const response = await cartService.orderFromCart(orderData);
-
-            // The API typically clears the cart on successful order, so refresh the cart state
             await refreshCart();
-
             console.log("Order placed successfully:", response);
             return response;
         } catch (error) {
@@ -129,21 +125,41 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const placeOrderDirectly = async (addressData) => {
 
-    // Initial load + re-fetch on auth change
-    useEffect(() => {
-        if (isAuthenticated) {
-            refreshCart();
-        } else {
-            setCartItems([]);
+        const userId = JSON.parse(localStorage.getItem("user_id"));
+        if (!isAuthenticated) {
+            throw { message: "Authentication Required", status: 401 };
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated]);
 
-    /** Updates item quantity by variant ID */
-    // const updateItemQuantity = async (cartId, newQuantity) => {
-    //  return updateToCart(cartId, newQuantity);
-    // };
+        // 1. Construct the 'items' array from the current cart state
+        const itemsPayload = currentCart.items.map(cartItem => ({
+            // Map cart item structure to the required product_variation and quantity
+            product_variation: cartItem.product_variation_id, // Adjust field names as per your cart state
+            quantity: cartItem.quantity
+        }));
+
+        // 2. Build the full payload structure
+        const fullOrderPayload = {
+            user_id: userId, // You should derive this from the authenticated user, not hardcode
+            items: itemsPayload,
+            address: addressData.address,
+            pincode: addressData.pincode,
+            latitude: addressData.latitude,
+            longitude: addressData.longitude,
+        };
+
+        try {
+            // Call the new service function with the full payload
+            const response = await cartService.orderDirectly(fullOrderPayload);
+            await refreshCart();
+            console.log("Order placed successfully:", response);
+            return response;
+        } catch (error) {
+            console.error("Failed to place direct order:", error);
+            throw error;
+        }
+    };
 
     /** Updates item quantity by cart item ID */
     const updateItemQuantity = async (cartId, newQuantity) => {
@@ -151,14 +167,12 @@ export const CartProvider = ({ children }) => {
             throw { message: "Authentication Required", status: 401 };
         }
 
-        // ⭐️ FIX 1: DEFENSIVE CHECK 
         if (!cartId) {
             console.error(
                 "updateItemQuantity failed: cartId is undefined. \nEnsure the item object passed from the component has a valid 'id' property (the cart item ID)."
             );
             throw new Error("Cannot update cart item: ID is missing.");
         }
-        // Optional check for quantity
         if (typeof newQuantity !== 'number' || newQuantity < 1) {
             console.error("updateItemQuantity failed: Invalid quantity provided.", { cartId, newQuantity });
             throw new Error("Cannot update cart item: Invalid quantity.");
@@ -185,7 +199,6 @@ export const CartProvider = ({ children }) => {
         try {
             await cartService.deleteCartItem(cartId);
             await refreshCart();
-            // ⭐️ FIXED: Changed console.log to remove reference to undefined 'quantity' variable
             console.log(`Item with Cart ID ${cartId} removed successfully.`);
         } catch (error) {
             console.error("Failed to remove item from cart:", error);
@@ -193,11 +206,39 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // --- CATALOG API HANDLER (SUBCATEGORIES) ---
 
+    /** 3. Fetches subcategories with optional filtering. */
+    const fetchCatalogSubcategories = async (categoryId, parentSubcategoryId) => {
+        try {
+            const data = await fetchSubCategories(categoryId, parentSubcategoryId);
+
+            // Optionally update the general state if no filters are used
+            if (categoryId === undefined && parentSubcategoryId === undefined) {
+                setSubcategories(data || []);
+            }
+
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch subcategories:", error);
+            // Don't throw, just return empty array for component safety
+            return [];
+        }
+    };
+
+
+    // Initial cart load + re-fetch on auth change
+    useEffect(() => {
+        if (isAuthenticated) {
+            refreshCart();
+        } else {
+            setCartItems([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated]);
 
     /** Finds item in cart (by product or variant id) */
     const findItemInCart = (productId, variantId = null) => {
-        // FIX: Also check for the 'variation_id' property used by your API response
         return safeCartItems.find(
             (item) =>
                 item.variation_id === productId ||
@@ -215,15 +256,19 @@ export const CartProvider = ({ children }) => {
             removeFromCart,
             refreshCart,
             clearCart,
-            // ⭐️ NEW: Export the new function
             placeOrderFromCart,
             findItemInCart,
             totalItems,
             isCartOpen,
             openCart,
             closeCart,
+            placeOrderDirectly,
+
+            // 4. NEW: Export the subcategory state and fetcher
+            subcategories,
+            fetchCatalogSubcategories,
         }),
-        [safeCartItems, totalItems, isCartOpen]
+        [safeCartItems, totalItems, isCartOpen, subcategories]
     );
 
     return (
