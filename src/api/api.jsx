@@ -186,6 +186,47 @@ orderDirectly: async (orderData) => {
         throw error.response?.data || new Error("Direct Order Submission Failed");
     }
 },
+
+/**
+   * Fetches a list of products, optionally filtered by category or search term.
+   * @param {Object} filters - An object containing filtering parameters.
+   * @param {number} [filters.categoryId] - ID of the category/subcategory to filter by.
+   * @param {string} [filters.search] - Search term for products.
+   * @returns {Promise<Array>} A list of products.
+   */
+  fetchProducts: async ({ categoryId, search, page = 1, pageSize = 20 }) => {
+    let url = "/products/"; // Assuming this is your base product endpoint
+    const params = new URLSearchParams();
+
+    if (categoryId) {
+      params.append("category_id", categoryId);
+    }
+
+    if (search) {
+      params.append("search", search);
+    }
+
+    if (page) {
+        params.append("page", page);
+    }
+
+    if (pageSize) {
+        params.append("page_size", pageSize);
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    try {
+      const res = await api.get(url);
+      // Assuming your product list is in res.data or res.data.results
+      return Array.isArray(res.data) ? res.data : res.data.results || []; 
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
