@@ -1,13 +1,12 @@
 // src/components/ProductCard/ProductCard.js
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Heart, ShoppingCart, Zap, X } from "lucide-react";
+import { Heart, ShoppingCart, Zap, Check } from "lucide-react"; // Import Check icon
 import { getImageUrl } from "../../api/config";
 import "./ProductCard.css";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
-import ProductDetailModal from "./ProductDetailModal"; 
 
 const ProductCard = ({ product }) => {
     // --- HOOKS ---
@@ -24,23 +23,31 @@ const ProductCard = ({ product }) => {
     const [isTogglingWishlist, setIsTogglingWishlist] = useState(false); 
     const [error, setError] = useState(null);
     
-    // NEW STATE for modal control
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    // NOTE: Removed isAddedOnce state as the status will be derived from the cart.
 
     // Update selected variant if product changes
     useEffect(() => {
         setSelectedVariant(hasVariations ? product.variations[0] : null);
     }, [product, hasVariations]);
 
-    // Derive wishlisted status from context for display logic
+    const getVariantId = useCallback(() => selectedVariant?.id || null, [selectedVariant]);
+
+    // --- CART STATUS & PRICE CALCULATION ---
+    
+    // 1. Calculate persistent cart status based on selected variant
+    const isInCart = useMemo(() => {
+        const productVariantId = getVariantId();
+        // Check if the currently selected variant exists in the cart with quantity > 0
+        return !!findItemInCart(product.id, productVariantId);
+    }, [product.id, getVariantId, findItemInCart]);
+
+    // 2. Derive wishlisted status
     const isWishlistedStatus = useMemo(() => isProductWishlisted(product.id), [
         isProductWishlisted,
         product.id,
     ]);
 
-    const getVariantId = useCallback(() => selectedVariant?.id || null, [selectedVariant]);
-
-    // --- PRICE CALCULATION (Unchanged) ---
+    // 3. Price calculation (unchanged)
     const { displayPrice, originalPrice, discountPercent } = useMemo(() => {
         const dPrice = selectedVariant
             ? parseFloat(selectedVariant.offer_price)
@@ -66,9 +73,13 @@ const ProductCard = ({ product }) => {
     // --- HANDLERS ---
 
     const handleCardClick = useCallback(() => {
-        // OPEN MODAL instead of navigating directly to product page
-        setIsModalOpen(true); 
-    }, []);
+        navigate(`/product/${product.id}`, { 
+            state: { 
+                product,
+                selectedVariant 
+            } 
+        });
+    }, [navigate, product, selectedVariant]);
 
     const handleVariationChange = useCallback(
         (e) => {
@@ -105,6 +116,7 @@ const ProductCard = ({ product }) => {
                 setError("Please select a variant");
                 return;
             }
+            if (isInCart) return; // Prevent adding if already in cart
 
             setIsAddingToCart(true);
             setError(null);
@@ -112,10 +124,12 @@ const ProductCard = ({ product }) => {
             try {
                 const productVariantId = getVariantId();
                 const existingItem = findItemInCart(product.id, productVariantId);
+                // If it's in the cart, increment. If not (or quantity is 0), add 1.
                 const currentQty = existingItem ? existingItem.quantity : 0;
                 const nextQty = currentQty + 1;
 
                 await addItemToCart(productVariantId, nextQty);
+                // isInCart will automatically update due to useMemo
                 
             } catch (error) {
                 console.error("addItemToCart error:", error);
@@ -124,7 +138,7 @@ const ProductCard = ({ product }) => {
                 setTimeout(() => setIsAddingToCart(false), 500); 
             }
         },
-        [addItemToCart, hasVariations, findItemInCart, product.id, getVariantId, selectedVariant]
+        [addItemToCart, hasVariations, findItemInCart, product.id, getVariantId, selectedVariant, isInCart]
     );
 
     const handleBuyNow = useCallback(
@@ -172,131 +186,115 @@ const ProductCard = ({ product }) => {
         [product.id, selectedVariant, navigate, addItemToCart, hasVariations, findItemInCart, getVariantId]
     );
 
+    // Determine the button state and content using the persistent status (isInCart)
+    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add");
+    const cartIcon = isInCart ? Check : ShoppingCart;
+    const isDisabled = isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist || isInCart;
+    // Use 'added-once' class for the permanent "Added" visual state
+    const buttonClass = `product-cart-btn ${isAddingToCart ? "adding" : ""} ${isInCart ? "added-once" : ""}`;
+
+
     // --- RENDER ---
     return (
-        <>
-            <div className="product-card product-card-animate" onClick={handleCardClick}>
-                {/* Discount Badge */}
-                {discountPercent > 0 && (
-                    <div className="product-discount-badge">{discountPercent}% OFF</div>
-                )}
+        <div className="product-card product-card-animate" onClick={handleCardClick}>
+            {/* Discount Badge */}
+            {discountPercent > 0 && (
+                <div className="product-discount-badge">{discountPercent}% OFF</div>
+            )}
 
-                {/* Image Section */}
-                <div className="product-image-container">
-                    <img
-                        src={getImageUrl(product.image || product.image_url)}
-                        alt={product.name}
-                        className="product-image"
-                        loading="lazy"
-                        onError={(e) => {
-                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                        }}
+            {/* Image Section */}
+            <div className="product-image-container">
+                <img
+                    src={getImageUrl(product.image || product.image_url)}
+                    alt={product.name}
+                    className="product-image"
+                    loading="lazy"
+                    onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                    }}
+                />
+
+                {/* Wishlist Button */}
+                <button
+                    className={`product-wishlist-btn ${isWishlistedStatus ? "wishlisted" : ""}`}
+                    onClick={handleWishlistClick}
+                    disabled={isTogglingWishlist} 
+                    aria-label={isWishlistedStatus ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                    <Heart
+                        className="product-wishlist-icon"
+                        fill={isWishlistedStatus ? "currentColor" : "none"}
                     />
-
-                    {/* Wishlist Button */}
-                    <button
-                        className={`product-wishlist-btn ${isWishlistedStatus ? "wishlisted" : ""}`}
-                        onClick={handleWishlistClick}
-                        disabled={isTogglingWishlist} 
-                        aria-label={isWishlistedStatus ? "Remove from wishlist" : "Add to wishlist"}
-                    >
-                        <Heart
-                            className="product-wishlist-icon"
-                            fill={isWishlistedStatus ? "currentColor" : "none"}
-                        />
-                    </button>
-                </div>
-
-                {/* Details Section */}
-                <div className="product-details">
-                    <div className="product-brand">
-                        {product.brand && product.brand !== "null" ? product.brand : "Fresh"}
-                    </div>
-
-                    <h3 className="product-name">{product.name}</h3>
-
-                    {/* Variation Dropdown */}
-                    {hasVariations ? (
-                        <select
-                            className="product-variation-select"
-                            onChange={handleVariationChange}
-                            value={selectedVariant?.id}
-                            disabled={isAddingToCart || isTogglingWishlist}
-                            aria-label="Select variant"
-                            onClick={(e) => e.stopPropagation()} 
-                        >
-                            {product.variations.map((v) => (
-                                <option key={v.id} value={v.id}>
-                                    {v.value} - ₹{parseFloat(v.offer_price).toFixed(0)}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <div className="product-variation-spacer"></div>
-                    )}
-
-                    {/* Error Message */}
-                    {error && <div className="product-error-message">{error}</div>}
-
-                    {/* Price Section */}
-                    <div className="product-price-container">
-                        <span className="product-price">
-                            ₹{displayPrice}
-                        </span>
-                        {originalPrice > displayPrice && (
-                            <span className="product-original-price">
-                                ₹{originalPrice}
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Action Buttons - ALWAYS SHOW ADD & BUY */}
-                    <div className="product-actions">
-                        <button
-                            className={`product-cart-btn ${isAddingToCart ? "adding" : ""}`}
-                            onClick={handleAddToCart}
-                            disabled={isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist}
-                            aria-label="Add to cart"
-                        >
-                            <ShoppingCart className="product-btn-icon" />
-                            <span>{isAddingToCart ? "Adding..." : "Add"}</span>
-                        </button>
-
-                        <button
-                            className="product-buy-btn"
-                            onClick={handleBuyNow}
-                            disabled={isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist}
-                            aria-label="Buy now"
-                        >
-                            <Zap className="product-btn-icon" />
-                            <span>Buy</span>
-                        </button>
-                    </div>
-                </div>
+                </button>
             </div>
 
-            {/* PRODUCT DETAIL MODAL */}
-            {isModalOpen && (
-                <ProductDetailModal
-                    product={product}
-                    closeModal={() => setIsModalOpen(false)}
-                    isWishlistedStatus={isWishlistedStatus}
-                    handleWishlistClick={handleWishlistClick}
-                    isTogglingWishlist={isTogglingWishlist}
-                    // Pass down necessary state/props for full functionality inside modal
-                    selectedVariant={selectedVariant}
-                    handleVariationChange={handleVariationChange}
-                    displayPrice={displayPrice}
-                    originalPrice={originalPrice}
-                    discountPercent={discountPercent}
-                    handleAddToCart={handleAddToCart}
-                    handleBuyNow={handleBuyNow}
-                    isAddingToCart={isAddingToCart}
-                    error={error}
-                    setError={setError}
-                />
-            )}
-        </>
+            {/* Details Section */}
+            <div className="product-details">
+                <div className="product-brand">
+                    {product.brand && product.brand !== "null" ? product.brand : "Fresh"}
+                </div>
+
+                <h3 className="product-name">{product.name}</h3>
+
+                {/* Variation Dropdown */}
+                {hasVariations ? (
+                    <select
+                        className="product-variation-select"
+                        onChange={handleVariationChange}
+                        value={selectedVariant?.id}
+                        disabled={isAddingToCart || isTogglingWishlist || isInCart}
+                        aria-label="Select variant"
+                        onClick={(e) => e.stopPropagation()} 
+                    >
+                        {product.variations.map((v) => (
+                            <option key={v.id} value={v.id}>
+                                {v.value} - ₹{parseFloat(v.offer_price).toFixed(0)}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    <div className="product-variation-spacer"></div>
+                )}
+
+                {/* Error Message */}
+                {error && <div className="product-error-message">{error}</div>}
+
+                {/* Price Section */}
+                <div className="product-price-container">
+                    <span className="product-price">
+                        ₹{displayPrice}
+                    </span>
+                    {originalPrice > displayPrice && (
+                        <span className="product-original-price">
+                            ₹{originalPrice}
+                        </span>
+                    )}
+                </div>
+
+                {/* Action Buttons - ALWAYS SHOW ADD & BUY */}
+                <div className="product-actions">
+                    <button
+                        className={buttonClass}
+                        onClick={handleAddToCart}
+                        disabled={isDisabled}
+                        aria-label={isInCart ? "Item added to cart" : "Add to cart"}
+                    >
+                        {React.createElement(cartIcon, { className: "product-btn-icon" })}
+                        <span>{buttonText}</span>
+                    </button>
+
+                    <button
+                        className="product-buy-btn"
+                        onClick={handleBuyNow}
+                        disabled={isDisabled}
+                        aria-label="Buy now"
+                    >
+                        <Zap className="product-btn-icon" />
+                        <span>Buy</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };
 

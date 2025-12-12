@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAddress } from '../../context/AddressContext';
-import { Plus, MapPin, Edit, Trash2, Home, CheckCircle } from 'lucide-react';
+import { Plus, MapPin, Edit, Trash2, Home, CheckCircle, Loader2, XCircle } from 'lucide-react'; // Added Loader2 and XCircle
 
 
 // ---------------- ADDRESS FORM ----------------
@@ -15,7 +15,13 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
         postal_code: "",
         country: "India",
         is_default: false,
+        latitude: "", // NEW: for geolocation
+        longitude: "", // NEW: for geolocation
     });
+
+    // NEW: Geolocation States
+    const [locationLoading, setLocationLoading] = useState(false);
+    const [locationError, setLocationError] = useState(null);
 
     const isEditMode = Boolean(initialData?.id);
 
@@ -27,6 +33,43 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
         }));
     };
 
+    // NEW: Function to fetch user's location
+    const handleGetLocation = () => {
+        if (!navigator.geolocation) {
+            setLocationError("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        setLocationLoading(true);
+        setLocationError(null);
+        setFormData(prev => ({ ...prev, latitude: "", longitude: "" })); // Clear previous coordinates
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setFormData((prev) => ({
+                    ...prev,
+                    // Convert to string for consistent state handling
+                    latitude: position.coords.latitude.toString(),
+                    longitude: position.coords.longitude.toString(),
+                }));
+                setLocationLoading(false);
+            },
+            (error) => {
+                setLocationLoading(false);
+                let msg = "Failed to get location.";
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = "Location access denied. Please enable it in your browser settings.";
+                } else if (error.code === error.TIMEOUT) {
+                    msg = "Timed out waiting for location.";
+                }
+                setLocationError(msg);
+                setFormData(prev => ({ ...prev, latitude: "", longitude: "" })); // Clear coordinates on error
+            },
+            // Options for high accuracy, max age, and timeout
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -36,6 +79,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
             return;
         }
 
+        // Pass the latitude and longitude (even if empty strings) to the parent onSubmit
         onSubmit(formData);
     };
 
@@ -54,7 +98,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
                     placeholder="Address Line 1 *" required />
 
                 <input name="address_line_2" value={formData.address_line_2} onChange={handleChange}
-                    placeholder="Address Line 2" />
+                    placeholder="Address Line 2 (Optional)" />
 
                 <input name="city" value={formData.city} onChange={handleChange}
                     placeholder="City *" required />
@@ -69,6 +113,38 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
                     placeholder="Country *" required />
             </div>
 
+            {/* NEW: Geolocation Button and Status Display */}
+            <div className="location-fetch-wrapper">
+                <button
+                    type="button"
+                    className="btn-location" 
+                    onClick={handleGetLocation}
+                    disabled={locationLoading || isSaving}
+                >
+                    {locationLoading ? (
+                        <>
+                            <Loader2 size={16} className="spin" /> Getting Location...
+                        </>
+                    ) : (
+                        <>
+                            <MapPin size={16} /> Use Current Location (Optional)
+                        </>
+                    )}
+                </button>
+                
+                {/* Status Display */}
+                {formData.latitude && formData.longitude && !locationLoading ? (
+                    <p className="location-status success">
+                        <CheckCircle size={14} /> Lat: {parseFloat(formData.latitude).toFixed(4)}, Long: {parseFloat(formData.longitude).toFixed(4)}
+                    </p>
+                ) : locationError ? (
+                    <p className="location-status error">
+                        <XCircle size={14} /> {locationError}
+                    </p>
+                ) : null}
+            </div>
+            {/* END NEW */}
+
             <label className="default-checkbox">
                 <input type="checkbox" name="is_default"
                     checked={formData.is_default} onChange={handleChange} />
@@ -76,7 +152,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
             </label>
 
             <div className="form-actions">
-                <button type="button" onClick={onCancel} className="btn-secondary">Cancel</button>
+                <button type="button" onClick={onCancel} className="btn-secondary" disabled={isSaving}>Cancel</button>
                 <button type="submit" className="btn-primary-save" disabled={isSaving}>
                     {isSaving ? "Saving..." : isEditMode ? "Update Address" : "Save Address"}
                 </button>
@@ -86,7 +162,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
 };
 
 
-// ---------------- ADDRESS CARD ----------------
+// ---------------- ADDRESS CARD (No Change) ----------------
 const AddressCard = ({ address, onEdit, onDelete, onSelect, isSelected }) => (
     <div className={`address-card ${isSelected ? "selected" : ""}`}>
         <div className="address-header-row">
@@ -106,6 +182,13 @@ const AddressCard = ({ address, onEdit, onDelete, onSelect, isSelected }) => (
             {address.address_line_2 && `${address.address_line_2}, `}
             {address.city}, {address.state} - {address.country} - {address.postal_code}
         </p>
+        
+        {/* Optional display for lat/long if available */}
+        {(address.latitude && address.longitude) && (
+             <p className="address-lines small-text">
+                Geo: Lat {parseFloat(address.latitude).toFixed(4)}, Long {parseFloat(address.longitude).toFixed(4)}
+            </p>
+        )}
 
         <p className="address-phone">Phone: {address.phone_number}</p>
 
@@ -128,7 +211,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelect, isSelected }) => (
 );
 
 
-// ---------------- MAIN COMPONENT ----------------
+// ---------------- MAIN COMPONENT (No Change) ----------------
 const AddressManager = () => {
     const {
         addresses,
@@ -156,11 +239,19 @@ const AddressManager = () => {
     const handleSaveAddress = async (formData) => {
         try {
             setIsSaving(true);
+            
+            // Prepare payload: convert lat/long to number if present
+            const payload = {
+                ...formData,
+                latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+                longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+            };
 
-            if (formData.id) {
-                await updateAddress(formData.id, formData);
+
+            if (payload.id) {
+                await updateAddress(payload.id, payload);
             } else {
-                await addAddress(formData);
+                await addAddress(payload);
             }
 
             setIsFormVisible(false);
@@ -176,7 +267,13 @@ const AddressManager = () => {
 
     // ------------ EDIT ADDRESS ------------
     const handleEditAddress = (address) => {
-        setEditingAddress(address);
+        // Ensure lat/long are strings for form compatibility if they exist
+        const formattedAddress = {
+            ...address,
+            latitude: address.latitude?.toString() || "",
+            longitude: address.longitude?.toString() || "",
+        };
+        setEditingAddress(formattedAddress);
         setIsFormVisible(true);
     };
 
@@ -210,7 +307,10 @@ const AddressManager = () => {
                 <AddressForm
                     initialData={editingAddress}
                     onSubmit={handleSaveAddress}
-                    onCancel={() => setIsFormVisible(false)}
+                    onCancel={() => {
+                        setIsFormVisible(false);
+                        setEditingAddress(null);
+                    }}
                     isSaving={isSaving}
                 />
             )}
@@ -259,7 +359,7 @@ const AddressManager = () => {
 
 export default AddressManager;
 
-// --- Component Styles (Updated to reflect form grid change) ---
+// --- Component Styles (Updated for Geolocation Feature) ---
 const AddressManagerStyles = `
     .address-manager-wrapper {
         padding: 0;
@@ -367,6 +467,67 @@ const AddressManagerStyles = `
         background: #d3d9df;
     }
 
+    /* NEW GEOLOCATION STYLES */
+    .location-fetch-wrapper {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .btn-location {
+        background-color: #5bc0de; /* Info blue/cyan */
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        width: 100%;
+    }
+    .btn-location:hover:not(:disabled) {
+        background-color: #31b0d5;
+    }
+    .btn-location:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .location-status {
+        font-size: 13px;
+        padding: 8px 10px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+    }
+    .location-status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .location-status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    /* END NEW GEOLOCATION STYLES */
+
     /* Address Card List */
     .address-list {
         display: flex;
@@ -421,6 +582,10 @@ const AddressManagerStyles = `
         font-size: 14px;
         color: #555;
         margin: 5px 0;
+    }
+    .address-lines.small-text {
+        font-size: 12px;
+        color: #888;
     }
     .address-phone {
         font-size: 13px;

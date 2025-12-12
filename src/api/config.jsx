@@ -1,20 +1,9 @@
-// services/config.js
-
-// ===========================
-// 🌐 CORRECT CONFIGURATION
-// ===========================
-export const API_BASE_URL = "https://39946e6edbbb.ngrok-free.app";
-// ❗ No /ec — this was your bug
-
-// Base path for the ecom endpoints
+export const API_BASE_URL = "https://snappier-reapply-kieth.ngrok-free.dev";
 export const ECOM_API_PATH = "/ecomapp";
-// ❗ Must start with /
-
 export const COMMON_HEADERS = {
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": "true",
 };
-
 // ===========================
 // 🖼 IMAGE URL HELPER
 // ===========================

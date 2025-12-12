@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingBag, Mail, Phone, Lock, User,
   CheckCircle2, XCircle, Loader2, ArrowRight,
-  Truck, Gift
+  Truck, Gift, MapPin // <-- ADDED MapPin icon for geolocation
 } from "lucide-react";
 
 import "./CustomerAuth.css";
@@ -89,7 +89,7 @@ const CustomerAuth = () => {
 };
 
 /* ==========================================
-      LOGIN FORM
+      LOGIN FORM (No changes)
 ========================================== */
 const LoginForm = ({ switchToRegister }) => {
   const [formData, setFormData] = useState({
@@ -180,7 +180,7 @@ const LoginForm = ({ switchToRegister }) => {
 };
 
 /* ==========================================
-      REGISTER FORM
+      REGISTER FORM (UPDATED)
 ========================================== */
 const RegisterForm = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -194,7 +194,47 @@ const RegisterForm = ({ switchToLogin }) => {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  // NEW STATES for geolocation
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState(null);
+
   const navigate = useNavigate();
+
+  // NEW: Function to fetch user's location
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setLocationLoading(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          // Store as string to be consistent with other form inputs
+          latitude: position.coords.latitude.toString(),
+          longitude: position.coords.longitude.toString(),
+        }));
+        setLocationLoading(false);
+      },
+      (error) => {
+        setLocationLoading(false);
+        let msg = "Failed to get location.";
+        if (error.code === error.PERMISSION_DENIED) {
+          msg = "Location access denied. Please allow it in your browser settings.";
+        } else if (error.code === error.TIMEOUT) {
+          msg = "Timed out waiting for location.";
+        }
+        setLocationError(msg);
+        setFormData((prev) => ({ ...prev, latitude: "", longitude: "" })); // Clear coordinates on error
+      },
+      // Geolocation options for accuracy and timeout
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -217,6 +257,7 @@ const RegisterForm = ({ switchToLogin }) => {
       mobile_number: formData.mobile_number,
       password: formData.password,
       role: "customer",
+      // Include latitude and longitude only if they are present
       ...(formData.latitude && { latitude: parseFloat(formData.latitude) }),
       ...(formData.longitude && { longitude: parseFloat(formData.longitude) }),
       ...(formData.user_address && { user_address: formData.user_address }),
@@ -229,7 +270,8 @@ const RegisterForm = ({ switchToLogin }) => {
       navigate("/login");
       switchToLogin();
     } catch (err) {
-      alert("Registration failed");
+      // In a real app, you would parse the error for specific messages
+      alert("Registration failed. Please check your details and try again.");
     } finally {
       setSubmitting(false);
     }
@@ -297,25 +339,54 @@ const RegisterForm = ({ switchToLogin }) => {
         }
       />
 
-      <InputGroup
-        icon={ArrowRight}
-        type="number"
-        placeholder="Latitude (Optional)"
-        value={formData.latitude}
-        onChange={(e) =>
-          setFormData({ ...formData, latitude: e.target.value })
-        }
-      />
-
-      <InputGroup
-        icon={ArrowRight}
-        type="number"
-        placeholder="Longitude (Optional)"
-        value={formData.longitude}
-        onChange={(e) =>
-          setFormData({ ...formData, longitude: e.target.value })
-        }
-      />
+      {/* NEW: Geolocation Button and Status Display */}
+      <div className="location-fetch-wrapper">
+        <motion.button
+          type="button"
+          // Using btn-primary for styling but adding a new class for visual distinction
+          className="btn-primary btn-location" 
+          onClick={handleGetLocation}
+          disabled={locationLoading}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+        >
+          {locationLoading ? (
+            <>
+              <Loader2 className="spin" size={18} /> Getting Location...
+            </>
+          ) : (
+            <>
+              <MapPin size={18} /> Use Current Location (Optional)
+            </>
+          )}
+        </motion.button>
+        
+        <AnimatePresence>
+          {formData.latitude && formData.longitude ? (
+            <motion.p
+              key="location-success"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className="validation-msg text-green" // Assuming 'text-green' is defined for success message color
+            >
+              <CheckCircle2 size={14} color="#22c55e" /> Location Captured! Lat: {parseFloat(formData.latitude).toFixed(4)}, Long:{" "}
+              {parseFloat(formData.longitude).toFixed(4)}
+            </motion.p>
+          ) : locationError ? (
+            <motion.p
+              key="location-error"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              className="validation-msg text-red"
+            >
+              <XCircle size={14} color="#ef4444" /> {locationError}
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
+      </div>
+      {/* The original Latitude and Longitude InputGroups were removed */}
 
       <motion.button
         whileHover={{ scale: 1.02 }}
@@ -337,7 +408,7 @@ const RegisterForm = ({ switchToLogin }) => {
 };
 
 /* ==========================================
-      HELPER COMPONENTS
+      HELPER COMPONENTS (No changes)
 ========================================== */
 const ValidatedInput = ({
   icon: Icon,

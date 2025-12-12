@@ -71,15 +71,15 @@ export const authService = {
   // CHECK MOBILE OR EMAIL AVAILABILITY
   // POST /check-availability/
   // -------------------------
-  checkAvailability: async (type, value) => {
-    try {
-      const res = await api.post("/check-availability/", { type, value });
-      return res.data;
-    } catch (error) {
-      // If API fails, assume available to avoid blocking user
-      return { isAvailable: true };
-    }
-  },
+  // checkAvailability: async (type, value) => {
+  //   try {
+  //     const res = await api.post("/check-availability/", { type, value });
+  //     return res.data;
+  //   } catch (error) {
+  //     // If API fails, assume available to avoid blocking user
+  //     return { isAvailable: true };
+  //   }
+  // },
 
   // -------------------------
   // LOGOUT

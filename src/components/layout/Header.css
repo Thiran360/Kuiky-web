@@ -2,82 +2,82 @@
    1. VARIABLES & BASE
    ======================================================= */
 :root {
-  --primary-yellow: #facc15;
-  --primary-yellow-hover: #eab308;
-  --bg-white: #ffffff;
-  --bg-off-white: #f9fafb;
-  --bg-gray-light: #e5e7eb;
-  --border-light: #d1d5db;
-  --border-medium: #9ca3af;
-  --text-dark: #111827;
-  --text-light: #6b7280;
-  --text-accent: #4b5563;
-  --error-red: #ef4444;
+    --primary-yellow: #facc15;
+    --primary-yellow-hover: #eab308;
+    --bg-white: #ffffff;
+    --bg-off-white: #f9fafb;
+    --bg-gray-light: #e5e7eb;
+    --border-light: #d1d5db;
+    --border-medium: #9ca3af;
+    --text-dark: #111827;
+    --text-light: #6b7280;
+    --text-accent: #4b5563;
+    --error-red: #ef4444;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* =======================================================
    2. HEADER CONTAINER & LAYOUT
    ======================================================= */
 .header-container {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border-light);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 0.5rem 0; 
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 0; 
 }
 
 .header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
 
 /* =======================================================
    3. LOGO SECTION
    ======================================================= */
 .header-logo-section {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .header-logo-text {
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: var(--text-dark);
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
 }
 .header-logo-accent {
-  color: var(--primary-yellow-hover);
+    color: var(--primary-yellow-hover);
 }
 .header-logo-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: 0.25rem;
-  border-radius: 50%;
-  background: var(--primary-yellow);
-  animation: softPulse 2s infinite;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: 0.25rem;
+    border-radius: 50%;
+    background: var(--primary-yellow);
+    animation: softPulse 2s infinite;
 }
 @keyframes softPulse {
-  0%, 100% { 
-    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4); 
-  }
-  50% { 
-    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); 
-  }
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4); 
+    }
+    50% { 
+        box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); 
+    }
 }
 
 /* =======================================================
@@ -86,272 +86,281 @@
 
 /* Desktop Search */
 .header-search-container {
-  flex: 1;
-  max-width: 600px;
-  position: relative;
-  display: none; 
+    flex: 1;
+    max-width: 600px;
+    position: relative;
+    display: none; 
 }
 @media (min-width: 768px) {
-  .header-search-container {
-    display: block; 
-  }
+    .header-search-container {
+        display: block; 
+    }
 }
 
 .header-search-input {
-  width: 100%;
-  background-color: var(--bg-off-white);
-  border: 1px solid var(--border-light);
-  border-radius: 9999px;
-  padding: 0.625rem 1rem 0.625rem 2.75rem;
-  font-size: 0.875rem;
-  outline: none;
-  transition: all 0.2s ease;
-  color: var(--text-dark);
+    width: 100%;
+    background-color: var(--bg-off-white);
+    border: 1px solid var(--border-light);
+    border-radius: 9999px;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s ease;
+    color: var(--text-dark);
 }
 .header-search-input:focus {
-  border-color: var(--primary-yellow);
-  background-color: var(--bg-white);
-  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
+    border-color: var(--primary-yellow);
+    background-color: var(--bg-white);
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
 }
 .header-search-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--border-medium);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--border-medium);
 }
 
 /* Mobile Search (Separate row) */
 .header-mobile-search {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem 0.5rem; 
-  display: block; 
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem 0.5rem; 
+    display: block; 
 }
 @media (min-width: 768px) {
-  .header-mobile-search {
-    display: none; 
-  }
+    .header-mobile-search {
+        display: none; 
+    }
 }
 
 .header-mobile-search-wrapper {
-  position: relative;
+    position: relative;
 }
 .header-mobile-search-input {
-  width: 100%;
-  background: var(--bg-off-white);
-  border: 1px solid var(--border-light);
-  border-radius: 0.75rem;
-  padding: 0.625rem 1rem 0.625rem 2.5rem;
-  font-size: 0.875rem;
-  outline: none;
+    width: 100%;
+    background: var(--bg-off-white);
+    border: 1px solid var(--border-light);
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
+    font-size: 0.875rem;
+    outline: none;
 }
 .header-mobile-search-icon {
-  position: absolute;
-  left: 0.875rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--border-medium);
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--border-medium);
 }
 
 /* =======================================================
    5. ACTION BUTTONS (DESKTOP)
    ======================================================= */
 .header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem; 
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; 
 }
 @media (min-width: 768px) {
-  .header-actions {
-    gap: 0.75rem; 
-  }
+    .header-actions {
+        gap: 0.75rem; 
+    }
 }
 
 /* Base style for all action buttons */
 .header-action-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: transparent;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-accent);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-accent);
 }
 .header-action-btn:hover {
-  background-color: var(--bg-off-white);
-  color: var(--text-dark);
+    background-color: var(--bg-off-white);
+    color: var(--text-dark);
 }
 
 /* Desktop-only action buttons (Wishlist & Cart) */
 .header-desktop-only {
-  display: none; 
-  flex-direction: column;
-  padding: 0.5rem 0.75rem;
+    display: none; 
+    flex-direction: column;
+    padding: 0.5rem 0.75rem;
 }
 @media (min-width: 768px) {
-  .header-desktop-only {
-    display: flex; 
-  }
-  .header-desktop-only:hover {
-    background-color: rgba(250, 204, 21, 0.1); 
-    color: var(--primary-yellow-hover);
-  }
+    .header-desktop-only {
+        display: flex; 
+    }
+    .header-desktop-only:hover {
+        background-color: rgba(250, 204, 21, 0.1); 
+        color: var(--primary-yellow-hover);
+    }
 }
 
 /* Action Label (Desktop only text) */
 .action-label {
-  display: none;
-  font-size: 0.6875rem; 
-  font-weight: 500;
-  margin-top: 2px;
-  color: var(--text-accent);
+    display: none;
+    font-size: 0.6875rem; 
+    font-weight: 500;
+    margin-top: 2px;
+    color: var(--text-accent);
 }
 @media (min-width: 1024px) {
-  .action-label {
-    display: block;
-  }
+    .action-label {
+        display: block;
+    }
 }
 
 /* Badge Styles */
 .header-action-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  font-size: 0.625rem;
-  font-weight: 700;
-  color: var(--bg-white);
-  padding: 0 4px;
-  box-shadow: 0 0 0 2px var(--bg-white);
-  background: var(--error-red); 
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--bg-white);
+    padding: 0 4px;
+    box-shadow: 0 0 0 2px var(--bg-white);
+    background: var(--error-red); 
 }
 .header-wishlist-badge {
-  background: #f59e0b; 
+    background: #f59e0b; 
 }
 .header-cart-badge {
-  background: var(--primary-yellow-hover); 
-  color: var(--text-dark);
+    background: var(--primary-yellow-hover); 
+    color: var(--text-dark);
 }
 
 /* =======================================================
    6. DESKTOP USER & LOGIN AREA
    ======================================================= */
 .header-desktop-user-area {
-  display: none; 
+    display: none; 
 }
 @media (min-width: 768px) {
-  .header-desktop-user-area {
-    display: flex; 
-  }
+    .header-desktop-user-area {
+        display: flex; 
+    }
 }
 
 .header-user-btn {
-  padding: 0.5rem 0.75rem;
-  background: var(--bg-off-white);
-  border: 1px solid var(--border-light);
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-dark);
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-off-white);
+    border: 1px solid var(--border-light);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex; /* Added for alignment */
+    align-items: center; /* Added for alignment */
+    gap: 0.5rem; /* Added for spacing */
 }
 .header-user-btn:hover {
-  background: var(--bg-gray-light);
+    background: var(--bg-gray-light);
 }
 .header-user-name {
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .header-chevron {
-  transition: transform 0.2s;
+    transition: transform 0.2s;
 }
 .header-user-btn[aria-expanded="true"] .header-chevron {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 /* Login Button */
 .header-login-btn {
-  background: var(--primary-yellow);
-  padding: 0.625rem 1.25rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  color: var(--text-dark);
+    background: var(--primary-yellow);
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex; /* Added for alignment */
+    align-items: center; /* Added for alignment */
+    gap: 0.5rem; /* Added for spacing */
 }
 .header-login-btn:hover {
-  background: var(--primary-yellow-hover);
+    background: var(--primary-yellow-hover);
 }
 .header-login-btn span {
-  display: none; 
+    display: none; 
 }
 @media (min-width: 480px) {
-  .header-login-btn span {
-    display: inline; 
-  }
+    .header-login-btn span {
+        display: inline; 
+    }
 }
 
 /* Desktop Dropdown Menu */
+.header-user-dropdown-wrapper {
+    position: relative;
+}
 .header-dropdown-menu {
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: var(--bg-white);
-  border-radius: 8px;
-  padding: 10px 0;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 60;
-  min-width: 160px;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: var(--bg-white);
+    border-radius: 8px;
+    padding: 10px 0;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 60;
+    min-width: 160px;
 }
 .header-dropdown-menu button {
-  width: 100%;
-  padding: 10px 15px;
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--text-dark);
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--text-dark);
 }
 .header-dropdown-menu button:hover {
-  background: var(--bg-off-white);
+    background: var(--bg-off-white);
 }
 
 /* =======================================================
    7. MOBILE MORE MENU (3-lines/X)
    ======================================================= */
 .header-mobile-more-wrapper {
-  position: relative;
-  display: flex; 
+    position: relative;
+    display: flex; 
 }
 @media (min-width: 768px) {
-  .header-mobile-more-wrapper {
-    display: none; 
-  }
+    .header-mobile-more-wrapper {
+        display: none; 
+    }
 }
 
 .header-mobile-menu {
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: var(--bg-white);
-  border-radius: 8px;
-  padding: 8px 0;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 60;
-  min-width: 180px;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: var(--bg-white);
+    border-radius: 8px;
+    padding: 8px 0;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 60;
+    min-width: 180px;
 }
 
 .header-mobile-menu-title {
@@ -364,21 +373,21 @@
 
 /* Base style for all menu buttons */
 .header-mobile-menu button {
-  width: 100%;
-  padding: 10px 15px;
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  color: var(--text-dark);
-  gap: 10px;
-  justify-content: flex-start; 
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--text-dark);
+    gap: 10px;
+    justify-content: flex-start; 
 }
 .header-mobile-menu button:hover {
-  background: var(--bg-off-white);
+    background: var(--bg-off-white);
 }
 
 /* Specific style for items containing a badge (Wishlist/Cart) */
@@ -425,9 +434,9 @@
    ======================================================= */
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--primary-yellow);
-  outline-offset: 2px;
+    outline: 2px solid var(--primary-yellow);
+    outline-offset: 2px;
 }
 button:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
 }
