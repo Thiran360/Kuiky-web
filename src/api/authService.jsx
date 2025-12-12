@@ -52,6 +52,14 @@ export const authService = {
 
       const token = res.data.access;
       const userId = res.data.user?.id;
+      const lat = res.data.user?.latitude;
+      const lon = res.data.user?.longitude;
+
+       if (lat && lon) {
+          localStorage.setItem("latitude", String(lat));
+          localStorage.setItem("longitude", String(lon));
+          console.log("Stored latitude and longitude in localStorage", lat, lon);
+        }
 
       if (!token) {
         console.warn("Registration success but token missing", res.data);
@@ -59,6 +67,7 @@ export const authService = {
         setAuthToken(token);
         localStorage.setItem("accessToken", token);
         localStorage.setItem("user_id", String(userId));
+
       }
 
       return res.data;
