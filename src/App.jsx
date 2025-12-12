@@ -14,11 +14,12 @@ import { CartProvider } from "./context/CartContext";
 import { AddressProvider } from "./context/AddressContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrderProvider } from "./context/OrderContext";
-
+import ProductDetailPage from "./components/product/ProductDetailPage";  
 // --- Components & Pages ---
 import Header from "./components/layout/Header";
 import LandingPage from "./pages/LandingPage";
 import CustomerAuth from "./components/auth/CustomerAuth";
+// import ProductListingPage from "./components/product/ProductListingPage";
 import Cart from "./components/product/Cart";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
@@ -27,6 +28,7 @@ import OrderHistoryPage from "./components/product/OrderHistoryPage";
 
 // Global Styles
 import "./styles/Global.css";
+import { Import } from "lucide-react";
 
 // Wrap inside Router so we can use useNavigate + useLocation
 const AppContent = () => {
@@ -68,6 +70,8 @@ const AppContent = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/address" element={<AddressManager />} />
         <Route path="/orders" element={<OrderHistoryPage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+
       </Routes>
     </div>
   );

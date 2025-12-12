@@ -16,7 +16,7 @@ export const ProfileProvider = ({ children }) => {
     if (!accessToken) return;
     setLoadingProfile(true);
 
-    try {
+    try {  
       const data = await profileService.getProfile();
       setProfile(data);
     } catch (error) {

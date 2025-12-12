@@ -1,28 +1,37 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-// Ensure fetchSubCategories is correctly imported and accepts an ID
+// Ensure both fetchCategories and fetchSubCategories are imported
 import { fetchCategories, fetchSubCategories } from '../../api/api'; 
 import { getImageUrl } from '../../api/config';
 import './CategoryRail.css';
 
+// Tracks the path (e.g., [MainCategory, SubCategory, SubSubCategory])
 const CategoryRail = ({ onCategorySelect, selectedCategoryId }) => {
     // State to hold ALL top-level categories
     const [allCategories, setAllCategories] = useState([]);
     // State for the categories currently displayed (Top-Level or Sub-Categories)
     const [displayedCategories, setDisplayedCategories] = useState([]);
-    // State for the parent category (used for Back button and title)
-    const [currentParent, setCurrentParent] = useState(null); 
+    
+    // State to track the current position in the hierarchy
+    // Structure: [{ category: {id: 1, name: 'Electronics'}, data: [...] }]
+    const [categoryHistory, setCategoryHistory] = useState([]); 
     
     const [loading, setLoading] = useState(true);
     const [subCatLoading, setSubCatLoading] = useState(false);
     const navigate = useNavigate();
+
+    // The current parent is the last item in the history, or null if at top level
+    const currentParent = categoryHistory.length > 0 
+        ? categoryHistory[categoryHistory.length - 1].category
+        : null;
 
     // --- Data Loading: Initial Load (Top-level categories) ---
     useEffect(() => {
         const loadCategories = async () => {
             setLoading(true);
             try {
+                // Fetch ALL main categories
                 const data = await fetchCategories();
                 if (Array.isArray(data)) {
                     setAllCategories(data);
@@ -38,82 +47,109 @@ const CategoryRail = ({ onCategorySelect, selectedCategoryId }) => {
     }, []);
 
     // --- Fetch and Display Subcategories ---
-    const fetchAndDisplaySubCategories = useCallback(async (parentCategory) => {
+    const fetchAndDisplaySubCategories = useCallback(async (categoryToDrillDown, isMainCategory = false) => {
         setSubCatLoading(true);
         try {
-            // ⭐️ API CALL: Fetch subcategories for the parent ID
-            const subData = await fetchSubCategories(parentCategory.id); 
+            let subData;
+
+            if (isMainCategory) {
+                // Scenario 1: Drill down from a Main Category to its top-level subcategories
+                // API Call: ?category_id=<ID>&parent_subcategory_id=null
+                subData = await fetchSubCategories(categoryToDrillDown.id, 'null'); 
+            } else {
+                // Scenario 2: Drill down from a Subcategory to its children
+                // API Call: ?parent_subcategory_id=<ID>
+                subData = await fetchSubCategories(undefined, categoryToDrillDown.id); 
+            }
 
             if (Array.isArray(subData) && subData.length > 0) {
-                setCurrentParent(parentCategory);
+                // Add the current parent to history and display the children
+                setCategoryHistory(prev => [
+                    ...prev, 
+                    { category: categoryToDrillDown, data: displayedCategories }
+                ]);
                 setDisplayedCategories(subData);
-                // Clear any previous selection made on the parent level
+                // Clear any external selection when moving deeper
                 onCategorySelect(null); 
             } else {
                 // If no subcategories are found, treat the click as a final selection
-                onCategorySelect(parentCategory.id);
+                onCategorySelect(categoryToDrillDown.id);
             }
         } catch (error) {
             console.error("Subcategory load failed:", error);
-            // Optionally, select the parent category if sub-fetch fails
-            onCategorySelect(parentCategory.id); 
+            // If fetch fails, still treat the parent as the selected category
+            onCategorySelect(categoryToDrillDown.id); 
         } finally {
             setSubCatLoading(false);
         }
-    }, [onCategorySelect]);
+    }, [onCategorySelect, displayedCategories]);
 
     // --- Click Handler Logic ---
     const handleCategoryClick = (category) => {
-        // 1. Check for Deselection (Only if the category is the current focus of the rail)
+        // 1. Deselection
         if (selectedCategoryId === category.id) {
             onCategorySelect(null);
             return;
         }
+        
+        // Find out if the clicked category is a main category
+        const isMainCategory = allCategories.some(cat => cat.id === category.id);
 
-        // Check if the category has sub-categories (assuming your API provides a way to know, 
-        // e.g., a flag like 'has_children' or a non-empty 'sub_categories' array)
-        const hasSubCategories = category.has_children || (category.sub_categories && category.sub_categories.length > 0);
-
-        if (hasSubCategories && !currentParent) {
-            // 2. Select a MAIN category with children: Fetch and display subcategories
-            fetchAndDisplaySubCategories(category); 
-            
-        } else if (currentParent && hasSubCategories) {
-             // 2b. Select a SUB-category that might have children (multi-level hierarchy)
-             fetchAndDisplaySubCategories(category);
-
+        // Check if the category has children (assuming your API provides a way to know, 
+        // or we treat it as having children if we can fetch subcategories for it).
+        // For simplicity and relying on the API structure, we assume any click *could* lead to subcategories.
+        // If the click is on the top-level rail, it must be a main category.
+        
+        if (isMainCategory && categoryHistory.length === 0) {
+            // 2. Click on a TOP-LEVEL MAIN CATEGORY (e.g., "Electronics")
+            // This needs to fetch subcategories with parent_subcategory_id=null
+            fetchAndDisplaySubCategories(category, true);
+        } else if (!isMainCategory || categoryHistory.length > 0) {
+             // 3. Click on a SUB-CATEGORY (multi-level hierarchy)
+             // This needs to fetch subcategories using parent_subcategory_id=<ID>
+             fetchAndDisplaySubCategories(category, false);
         } else {
-            // 3. Select Leaf Category (No more children): Final selection for product filtering
-            onCategorySelect(category.id); 
+            // 4. Fallback: Leaf category selection
+            onCategorySelect(category.id);
         }
     };
     
     // --- Back Button Handler ---
     const handleGoBack = () => {
-        // Clear the current parent and show the top level again
-        setCurrentParent(null);
-        setDisplayedCategories(allCategories);
-        onCategorySelect(null); // Clear external selection when going back to top level
+        if (categoryHistory.length > 0) {
+            // Pop the last entry from history
+            const previousStep = categoryHistory[categoryHistory.length - 1];
+            
+            // Restore the previous list and history
+            setDisplayedCategories(previousStep.data);
+            setCategoryHistory(prev => prev.slice(0, -1));
+            onCategorySelect(null); // Clear external selection
+        } else {
+            // Should only happen if handleGoBack is called when history is empty (i.e., at the very top level)
+            setCurrentParent(null); // This is handled implicitly now by categoryHistory.length
+            setDisplayedCategories(allCategories);
+            onCategorySelect(null);
+        }
     };
     
     // --- Determine Title ---
     const railTitle = currentParent 
-        ? `Subcategories of ${currentParent.name}` 
+        ? currentParent.name // Use the name of the current parent (last item in history)
         : "Shop by Category";
 
     return (
         <div className="category-rail-container">
             <div className="category-rail-content">
                 <div className="category-header-wrapper">
-                    {/* Render Back Button only if not on the top level */}
-                    {currentParent && (
+                    {/* Render Back Button only if history is not empty (i.e., not at the top level) */}
+                    {categoryHistory.length > 0 && (
                         <motion.button 
                             className="back-button"
                             onClick={handleGoBack}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                         >
-                            ← Back to All
+                            ← Back to {categoryHistory.length === 1 ? 'All Categories' : categoryHistory[categoryHistory.length - 2]?.category.name || 'Previous Level'}
                         </motion.button>
                     )}
                     <h3 className="category-rail-title">{railTitle}</h3>
@@ -150,9 +186,9 @@ const CategoryRail = ({ onCategorySelect, selectedCategoryId }) => {
                                         e.target.src = 'https://via.placeholder.com/64?text=' + cat.name.charAt(0); 
                                     }}
                                 />
-                                {/* Optional: Show an arrow if it has sub-categories (based on assumed API flag) */}
+                                {/* Assuming 'has_children' is present on the category object when it has subcategories */}
                                 {cat.has_children && ( 
-                                     <span className="category-arrow">→</span>
+                                    <span className="category-arrow">→</span>
                                 )}
                             </div>
                             <span className="category-name">
