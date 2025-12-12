@@ -9,10 +9,7 @@ const api = axios.create({
   baseURL: `${API_BASE_URL}${ECOM_API_PATH}`,
   headers: COMMON_HEADERS,
 });
-
-// Helper retrieves token
 const getAccessToken = () => localStorage.getItem("accessToken");
-
 // ===========================
 // 🔐 SAVE TOKEN + SYNC AXIOS
 // ===========================

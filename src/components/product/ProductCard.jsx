@@ -3,21 +3,17 @@
 // This is not needed here
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Heart, ShoppingCart, Zap } from "lucide-react";
+import { Heart, ShoppingCart, Zap, Check } from "lucide-react"; // Import Check icon
 import { getImageUrl } from "../../api/config";
 import "./ProductCard.css";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
-// 1. Import Wishlist Context
 import { useWishlist } from "../../context/WishlistContext";
-
 
 const ProductCard = ({ product }) => {
     // --- HOOKS ---
     const { addItemToCart, findItemInCart } = useCart();
     const navigate = useNavigate();
-    
-    // 2. Access Wishlist Context functions
     const { isProductWishlisted, toggleWishlist } = useWishlist();
 
     const hasVariations = product.variations && product.variations.length > 0;
@@ -25,28 +21,35 @@ const ProductCard = ({ product }) => {
     const [selectedVariant, setSelectedVariant] = useState(
         hasVariations ? product.variations[0] : null
     );
-    // 3. REMOVE local isWishlisted state and use context derivation
     const [isAddingToCart, setIsAddingToCart] = useState(false);
-    // 4. Add state for controlling the wishlist button loading
     const [isTogglingWishlist, setIsTogglingWishlist] = useState(false); 
     const [error, setError] = useState(null);
+    
+    // NOTE: Removed isAddedOnce state as the status will be derived from the cart.
 
     // Update selected variant if product changes
     useEffect(() => {
         setSelectedVariant(hasVariations ? product.variations[0] : null);
     }, [product, hasVariations]);
 
-    // 5. Derive wishlisted status from context for display logic
+    const getVariantId = useCallback(() => selectedVariant?.id || null, [selectedVariant]);
+
+    // --- CART STATUS & PRICE CALCULATION ---
+    
+    // 1. Calculate persistent cart status based on selected variant
+    const isInCart = useMemo(() => {
+        const productVariantId = getVariantId();
+        // Check if the currently selected variant exists in the cart with quantity > 0
+        return !!findItemInCart(product.id, productVariantId);
+    }, [product.id, getVariantId, findItemInCart]);
+
+    // 2. Derive wishlisted status
     const isWishlistedStatus = useMemo(() => isProductWishlisted(product.id), [
         isProductWishlisted,
         product.id,
     ]);
 
-
-    // Memoize the Variant ID logic
-    const getVariantId = useCallback(() => selectedVariant?.id || null, [selectedVariant]);
-
-    // --- PRICE CALCULATION (Unchanged) ---
+    // 3. Price calculation (unchanged)
     const { displayPrice, originalPrice, discountPercent } = useMemo(() => {
         const dPrice = selectedVariant
             ? parseFloat(selectedVariant.offer_price)
@@ -71,6 +74,15 @@ const ProductCard = ({ product }) => {
 
     // --- HANDLERS ---
 
+    const handleCardClick = useCallback(() => {
+        navigate(`/product/${product.id}`, { 
+            state: { 
+                product,
+                selectedVariant 
+            } 
+        });
+    }, [navigate, product, selectedVariant]);
+
     const handleVariationChange = useCallback(
         (e) => {
             e.stopPropagation();
@@ -84,9 +96,6 @@ const ProductCard = ({ product }) => {
         [product.variations]
     );
 
-    /**
-     * 6. New handler using toggleWishlist from context
-     */
     const handleWishlistClick = useCallback(async (e) => {
         e.stopPropagation();
         if (isTogglingWishlist) return;
@@ -96,15 +105,11 @@ const ProductCard = ({ product }) => {
             await toggleWishlist(product.id);
         } catch (err) {
             console.error("Failed to toggle wishlist:", err);
-            // Context handles the alert for login/server errors
         } finally {
             setIsTogglingWishlist(false);
         }
     }, [isTogglingWishlist, toggleWishlist, product.id]);
 
-    /**
-     * ADD BUTTON HANDLER (Unchanged logic, added isTogglingWishlist to dependencies for robustness)
-     */
     const handleAddToCart = useCallback(
         async (e) => {
             e.stopPropagation();
@@ -113,41 +118,31 @@ const ProductCard = ({ product }) => {
                 setError("Please select a variant");
                 return;
             }
+            if (isInCart) return; // Prevent adding if already in cart
 
             setIsAddingToCart(true);
             setError(null);
 
             try {
                 const productVariantId = getVariantId();
-                
-                // Get current quantity and calculate next quantity
                 const existingItem = findItemInCart(product.id, productVariantId);
+                // If it's in the cart, increment. If not (or quantity is 0), add 1.
                 const currentQty = existingItem ? existingItem.quantity : 0;
                 const nextQty = currentQty + 1;
 
                 await addItemToCart(productVariantId, nextQty);
+                // isInCart will automatically update due to useMemo
                 
             } catch (error) {
                 console.error("addItemToCart error:", error);
                 setError("Failed to add. Try again.");
             } finally {
-                // Short delay for visual feedback
                 setTimeout(() => setIsAddingToCart(false), 500); 
             }
         },
-        [
-            addItemToCart,
-            hasVariations,
-            findItemInCart,
-            product.id, 
-            getVariantId,
-            selectedVariant
-        ]
+        [addItemToCart, hasVariations, findItemInCart, product.id, getVariantId, selectedVariant, isInCart]
     );
 
-    /**
-     * BUY NOW HANDLER (Unchanged logic, added isTogglingWishlist to dependencies for robustness)
-     */
     const handleBuyNow = useCallback(
         async (e) => {
             e.stopPropagation();
@@ -167,18 +162,16 @@ const ProductCard = ({ product }) => {
                 return;
             }
 
-            setIsAddingToCart(true); // Show loading state
+            setIsAddingToCart(true); 
 
             try {
                 const productVariantId = getVariantId();
                 const existingItem = findItemInCart(product.id, productVariantId);
                 
-                // Ensure at least 1 of the selected product/variant is in the cart
                 if (!existingItem) {
                     await addItemToCart(productVariantId, 1);
                 }
 
-                // Navigate directly to the cart/checkout page
                 navigate("/cart", {
                     state: {
                         buyNowProduct: product.id,
@@ -192,20 +185,20 @@ const ProductCard = ({ product }) => {
                 setIsAddingToCart(false);
             }
         },
-        [
-            product.id,
-            selectedVariant,
-            navigate,
-            addItemToCart,
-            hasVariations,
-            findItemInCart,
-            getVariantId
-        ]
+        [product.id, selectedVariant, navigate, addItemToCart, hasVariations, findItemInCart, getVariantId]
     );
+
+    // Determine the button state and content using the persistent status (isInCart)
+    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add");
+    const cartIcon = isInCart ? Check : ShoppingCart;
+    const isDisabled = isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist || isInCart;
+    // Use 'added-once' class for the permanent "Added" visual state
+    const buttonClass = `product-cart-btn ${isAddingToCart ? "adding" : ""} ${isInCart ? "added-once" : ""}`;
+
 
     // --- RENDER ---
     return (
-        <div className="product-card product-card-animate" onClick={() => navigate(`/product/${product.id}`)}>
+        <div className="product-card product-card-animate" onClick={handleCardClick}>
             {/* Discount Badge */}
             {discountPercent > 0 && (
                 <div className="product-discount-badge">{discountPercent}% OFF</div>
@@ -225,24 +218,19 @@ const ProductCard = ({ product }) => {
 
                 {/* Wishlist Button */}
                 <button
-                    className={`product-wishlist-btn ${
-                        // 7. Use the derived status for CSS class
-                        isWishlistedStatus ? "wishlisted" : ""
-                    }`}
+                    className={`product-wishlist-btn ${isWishlistedStatus ? "wishlisted" : ""}`}
                     onClick={handleWishlistClick}
-                    // 7. Disable button when toggling
                     disabled={isTogglingWishlist} 
                     aria-label={isWishlistedStatus ? "Remove from wishlist" : "Add to wishlist"}
                 >
                     <Heart
                         className="product-wishlist-icon"
-                        // 7. Use the derived status for fill color
                         fill={isWishlistedStatus ? "currentColor" : "none"}
                     />
                 </button>
             </div>
 
-            {/* Details Section (Unchanged) */}
+            {/* Details Section */}
             <div className="product-details">
                 <div className="product-brand">
                     {product.brand && product.brand !== "null" ? product.brand : "Fresh"}
@@ -256,9 +244,8 @@ const ProductCard = ({ product }) => {
                         className="product-variation-select"
                         onChange={handleVariationChange}
                         value={selectedVariant?.id}
-                        disabled={isAddingToCart || isTogglingWishlist}
+                        disabled={isAddingToCart || isTogglingWishlist || isInCart}
                         aria-label="Select variant"
-                        // Prevent the card click handler from triggering when selecting variant
                         onClick={(e) => e.stopPropagation()} 
                     >
                         {product.variations.map((v) => (
@@ -289,19 +276,19 @@ const ProductCard = ({ product }) => {
                 {/* Action Buttons - ALWAYS SHOW ADD & BUY */}
                 <div className="product-actions">
                     <button
-                        className={`product-cart-btn ${isAddingToCart ? "adding" : ""}`}
+                        className={buttonClass}
                         onClick={handleAddToCart}
-                        disabled={isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist}
-                        aria-label="Add to cart"
+                        disabled={isDisabled}
+                        aria-label={isInCart ? "Item added to cart" : "Add to cart"}
                     >
-                        <ShoppingCart className="product-btn-icon" />
-                        <span>{isAddingToCart ? "Adding..." : "Add"}</span>
+                        {React.createElement(cartIcon, { className: "product-btn-icon" })}
+                        <span>{buttonText}</span>
                     </button>
 
                     <button
                         className="product-buy-btn"
                         onClick={handleBuyNow}
-                        disabled={isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist}
+                        disabled={isDisabled}
                         aria-label="Buy now"
                     >
                         <Zap className="product-btn-icon" />
