@@ -2,7 +2,9 @@
 import axios from "axios";
 
 // Assuming BASE_URL_ORDER is your base URL up to the root of the API
-const BASE_URL_ORDER = "https://39946e6edbbb.ngrok-free.app/ecomapp";
+
+const BASE_URL_ORDER = "https://snappier-reapply-kieth.ngrok-free.dev/ecomapp";
+
 
 const getAuthHeader = () => {
     const token = localStorage.getItem("accessToken");
@@ -88,6 +90,7 @@ export const orderApi = {
                 getAuthHeader()
             );
             
+
             return response.data;
         } catch (error) {
             console.error("Failed to add review:", error.response?.data || error);
@@ -104,7 +107,8 @@ export const orderApi = {
             );
             
             const data = response.data;
-            
+           
+
             // Assuming the backend returns an array of reviews (usually just one for the current user/product combo)
             if (Array.isArray(data) && data.length > 0) {
                 return data[0]; // Return the existing review object
@@ -119,20 +123,21 @@ export const orderApi = {
     // ⭐️ PUT: Update an existing review ⭐️
     updateReview: async (reviewId, { rating, description }) => {
         try {
-            const payload = { 
+            
+            const payload = {
                 rating: rating,
                 comment: description
             };
-            
+
             const response = await axios.put(
                 `${BASE_URL_ORDER}/reviews/update/${reviewId}/`,
                 payload,
                 getAuthHeader()
             );
-            
-            return Array.isArray(response.data) && response.data.length > 0 
-                   ? response.data[0] 
-                   : response.data;
+
+            return Array.isArray(response.data) && response.data.length > 0
+                ? response.data[0]
+                : response.data;
         } catch (error) {
             console.error(`Failed to update review ${reviewId}:`, error.response?.data || error);
             throw error.response?.data || new Error("Failed to update product review.");

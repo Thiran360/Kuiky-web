@@ -19,6 +19,7 @@ import ProductDetailPage from "./components/product/ProductDetailPage";
 import Header from "./components/layout/Header";
 import LandingPage from "./pages/LandingPage";
 import CustomerAuth from "./components/auth/CustomerAuth";
+// import ProductListingPage from "./components/product/ProductListingPage";
 import Cart from "./components/product/Cart";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
