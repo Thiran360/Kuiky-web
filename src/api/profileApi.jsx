@@ -1,7 +1,7 @@
 // src/api/profileApi.js
 import axios from 'axios';
 
-const BASE_URL = 'https://39946e6edbbb.ngrok-free.app/ecomapp'; // Your API Base URL
+const BASE_URL = 'https://snappier-reapply-kieth.ngrok-free.dev/ecomapp'; // Your API Base URL
 
 // Helper to get token
 const getAuthHeader = () => {

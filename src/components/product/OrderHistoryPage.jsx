@@ -1,21 +1,9 @@
-// src/pages/OrderHistoryPage.jsx
-import React, { useState, useEffect } from 'react'; // ⭐️ Added useEffect
-import { useNavigate } from 'react-router-dom';
-// ⭐️ Import the Context and its Hook
-import { useOrder, OrderProvider } from '../../context/OrderContext'; 
-// Assuming useAddress/useProfile provides userId
-import { useAddress } from '../../context/AddressContext'; 
-import { Package, ShoppingBag, Loader, CornerDownLeft, X, AlertTriangle, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useOrder, OrderProvider } from '../../context/OrderContext';
+import { useAddress } from '../../context/AddressContext';
+import { ShoppingBag, Loader, AlertTriangle, Star, X } from 'lucide-react';
+import { getImageUrl } from '../../api/config';
 
-
-// -----------------------------------------------------------------------------------
-// --- NEW COMPONENTS FOR REVIEW FUNCTIONALITY ---
-// -----------------------------------------------------------------------------------
-
-// ⭐️ REMOVED: Mock API function 'submitProductReview' is no longer needed.
-
-
-// Helper component for Star Rating input (Unchanged)
 const StarRating = ({ value, onRate, disabled }) => {
     return (
         <div className="star-rating">
@@ -24,7 +12,7 @@ const StarRating = ({ value, onRate, disabled }) => {
                 return (
                     <Star
                         key={index}
-                        size={18}
+                        size={16}
                         className={`star ${ratingValue <= value ? 'filled' : ''} ${disabled ? 'disabled' : ''}`}
                         onClick={() => !disabled && onRate(ratingValue)}
                     />
@@ -34,40 +22,29 @@ const StarRating = ({ value, onRate, disabled }) => {
     );
 };
 
-// Component for the Review Form
-const ProductReviewForm = ({ product, orderId, userId, fetchOrders }) => {
-    // ⭐️ Retrieve all necessary functions from the Order Context
+const ProductReviewModal = ({ product, orderId, userId, onClose, fetchOrders }) => {
     const { addProductReview, updateProductReview, fetchProductReview } = useOrder();
 
-    // State for existing review data
-    const [reviewId, setReviewId] = useState(null); // ID of existing review if found
-    const [initialLoading, setInitialLoading] = useState(true); // Loading state for initial fetch
-    
-    // State for form fields
+    const [reviewId, setReviewId] = useState(null);
+    const [initialLoading, setInitialLoading] = useState(true);
     const [rating, setRating] = useState(0);
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
-    // Derived state to check if the user is editing an existing review
+
     const isEditing = reviewId !== null;
 
-    // 1. Fetch existing review on mount
     useEffect(() => {
         const loadReview = async () => {
             setInitialLoading(true);
             try {
-                // Call the context function to check for an existing review
                 const existingReview = await fetchProductReview(product.product_id);
 
                 if (existingReview) {
                     setReviewId(existingReview.id);
-                    // Set form fields with existing data from the backend response
                     setRating(existingReview.rating || 0);
-                    // Backend uses 'comment', so we use that to set 'description'
-                    setDescription(existingReview.comment || ''); 
+                    setDescription(existingReview.comment || '');
                 }
             } catch (error) {
-                // Log the error but continue, allowing the user to submit a new review.
                 console.error("Failed to load existing review:", error);
             } finally {
                 setInitialLoading(false);
@@ -75,487 +52,847 @@ const ProductReviewForm = ({ product, orderId, userId, fetchOrders }) => {
         };
 
         loadReview();
-    // Dependency array ensures this runs once per product, and when fetchProductReview changes
-    }, [product.product_id, fetchProductReview]); 
-    
-    // Show a loading state while checking for existing review
-    if (initialLoading) {
-        return (
-            <div className="review-success-message" style={{ backgroundColor: '#f0f8ff', borderColor: '#007bff', color: '#007bff' }}>
-                <p>Checking for existing review...</p>
-            </div>
-        );
-    }
-
+    }, [product.product_id, fetchProductReview]);
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (rating === 0) {
             alert("Please select a star rating.");
             return;
         }
 
         setIsSubmitting(true);
-        
+
         const data = { rating, description };
         let result;
 
         if (isEditing) {
-            // ⭐️ UPDATE EXISTING REVIEW: Pass reviewId and the updated data
             result = await updateProductReview(reviewId, data);
         } else {
-            // ⭐️ ADD NEW REVIEW: Pass productId and the new data
-            result = await addProductReview({ productId: product.product_id, ...data });
+            // Include product_id in the data when adding a new review
+            result = await addProductReview({ 
+                productId: product.product_id, 
+                product_id: product.product_id, // Make sure this is included
+                ...data 
+            });
         }
 
         if (result.success) {
             alert(result.message);
-            
-            // If successfully added a NEW review, set the ID to switch to edit mode
             if (result.review && !isEditing) {
-                 setReviewId(result.review.id);
+                setReviewId(result.review.id);
             }
-            // Optionally refresh the order list
-            if (fetchOrders) fetchOrders(); 
+            if (fetchOrders) fetchOrders();
+            onClose();
         } else {
-            // Display error message from the context/API
             alert(`Action Failed: ${result.message}`);
         }
         setIsSubmitting(false);
     };
 
     return (
-        <form onSubmit={handleReviewSubmit} className="review-form-container">
-            <h5 className="review-product-name">
-                {isEditing ? 'Update Review:' : 'Write Review:'} {product.name} ({product.value})
-            </h5>
-            
-            <div className="review-row">
-                <label>Your Rating:</label>
-                {/* Value is now initialized from state, which is populated by fetchProductReview */}
-                <StarRating value={rating} onRate={setRating} disabled={isSubmitting} />
-            </div>
-            
-            <div className="review-row">
-                <label htmlFor={`review-desc-${product.id}`}>Description:</label>
-                <textarea
-                    id={`review-desc-${product.id}`}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Tell us what you think..."
-                    rows="2"
-                    disabled={isSubmitting}
-                />
-            </div>
-            
-            <div className="review-submit-row">
-                <button 
-                    type="submit" 
-                    className="btn-yellow-primary submit-review-btn"
-                    disabled={isSubmitting || rating === 0}
-                >
-                    {isSubmitting 
-                        ? (isEditing ? 'Updating...' : 'Submitting...') 
-                        : (isEditing ? 'Update Review' : 'Submit Review') // ⭐️ Dynamic Button Text
-                    }
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close" onClick={onClose}>
+                    <X size={24} />
                 </button>
-            </div>
-            <hr className="review-separator"/>
-        </form>
-    );
-};
 
-
-// -----------------------------------------------------------------------------------
-// --- ORDER ITEM CARD (UNMODIFIED) ---
-// -----------------------------------------------------------------------------------
-
-const OrderItemCard = ({ item, userId, fetchOrders }) => {
-    // ⭐️ Get cancellation function from context
-    const { cancelUserOrder } = useOrder(); 
-    const [isCancelling, setIsCancelling] = useState(false); 
-    const totalItems = item.items.reduce((sum, product) => sum + product.quantity, 0);
-    const totalAmount = parseFloat(item.total).toFixed(0);
-    const statusText = item.status.charAt(0).toUpperCase() + item.status.slice(1);
-    
-    // ⭐️ CANCELLATION LOGIC: Only allow cancellation for these statuses.
-    const isCancellable = ['pending', 'accepted', 'forwarded'].includes(item.status);
-    
-    // ⭐️ REVIEW LOGIC: Only allow review for this status.
-    const isReviewable = item.status === 'delivered';
-
-    const getStatusClass = (status) => {
-        switch (status) {
-            case 'accepted': return 'status-accepted';
-            case 'forwarded': return 'status-forwarded';
-            case 'delivered': return 'status-delivered';
-            case 'cancelled': return 'status-cancelled'; 
-            default: return 'status-pending';
-        }
-    };
-
-    const formatDate = (dateString) => {
-        try {
-            return new Date(dateString).toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        } catch {
-            return dateString;
-        }
-    }
-
-    // ⭐️ Handler for cancellation
-    const handleCancel = async () => {
-        if (!window.confirm(`Are you sure you want to cancel Order #${item.id}? This action cannot be undone.`)) {
-            return;
-        }
-
-        setIsCancelling(true);
-        try {
-            // Pass the order ID to the context function, which calls the API
-            const result = await cancelUserOrder(item.id);
-
-            if (result.success) {
-                alert(result.message); 
-            } else {
-                alert(`Cancellation Failed: ${result.message}`); 
-            }
-        } catch (err) {
-            alert("An unknown error occurred during cancellation.");
-        } finally {
-            setIsCancelling(false);
-        }
-    };
-
-    return (
-        <div className="order-card">
-            <div className="order-header">
-                <div className="order-header-left">
-                    <p className="order-id">Order ID: **#{item.id}**</p>
-                    <p className="order-date">Placed on: {formatDate(item.date)}</p>
-                </div>
-                <div className={`order-status-badge ${getStatusClass(item.status)}`}>
-                    {statusText}
-                </div>
-            </div>
-
-            <div className="order-details-summary">
-                <div className="order-detail-row">
-                    <span>Total Items</span>
-                    <strong>{totalItems}</strong>
-                </div>
-                <div className="order-detail-row total-amount-row">
-                    <span>Order Total</span>
-                    <strong>₹{totalAmount}</strong>
-                </div>
-            </div>
-
-            <div className="order-items-preview">
-                {/* ⭐️ Iterating over items, showing preview AND conditional review form */}
-                {isReviewable && <p className="review-prompt-message">🎉 This order has been delivered! Write or update your review for your items below.</p>}
-                
-                {item.items.map((product) => (
-                    <div key={product.id} className={`item-review-wrapper ${isReviewable ? 'reviewable' : ''}`}>
-                        <div className="item-row">
-                            <Package size={14} className="item-icon" />
-                            <span className="item-name">{product.name} ({product.value})</span>
-                            <span className="item-quantity">x{product.quantity}</span>
-                        </div>
-                        {/* ⭐️ Conditional Review Form */}
-                        {isReviewable && (
-                            <ProductReviewForm 
-                                product={product} 
-                                orderId={item.id} 
-                                userId={userId} 
-                                fetchOrders={fetchOrders}
-                            />
-                        )}
+                {initialLoading ? (
+                    <div className="modal-loading">
+                        <Loader size={24} className="spin" />
+                        <p>Loading review...</p>
                     </div>
-                ))}
-                
-            </div>
+                ) : (
+                    <form onSubmit={handleReviewSubmit}>
+                        <h3 className="modal-title">{isEditing ? 'Update Your Review' : 'Rate & Review Product'}</h3>
 
-            <div className="order-actions">
-                <button 
-                    className="btn-yellow-outline" 
-                    onClick={() => console.log('View details for', item.id)}
-                >
-                    View Details
-                </button>
-                
-                {/* ⭐️ Conditional Cancel Button (Only if status is cancellable) */}
-                {isCancellable && (
-                    <button 
-                        className="btn-red-outline" 
-                        onClick={handleCancel}
-                        disabled={isCancelling}
-                    >
-                        {isCancelling ? (
-                            <>
-                                Cancelling... 
-                                <Loader size={16} className="spin" />
-                            </>
-                        ) : (
-                            'Cancel'
-                        )}
-                    </button>
+                        <div className="modal-product-info">
+                            <p className="modal-product-name">{product.name}</p>
+                            <p className="modal-product-details">
+                                {product.color && `Color: ${product.color}`}
+                                {product.color && product.size && ' • '}
+                                {product.size && `Size: ${product.size}`}
+                            </p>
+                        </div>
+
+                        <div className="modal-field">
+                            <label>Your Rating</label>
+                            <StarRating value={rating} onRate={setRating} disabled={isSubmitting} />
+                        </div>
+
+                        <div className="modal-field">
+                            <label htmlFor="review-description">Your Review</label>
+                            <textarea
+                                id="review-description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Share your experience with this product..."
+                                rows="4"
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={onClose}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn-primary"
+                                disabled={isSubmitting || rating === 0}
+                            >
+                                {isSubmitting
+                                    ? (isEditing ? 'Updating...' : 'Submitting...')
+                                    : (isEditing ? 'Update Review' : 'Submit Review')
+                                }
+                            </button>
+                        </div>
+                    </form>
                 )}
             </div>
         </div>
     );
 };
 
+const OrderItemCard = ({ product, userId, fetchOrders }) => {
+    const [showReviewModal, setShowReviewModal] = useState(false);
 
-// -----------------------------------------------------------------------------------
-// --- MAIN ORDER HISTORY PAGE COMPONENT (UNMODIFIED) ---
-// -----------------------------------------------------------------------------------
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        } catch {
+            return dateString;
+        }
+    };
+
+    const getStatusText = (status) => {
+        const statusMap = {
+            'delivered': 'Delivered',
+
+            'shipped': 'Shipped',
+            'processing': 'Processing',
+            'pending': 'Pending',
+            'cancelled': 'Cancelled'
+        };
+        return statusMap[status?.toLowerCase()] || status || 'Processing';
+    };
+
+    const getStatusMessage = (status) => {
+        const messageMap = {
+            'delivered': 'Your item has been delivered',
+            'shipped': 'Your item is on the way',
+            'processing': 'Your order is being processed',
+            'pending': 'Your order is pending',
+            'cancelled': 'Your order has been cancelled'
+        };
+        return messageMap[status?.toLowerCase()] || 'Your order is being processed';
+    };
+
+    return (
+        <div className="order-item-wrapper">
+            <div className="order-item-card">
+                <div className="product-image-name-container">
+                    {product.image && (
+                        <div className="order-item-image">
+                            <img
+                                src={getImageUrl(product.image || product.image_url)}
+                                alt={product.name || 'Product'}
+                                loading="lazy"
+                                onError={(e) => {
+                                    e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    <div className="order-item-details">
+                        <h3 className="order-item-name">{product.name || product.product_name || 'Product'}</h3>
+                        {(product.color || product.size) && (
+                            <p className="order-item-meta">
+                                {product.color && `Color: ${product.color}`}
+                                {product.color && product.size && ' • '}
+                                {product.size && `Size: ${product.size}`}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                {product.price && (
+                    <div className="order-item-price">
+                        ₹{Number(product.price).toLocaleString('en-IN')}
+                    </div>
+                )}
+
+                <div className="order-item-status">
+                    <div className="status-indicator">
+                        <span className="status-dot" data-status={product.status?.toLowerCase()}></span>
+                        <span className="status-text">
+                            {getStatusText(product.status)}
+                            {product.deliveredDate && product.status?.toLowerCase() === 'delivered' && ` on ${formatDate(product.deliveredDate)}`}
+                        </span>
+                    </div>
+                    <p className="status-message">{getStatusMessage(product.status)}</p>
+                    {product.status?.toLowerCase() === 'delivered' && (
+                        <button
+                            className="rate-review-btn"
+                            onClick={() => setShowReviewModal(true)}
+                        >
+                            <Star size={14} />
+                            Rate & Review Product
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {showReviewModal && (
+                <ProductReviewModal
+                    product={product}
+                    orderId={product.orderId}
+                    userId={userId}
+                    onClose={() => setShowReviewModal(false)}
+                    fetchOrders={fetchOrders}
+                />
+            )}
+        </div>
+    );
+};
 
 const OrderHistoryPage = ({ userId }) => {
-    const { orders, loading, error, fetchOrders } = useOrder(); 
-    const navigate = useNavigate();
+    const { orders, loading, error, fetchOrders } = useOrder();
+
+    const flattenedOrders = orders.flatMap((order) => {
+        const orderItems = order.items || order.products || order.order_items || [];
+        return orderItems.map((item) => ({
+            ...item,
+            orderId: order.id || order.order_id,
+            deliveredDate: order.delivered_date || order.deliveredDate || order.date || order.created_at,
+            status: order.status || item.status || 'processing',
+            name: item.name || item.product_name || item.title,
+            price: item.price || item.product_price || item.total,
+            image: item.image || item.product_image || item.image_url,
+            product_id: item.product_id || item.id
+        }));
+    });
 
     const customStyles = `
-        /* General Layout */
+        * {
+            box-sizing: border-box;
+        }
+
         .order-history-page {
-            padding: 40px 20px;
-            background-color: #f7f7f7;
-            min-height: 80vh;
+            padding: 0;
+            background-color: #f8f9fa;
+            min-height: 100vh;
         }
+
         .order-history-container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white; 
-            padding: 30px;
+            background: #ffffff;
+            padding: 0;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            margin-bottom: 40px;
         }
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-        }
-        .page-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
+
+        .order-item-card {
             display: flex;
             align-items: center;
-            gap: 10px;
+            padding: 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.5s ease-out;
+            margin-bottom: 0;
         }
-        .order-list {
-            display: grid;
+
+        .order-item-card:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-item-card:hover {
+            background: #f9f9f9;
+            transform: translateX(8px);
+            box-shadow: -8px 0 0 #ffd700;
+        }
+
+        .product-image-name-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
             gap: 20px;
+            margin-right: 40px;
         }
 
-        /* Order Card */
-        .order-card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
+        .order-item-image {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+            overflow: hidden;
             border-radius: 8px;
-            padding: 20px;
-            transition: box-shadow 0.2s;
-        }
-        .order-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            position: relative;
+            background: #f8f9fa;
         }
 
-        /* Order Header & Details */
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #f0f0f0;
+        .order-item-card:hover .order-item-image {
+            border-color: #ffd700;
+            transform: scale(1.05) rotate(1deg);
         }
-        .order-id { font-weight: 600; color: #333; margin-bottom: 4px; }
-        .order-date { font-size: 14px; color: #666; }
-        .order-details-summary { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #f0f0f0; }
-        .order-detail-row { display: flex; justify-content: space-between; font-size: 16px; padding: 4px 0; }
-        .total-amount-row { font-size: 18px; font-weight: 700; margin-top: 5px; border-top: 1px solid #eee; padding-top: 10px !important; }
-        .order-items-preview { margin-bottom: 15px; }
-        .review-prompt-message { font-size: 14px; color: #28a745; font-weight: 600; margin-bottom: 10px; border-left: 3px solid #28a745; padding-left: 10px;}
-        
-        .item-review-wrapper { border: 1px solid #f0f0f0; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; }
-        .item-review-wrapper.reviewable { border-color: #ffeeba; background-color: #fffdf7; } /* Highlight for reviewable items */
 
-        .item-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #555; padding: 3px 0; }
-        .item-name { flex-grow: 1; }
-        .more-items-notice { font-size: 13px; color: #007bff; text-align: right; margin-top: 5px; font-style: italic; }
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
 
-        /* Status Badge Styling */
-        .order-status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
+        .order-item-card:hover .order-item-image img {
+            transform: scale(1.1);
+        }
+
+        .order-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+            transition: color 0.3s ease;
+        }
+
+        .order-item-card:hover .order-item-name {
+            color: #000000;
+        }
+
+        .order-item-meta {
+            font-size: 14px;
+            color: #666666;
+            margin: 0;
+        }
+
+        .order-item-price {
+            flex-shrink: 0;
+            font-size: 18px;
             font-weight: 700;
-            text-transform: uppercase;
-            color: white;
+            color: #000000;
+            margin-right: 60px;
             min-width: 100px;
             text-align: center;
-        }
-        .status-accepted { background-color: #28a745; } 
-        .status-forwarded { background-color: #007bff; }
-        .status-delivered { background-color: #6c757d; }
-        .status-pending { background-color: #ffc107; } 
-        .status-cancelled { background-color: #dc3545; } 
-
-        /* Buttons (Yellow theme as requested) */
-        .order-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-        .btn-yellow-outline {
-            padding: 8px 15px;
-            background: none;
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            color: #ffc107;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-yellow-outline:hover {
-            background-color: #ffc107;
-            color: #333;
-        }
-        /* New class for review submit button */
-        .btn-yellow-primary {
-            padding: 6px 12px;
-            background-color: #ffc107;
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            color: #333;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn-yellow-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-red-outline {
-            padding: 8px 15px;
-            background: none;
-            border: 1px solid #dc3545;
-            border-radius: 4px;
-            color: #dc3545;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex; 
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-red-outline:hover:not(:disabled) { 
-            background-color: #dc3545;
-            color: white;
-        }
-        .btn-red-outline:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* State messages and Spin animation */
-        .state-message {
-            text-align: center;
-            padding: 50px 20px;
-            border: 1px dashed #ccc;
+            padding: 8px 16px;
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
-        .state-message .icon {
-            color: #ffc107;
-            margin-bottom: 15px;
+
+        .order-item-card:hover .order-item-price {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+            border-color: #ffd700;
         }
-        .state-message .icon.spin {
-            animation: spin 1s linear infinite; 
+
+        .order-item-status {
+            flex-shrink: 0;
+            text-align: left;
+            min-width: 220px;
         }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #cccccc;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot[data-status="delivered"] {
+            background-color: #ffd700;
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .status-dot[data-status="shipped"] {
+            background-color: #000000;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-dot[data-status="processing"] {
+            background-color: #666666;
+            animation: spin 1s linear infinite;
+        }
+
         @keyframes spin {
+            from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
-        /* ⭐️ NEW REVIEW STYLES ⭐️ */
-        .review-form-container {
-            padding: 10px 0 0;
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .review-form-container .review-product-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #555;
-            margin: 0;
-        }
-        .review-form-container .review-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            color: #666;
-        }
-        .review-form-container .review-row label {
-            min-width: 90px;
-        }
-        .review-form-container textarea {
-            flex-grow: 1;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-        }
-        .review-form-container .review-submit-row {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 5px;
-        }
-        .review-separator {
-            border: none;
-            border-top: 1px dashed #eee;
-            margin: 10px 0 0;
-        }
-        .review-success-message {
-            margin-top: 10px;
-            padding: 8px;
-            background-color: #e6ffed;
-            border: 1px solid #28a745;
-            border-radius: 4px;
-            text-align: center;
-            font-size: 14px;
-            color: #28a745;
+        .status-dot[data-status="pending"] {
+            background-color: #999999;
         }
 
-        /* Star Rating Styles */
-        .star-rating {
+        .status-dot[data-status="cancelled"] {
+            background-color: #000000;
+        }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333333;
+        }
+
+        .status-message {
+            font-size: 13px;
+            color: #666666;
+            margin: 2px 0 10px 20px;
+        }
+
+        .rate-review-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 2px solid #ffd700;
+            color: #000000;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
+            margin-left: 20px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            animation: subtleGlow 2s infinite alternate;
+        }
+
+        @keyframes subtleGlow {
+            from {
+                box-shadow: 0 0 4px rgba(255, 215, 0, 0.2);
+            }
+            to {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            }
+        }
+
+        .rate-review-btn:hover {
+            background: #ffd700;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .rate-review-btn svg {
+            flex-shrink: 0;
+            color: #000000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
         }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ffd700;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #f5f5f5;
+            border: none;
+            color: #333333;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .modal-close:hover {
+            background: #ffd700;
+            color: #000000;
+            transform: rotate(90deg);
+            border-color: #ffd700;
+        }
+
+        .modal-loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .modal-loading .spin {
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+            color: #ffd700;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #000000;
+            margin: 0 0 24px 0;
+            text-align: center;
+        }
+
+        .modal-product-info {
+            padding: 18px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-product-info:hover {
+            border-color: #ffd700;
+            transform: translateY(-2px);
+            background: #fffef5;
+        }
+
+        .modal-product-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #000000;
+            margin: 0 0 8px 0;
+        }
+
+        .modal-product-details {
+            font-size: 14px;
+            color: #666666;
+            margin: 0;
+        }
+
+        .modal-field {
+            margin-bottom: 22px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 10px;
+        }
+
+        .modal-field textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #333333;
+        }
+
+        .modal-field textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .star-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .star {
-            color: #ccc; /* Unfilled star color */
-            transition: color 0.1s;
+            cursor: pointer;
+            color: #e0e0e0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        .star:hover {
+            transform: scale(1.2);
+            color: #ffd700 !important;
+        }
+
         .star.filled {
-            color: #ffc107; /* Filled star color */
+            color: #ffd700;
         }
+
         .star.disabled {
             cursor: not-allowed;
         }
+
+        .star.disabled:hover {
+            transform: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: flex-end;
+            margin-top: 28px;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 11px 26px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: #ffd700;
+            color: #000000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #f0f0f0;
+            color: #999999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #333333;
+            border-color: #cccccc;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #333333;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .state-message {
+            text-align: center;
+            padding: 100px 40px;
+            background: #ffffff;
+            border-radius: 12px;
+            margin: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .state-message .icon {
+            color: #ffd700;
+            margin-bottom: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .state-message .icon.spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .state-message h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #000000;
+            margin: 0 0 16px 0;
+        }
+
+        .state-message p {
+            font-size: 16px;
+            color: #666666;
+            margin: 0 0 32px 0;
+        }
+
+        @media (max-width: 768px) {
+            .order-item-card {
+                flex-wrap: wrap;
+                padding: 18px;
+            }
+
+            .product-image-name-container {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 16px;
+            }
+
+            .order-item-price {
+                margin-right: 20px;
+                min-width: auto;
+            }
+
+            .order-item-status {
+                width: 100%;
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid #f0f0f0;
+            }
+
+            .modal-content {
+                padding: 24px;
+                margin: 0 16px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-item-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .order-item-name {
+                font-size: 15px;
+            }
+
+            .order-item-price {
+                font-size: 16px;
+            }
+
+            .rate-review-btn {
+                width: calc(100% - 20px);
+                justify-content: center;
+            }
+        }
+            /* ============================================
+   NEW UI ENHANCEMENTS (Safe to add anywhere below)
+   ============================================ */
+
+/* Add clean spacing between product list items */
+.order-item-wrapper {
+    margin-bottom: 22px;
+}
+
+/* Wrap each card inside a wrapper (non-breaking enhancement) */
+.order-item-wrapper .order-item-card {
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: all 0.35s ease;
+}
+
+/* Enhanced hover effect */
+.order-item-wrapper .order-item-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+    background: #fffef5;
+}
+
+/* Slight shadow glow on product image */
+.order-item-wrapper .order-item-card:hover .order-item-image {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+/* Add bottom spacing for the full container */
+.order-history-container {
+    padding-bottom: 40px;
+}
+
+/* Subtle divider line between list & top header */
+.order-history-container::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right, #ffd700, transparent);
+    margin-bottom: 18px;
+    border-radius: 6px;
+}
+
     `;
 
     if (loading) {
@@ -579,17 +916,16 @@ const OrderHistoryPage = ({ userId }) => {
                 <style>{customStyles}</style>
                 <div className="order-history-container">
                     <div className="state-message">
-                        <AlertTriangle size={48} className="icon" style={{ color: '#dc3545' }} />
+                        <AlertTriangle size={48} className="icon" />
                         <h2>An Error Occurred</h2>
                         <p>{error}</p>
-                        <button className="btn-yellow-outline" onClick={fetchOrders}>Try Again</button>
                     </div>
                 </div>
             </div>
         );
     }
 
-    if (orders.length === 0) {
+    if (flattenedOrders.length === 0) {
         return (
             <div className="order-history-page">
                 <style>{customStyles}</style>
@@ -598,67 +934,33 @@ const OrderHistoryPage = ({ userId }) => {
                         <ShoppingBag size={48} className="icon" />
                         <h2>No Orders Yet</h2>
                         <p>Looks like you haven't placed any orders.</p>
-                        <button 
-                            className="btn-yellow-outline" 
-                            onClick={() => navigate('/')}
-                            style={{ padding: '10px 20px' }}
-                        >
-                            <CornerDownLeft size={18} /> Continue Shopping
-                        </button>
                     </div>
                 </div>
             </div>
         );
     }
 
-
     return (
         <div className="order-history-page">
             <style>{customStyles}</style>
             <div className="order-history-container">
-                <div className="page-header">
-                    <h1>
-                        <Package size={32} />
-                        Your Order History
-                    </h1>
-                    <button 
-                        className="btn-yellow-outline" 
-                        onClick={() => navigate('/')}
-                        style={{ padding: '10px 20px' }}
-                    >
-                        <CornerDownLeft size={18} /> Continue Shopping
-                    </button>
-                </div>
-                
-                <div className="order-list">
-                    {orders.map((order) => (
-                        // OrderItemCard now receives userId and fetchOrders
-                        <OrderItemCard 
-                            key={order.id} 
-                            item={order} 
-                            userId={userId} 
-                            fetchOrders={fetchOrders}
-                        />
-                    ))}
-                </div>
+                {flattenedOrders.map((product, index) => (
+                    <OrderItemCard
+                        key={`${product.orderId}-${product.id || index}`}
+                        product={product}
+                        userId={userId}
+                        fetchOrders={fetchOrders}
+                    />
+                ))}
             </div>
         </div>
     );
 };
 
-// -----------------------------------------------------------------------------------
-// --- EXPORT WRAPPER (UNMODIFIED) ---
-// -----------------------------------------------------------------------------------
-
-/**
- * This component is used to wrap OrderHistoryPage with the necessary context.
- * It uses a mock implementation for useAddress/userId for demonstration.
- */
 const OrderHistoryWrapper = () => {
-    // ⭐️ MOCKING useAddress for userId based on previous context.
-    const mockUseAddress = () => ({ userId: localStorage.getItem("userId") || 4 }); 
-    const userId = (useAddress || mockUseAddress)().userId; 
-    
+    const mockUseAddress = () => ({ userId: localStorage.getItem("userId") || 4 });
+    const userId = (useAddress || mockUseAddress)().userId;
+
     return (
         <OrderProvider userId={userId}>
             <OrderHistoryPage userId={userId} />

@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Assuming BASE_URL_ORDER is your base URL up to the root of the API
-const BASE_URL_ORDER = "https://39946e6edbbb.ngrok-free.app/ecomapp";
+const BASE_URL_ORDER = "https://snappier-reapply-kieth.ngrok-free.dev/ecomapp";
 
 const getAuthHeader = () => {
     const token = localStorage.getItem("accessToken");
