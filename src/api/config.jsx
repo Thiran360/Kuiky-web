@@ -3,7 +3,7 @@
 // ===========================
 // 🌐 CORRECT CONFIGURATION
 // ===========================
-export const API_BASE_URL = "https://39946e6edbbb.ngrok-free.app";
+export const API_BASE_URL = "https://snappier-reapply-kieth.ngrok-free.dev";
 // ❗ No /ec — this was your bug
 
 // Base path for the ecom endpoints
