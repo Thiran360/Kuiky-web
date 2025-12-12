@@ -5,6 +5,7 @@ import { useCart } from "../../context/CartContext";
 import { useAddress } from "../../context/AddressContext";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../api/config";
+import "./cart.css";
 import {
   Trash2, ShoppingBag, ArrowLeft, ShoppingCart,
   MapPin, ChevronRight, X
