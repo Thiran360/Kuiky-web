@@ -16,7 +16,7 @@ const CategoryRail = ({ onCategorySelect, selectedCategoryId }) => {
     // State to track the current position in the hierarchy
     // Structure: [{ category: {id: 1, name: 'Electronics'}, data: [...] }]
     const [categoryHistory, setCategoryHistory] = useState([]); 
-    
+    const [currentparent,setCurrentParent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [subCatLoading, setSubCatLoading] = useState(false);
     const navigate = useNavigate();
