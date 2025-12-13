@@ -1,21 +1,16 @@
-// src/pages/Wishlist.jsx
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import { getImageUrl } from "../api/config";
-import { Trash2, ShoppingCart } from "lucide-react";
+import { Trash2, ShoppingCart, Check, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/layout/Header";
 import "./Wishlist.css";
 import { wishlistService } from "../api/wishlistService";
 
 const Wishlist = () => {
   const { wishlist, loading, loadWishlist, removeItemLocally } = useWishlist();
-  const { addItemToCart, refreshCart } = useCart();
+  const { addItemToCart, refreshCart, findItemInCart } = useCart();
   const navigate = useNavigate();
-
-  const [addedToCart, setAddedToCart] = useState({});
 
   useEffect(() => {
     loadWishlist();
@@ -25,65 +20,70 @@ const Wishlist = () => {
 
   const getProductId = (item) => {
     const p = getProduct(item);
-    return (
-      item?.product_id ||
-      p?.product_id ||
-      p?.id ||
-      item?.product?.id ||
-      null
-    );
+    return item?.product_id || p?.product_id || p?.id || null;
   };
 
-  // REMOVE
-  const handleRemove = async (e, productId) => {
-    if (e) e.stopPropagation();
-    if (!productId) return;
+  const getVariantForCart = (product) => {
+    if (!product) return null;
+    if (product.default_variant) return product.default_variant;
+    if (product.variations?.length) return product.variations[0];
+    return null;
+  };
 
+  const getWishlistPrice = (product) => {
+    const variant = getVariantForCart(product);
+    if (variant?.price != null) return Number(variant.price);
+    if (product?.offer_price != null) return Number(product.offer_price);
+    if (product?.selling_price != null) return Number(product.selling_price);
+    if (product?.price != null) return Number(product.price);
+    return 0;
+  };
+
+  const handleRemove = async (e, productId) => {
+    e.stopPropagation();
     try {
-      // Uses DELETE /wishlist/remove/ with body { product_id }
       await wishlistService.removeFromWishlist(productId);
       removeItemLocally(productId);
-    } catch (err) {
-      console.error("Failed to remove from wishlist:", err);
-      // Stop telling the user "login again" every time; just show generic error.
-      alert("Failed to remove item from wishlist. Please try again.");
+    } catch {
+      alert("Failed to remove item");
     }
   };
 
-  // ADD → CART
-  const handleMoveToCart = async (e, productId, product) => {
+  const handleMoveToCart = async (e, product) => {
     e.stopPropagation();
-    if (!productId) return;
+    const variant = getVariantForCart(product);
+    if (!variant?.id) return alert("Product not available");
 
-    try {
-      // If no variant, fall back to productId
-      const variantId =
-        product?.default_variant_id ||
-        product?.variations?.[0]?.id ||
-        productId;
-
-      await addItemToCart(variantId, 1);
+    if (findItemInCart(variant.id)) {
       await refreshCart();
-
-      setAddedToCart((prev) => ({ ...prev, [productId]: true }));
-    } catch (err) {
-      console.error("Move to cart failed:", err);
-      alert("Failed to move item to cart.");
+      return;
     }
+
+    await addItemToCart(variant.id, 1);
   };
 
   return (
     <div className="wishlist-page">
       <div className="wishlist-container">
-        <h1 className="wishlist-title">My Wishlist</h1>
+        <div className="wishlist-header">
+          <button className="wishlist-back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> Back
+          </button>
+          <h1 className="wishlist-title">
+            My Wishlist ({wishlist.length})
+          </h1>
+        </div>
 
-        {loading && <div className="wishlist-loading">Loading...</div>}
+        {loading && <p className="wishlist-loading">Loading...</p>}
 
         {!loading && wishlist.length === 0 && (
           <div className="wishlist-empty">
-            <p>Your wishlist is empty.</p>
-            <button className="wishlist-empty-btn" onClick={() => navigate("/")}>
-              Shop Now
+            <p>You haven't saved any items yet.</p>
+            <button
+              className="wishlist-empty-btn"
+              onClick={() => navigate("/")}
+            >
+              Start Shopping
             </button>
           </div>
         )}
@@ -93,16 +93,23 @@ const Wishlist = () => {
             {wishlist.map((item) => {
               const product = getProduct(item);
               const productId = getProductId(item);
-
               if (!productId) return null;
 
-              const name =
-                product?.name || product?.product_name || "Unnamed";
-              const price =
-                product?.offer_price ||
-                product?.selling_price ||
-                product?.price ||
-                0;
+              const price = getWishlistPrice(product);
+              const originalPrice =
+                product?.price != null ? Number(product.price) : price;
+
+              const discount =
+                originalPrice > price
+                  ? Math.round(
+                      ((originalPrice - price) / originalPrice) * 100
+                    )
+                  : 0;
+
+              const variant = getVariantForCart(product);
+              const isInCart = variant?.id
+                ? !!findItemInCart(variant.id)
+                : false;
 
               const image =
                 product?.image ||
@@ -114,46 +121,58 @@ const Wishlist = () => {
                   <div className="wishlist-image-wrapper">
                     <img
                       src={getImageUrl(image)}
-                      alt={name}
-                      className="wishlist-image"
+                      alt={product?.name}
+                      onError={(e) =>
+                        (e.target.src =
+                          "https://via.placeholder.com/200")
+                      }
                     />
+                    {discount > 0 && (
+                      <span className="wishlist-discount-badge">
+                        {discount}% OFF
+                      </span>
+                    )}
                   </div>
 
                   <div className="wishlist-info">
-                    <h2 className="wishlist-product-name">{name}</h2>
+                    <h3 className="wishlist-product-name">
+                      {product?.name || "Unnamed Product"}
+                    </h3>
 
-                    <div className="wishlist-price-row">
-                      <span className="wishlist-price">
-                        ₹{Number(price).toFixed(2)}
+                    <div className="wishlist-price-section">
+                      <span className="wishlist-current-price">
+                        ₹{price.toFixed(0)}
                       </span>
+                      {originalPrice > price && (
+                        <span className="wishlist-original-price">
+                          ₹{originalPrice.toFixed(0)}
+                        </span>
+                      )}
                     </div>
 
                     <div className="wishlist-actions">
-                      {addedToCart[productId] ? (
-                        <button
-                          className="wishlist-move-to-cart added"
-                          disabled
-                        >
-                          ✔ Added
+                      {isInCart ? (
+                        <button className="wishlist-move-to-cart added-state">
+                          <Check size={14} /> Added
                         </button>
                       ) : (
                         <button
                           className="wishlist-move-to-cart"
                           onClick={(e) =>
-                            handleMoveToCart(e, productId, product)
+                            handleMoveToCart(e, product)
                           }
                         >
-                          <ShoppingCart size={18} />
-                          <span>Add to Cart</span>
+                          <ShoppingCart size={14} /> Move to Cart
                         </button>
                       )}
 
                       <button
                         className="wishlist-remove-btn"
-                        onClick={(e) => handleRemove(e, productId)}
+                        onClick={(e) =>
+                          handleRemove(e, productId)
+                        }
                       >
-                        <Trash2 size={18} />
-                        <span>Remove</span>
+                        <Trash2 size={14} /> Remove
                       </button>
                     </div>
                   </div>

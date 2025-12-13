@@ -189,7 +189,7 @@ const ProductCard = ({ product }) => {
     );
 
     // Determine the button state and content using the persistent status (isInCart)
-    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add");
+    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add To Cart");
     const cartIcon = isInCart ? Check : ShoppingCart;
     const isDisabled = isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist || isInCart;
     // Use 'added-once' class for the permanent "Added" visual state
@@ -283,16 +283,6 @@ const ProductCard = ({ product }) => {
                     >
                         {React.createElement(cartIcon, { className: "product-btn-icon" })}
                         <span>{buttonText}</span>
-                    </button>
-
-                    <button
-                        className="product-buy-btn"
-                        onClick={handleBuyNow}
-                        disabled={isDisabled}
-                        aria-label="Buy now"
-                    >
-                        <Zap className="product-btn-icon" />
-                        <span>Buy</span>
                     </button>
                 </div>
             </div>
