@@ -166,7 +166,11 @@ const Profile = () => {
                 <ProfileItem icon={<User size={16} />} label="Username" value={user.username} />
                 <ProfileItem icon={<Phone size={16} />} label="Mobile" value={user.mobile_number} />
                 <ProfileItem icon={<Mail size={16} />} label="Email" value={user.email} />
-                <ProfileItem icon={<MapPin size={16} />} label="Address" value={user.user_address} />
+                <ProfileItem icon={<Home size={16} />} label="House / Flat No" value={formData.address_line1} />
+                <ProfileItem icon={<Building size={16} />} label="Street / Area" value={formData.address_line2} />
+                <ProfileItem icon={<Map size={16} />} label="City" value={formData.city} />
+                <ProfileItem icon={<MapPin size={16} />} label="State" value={formData.state} />
+                <ProfileItem icon={<Hash size={16} />} label="Pincode" value={formData.pincode} />
               </>
             ) : (
               <>
@@ -194,10 +198,10 @@ const Profile = () => {
 
 /* ---------------- SUB COMPONENTS ---------------- */
 
-const ProfileItem = ({ icon, label, value }) => (
-  <div className="profile-item">
+const ProfileItem = ({ icon, label, value, isAddress }) => (
+  <div className={`profile-item ${isAddress ? 'address-item' : ''}`}>
     <div className="item-icon-wrapper">{icon}</div>
-    <div>
+    <div className="item-content">
       <div className="item-label">{label}</div>
       <div className="item-value">{value || "-"}</div>
     </div>
