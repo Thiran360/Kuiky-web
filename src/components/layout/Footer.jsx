@@ -90,10 +90,7 @@ const Footer = () => {
       {/* BOTTOM */}
       <div className="footer-bottom">
         <div className="footer-bottom-left">
-          <span><ShoppingBag size={14}/> Seller</span>
-          <span><Megaphone size={14}/> Advertise</span>
-          <span><Gift size={14}/> Gift Cards</span>
-          <span><HelpCircle size={14}/> Help</span>
+          <span><ShoppingBag size={14}/> Seller<Megaphone size={14}/> Advertise<Gift size={14}/> Gift Cards<HelpCircle size={14}/> Help</span>
         </div>
         <div className="footer-bottom-right">
           © 2025 Ecom
