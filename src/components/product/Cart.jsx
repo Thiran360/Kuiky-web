@@ -171,18 +171,22 @@ const CartPage = () => {
   // ============= EMPTY CART UI (Conditional Return) =============
   // This MUST come after all hooks are called.
   if (!cartItems.length) {
-    return (
-      <div className="checkout-page">
-        <div className="empty-checkout">
-          <ShoppingBag size={80} />
-          <h2>Your cart is empty</h2>
-          <button className="btn-yellow-primary" onClick={() => navigate("/")}>
-            <ArrowLeft size={18} /> Continue Shopping
-          </button>
-        </div>
+  return (
+    <div className="checkout-page">
+      <div className="empty-checkout">
+        <ShoppingBag size={80} />
+        <h2>Your cart is empty</h2>
+
+        <button
+          className="btn-yellow-primary"
+          onClick={() => navigate("/")}
+        >
+          Continue Shopping
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
 
   return (
