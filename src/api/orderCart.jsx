@@ -8,12 +8,15 @@ const BASE_URL_ORDER = "https://snappier-reapply-kieth.ngrok-free.dev/ecomapp";
 
 const getAuthHeader = () => {
     const token = localStorage.getItem("accessToken");
-    return { headers: { Authorization: `Bearer ${token}` } };
+    return { headers: { 
+        "ngrok-skip-browser-warning": "true",
+        Authorization: `Bearer ${token}` } };
 };
 
 export const orderApi = {
     // GET: Fetch all orders for a user
     fetchOrders: async () => {
+        const userId = JSON.parse(localStorage.getItem("user_id"));
         try {
             const response = await axios.get(
                 `${BASE_URL_ORDER}/user-orders/?user_id=${userId}`,

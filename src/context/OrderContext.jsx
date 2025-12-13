@@ -18,7 +18,7 @@ export const OrderProvider = ({ children, userId }) => {
 
     // ⭐️ FIX: Removed 'userId' argument from the function, relying on the closure variable
     // and correctly using 'userId' from the provider's props.
-    const fetchOrders = useCallback(async (userId) => {
+    const fetchOrders = useCallback(async () => {
         if (!userId) {
             setLoading(false);
             // Stop execution if no user ID is available

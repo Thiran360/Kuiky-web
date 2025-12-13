@@ -15,7 +15,7 @@ const StarRating = ({ value, onRate, disabled }) => {
                 return (
                     <Star
                         key={index}
-                        size={20} 
+                        size={20}
                         className={`star ${ratingValue <= value ? 'filled' : ''} ${disabled ? 'disabled' : ''}`}
                         onClick={() => !disabled && onRate(ratingValue)}
                         fill={ratingValue <= value ? 'var(--color-primary, #ffd700)' : 'currentColor'}
@@ -30,14 +30,14 @@ const StarRating = ({ value, onRate, disabled }) => {
 // -----------------------------------------------------------
 // 2. ProductReviewModal Component
 // -----------------------------------------------------------
-const ProductReviewModal = ({ product, onClose }) => { 
+const ProductReviewModal = ({ product, onClose }) => {
     // Get all necessary functions from context
-    const { 
-        addProductReview, 
-        updateProductReview, 
-        fetchProductReview, 
-        fetchOrders 
-    } = useOrder(); 
+    const {
+        addProductReview,
+        updateProductReview,
+        fetchProductReview,
+        fetchOrders
+    } = useOrder();
 
     const [reviewId, setReviewId] = useState(null);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -72,11 +72,10 @@ const ProductReviewModal = ({ product, onClose }) => {
         if (product.product_id) {
             loadReview();
         } else {
-             setInitialLoading(false);
+            setInitialLoading(false);
         }
-        
-    }, [product.product_id, fetchProductReview]);
 
+    }, [product.product_id, fetchProductReview]);
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
@@ -94,33 +93,33 @@ const ProductReviewModal = ({ product, onClose }) => {
 
         if (isEditing) {
             // Payload for update
-            result = await updateProductReview(reviewId, { 
-                rating, 
-                description 
+            result = await updateProductReview(reviewId, {
+                rating,
+                description
             });
         } else {
             // Payload for add (aligned with typical context function parameters)
-            result = await addProductReview({ 
-                productId: product.product_id, 
-                review: rating,      
-                comment: description 
+            result = await addProductReview({
+                productId: product.product_id,
+                review: rating,
+                comment: description
             });
         }
 
         if (result.success) {
             setAlertMessage(result.message);
             setSubmitSuccess(true);
-            
+
             if (result.review && !isEditing) {
                 setReviewId(result.review.id);
             }
-            
+
             // ⭐️ IMPORTANT: Refresh the list of orders to update the 'Rate & Review' button status
-            if (fetchOrders) fetchOrders(); 
-            
+            if (fetchOrders) fetchOrders();
+
             // Close the modal after success
-            setTimeout(onClose, 1000); 
-            
+            setTimeout(onClose, 1000);
+
         } else {
             setAlertMessage(`Action Failed: ${result.message}`);
             setSubmitSuccess(false);
@@ -143,7 +142,7 @@ const ProductReviewModal = ({ product, onClose }) => {
                 ) : (
                     <form onSubmit={handleReviewSubmit}>
                         <h3 className="modal-title">{isEditing ? 'Update Your Review' : 'Rate & Review Product'}</h3>
-                        
+
                         {alertMessage && (
                             <div className={`alert-message ${submitSuccess ? 'success' : 'error'}`}>
                                 <AlertTriangle size={18} /> {alertMessage}
@@ -206,7 +205,7 @@ const ProductReviewModal = ({ product, onClose }) => {
 // -----------------------------------------------------------
 // 3. OrderItemCard Component
 // -----------------------------------------------------------
-const OrderItemCard = ({ product, userId }) => { 
+const OrderItemCard = ({ product, userId }) => {
     const [showReviewModal, setShowReviewModal] = useState(false);
 
     const formatDate = (dateString) => {
@@ -243,7 +242,7 @@ const OrderItemCard = ({ product, userId }) => {
         };
         return messageMap[status?.toLowerCase()] || 'Your order is being processed';
     };
-    
+
     return (
         <div className="order-item-wrapper">
             <div className="order-item-card">
@@ -288,7 +287,7 @@ const OrderItemCard = ({ product, userId }) => {
                         </span>
                     </div>
                     <p className="status-message">{getStatusMessage(product.status)}</p>
-                    
+
                     {/* Only show Review button if delivered */}
                     {product.status?.toLowerCase() === 'delivered' && (
                         <button
@@ -318,6 +317,11 @@ const OrderItemCard = ({ product, userId }) => {
 const OrderHistoryPage = ({ userId }) => {
     // ⭐️ Retrieve data and fetchOrders function from context
     const { orders, loading, error, fetchOrders } = useOrder();
+
+    // ✅ Automatically fetch orders when page loads
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const flattenedOrders = orders?.flatMap((order) => {
         const orderItems = order.items || order.products || order.order_items || [];
@@ -962,7 +966,7 @@ const OrderHistoryPage = ({ userId }) => {
                         <AlertTriangle size={48} className="icon" />
                         <h2>An Error Occurred</h2>
                         <p>{error}</p>
-                         <button className="btn-yellow-outline" onClick={fetchOrders}>Try Again</button>
+                        <button className="btn-yellow-outline" onClick={fetchOrders}>Try Again</button>
                     </div>
                 </div>
             </div>
@@ -996,7 +1000,7 @@ const OrderHistoryPage = ({ userId }) => {
                         key={`${product.orderId}-${product.product_id || index}`}
                         product={product}
                         userId={userId}
-                        // fetchOrders is NOT drilled here, it's accessed by ProductReviewModal via context
+                    // fetchOrders is NOT drilled here, it's accessed by ProductReviewModal via context
                     />
                 ))}
             </div>
@@ -1010,7 +1014,7 @@ const OrderHistoryPage = ({ userId }) => {
 const OrderHistoryWrapper = () => {
     // Mock for useAddress if it's not defined/available in this scope
     const mockUseAddress = () => ({ userId: localStorage.getItem("userId") || 4 });
-    
+
     // Fallback logic to determine userId
     const userId = (useAddress ? useAddress() : mockUseAddress()).userId;
 
