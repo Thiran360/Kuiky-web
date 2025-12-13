@@ -103,23 +103,25 @@ body {
   margin-bottom: 18px;
 }
 
-/* Buttons */
+/* Buttons - Reduced Size */
 .edit-btn,
 .cancel-btn {
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 0.8rem;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 700;
   border: 2px solid var(--gold);
   background: transparent;
   color: var(--gold);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .edit-btn:hover,
 .cancel-btn:hover {
   background: var(--gold);
   color: #000;
+  transform: translateY(-2px);
 }
 
 /* ================= RIGHT PANEL ================= */
@@ -131,15 +133,23 @@ body {
   align-content: start;
 }
 
-/* ================= VIEW MODE ITEMS ================= */
+/* ================= VIEW MODE ITEMS (Default Display) ================= */
 .profile-item {
-  grid-column: span 2;
+  grid-column: span 1;
   display: flex;
   gap: 14px;
   padding: 16px;
   border-radius: 14px;
   background: #fafafa;
   border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.profile-item:hover {
+  background: #f5f5f5;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .item-icon-wrapper {
@@ -150,13 +160,23 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .item-label {
   font-size: 0.65rem;
   color: var(--muted);
   text-transform: uppercase;
-  margin-bottom: 2px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .item-value {
@@ -178,6 +198,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 6px;
   display: block;
+  letter-spacing: 0.5px;
 }
 
 .input-wrapper {
@@ -190,6 +211,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   color: var(--gold);
+  pointer-events: none;
 }
 
 .input-wrapper input {
@@ -199,28 +221,38 @@ body {
   border: 1.5px solid var(--border);
   font-size: 0.85rem;
   background: #fff;
+  transition: all 0.3s ease;
 }
 
 .input-wrapper input:focus {
   outline: none;
   border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
 }
 
-/* ================= SAVE BUTTON ================= */
+/* ================= SAVE BUTTON - Reduced Size ================= */
 .save-btn {
   grid-column: span 2;
-  margin-top: 8px;
-  padding: 14px;
+  margin: 8px auto 0;   /* ← THIS centers it */
+  width: 25%;
+  padding: 12px;
   background: var(--gold);
   border: none;
-  border-radius: 14px;
-  font-size: 0.9rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .save-btn:hover {
   filter: brightness(0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.save-btn:active {
+  transform: translateY(0);
 }
 
 /* ================= TOAST ================= */
@@ -235,6 +267,312 @@ body {
   border-radius: 12px;
   font-weight: 600;
   z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ================= TABLET ================= */
+@media (max-width: 1024px) {
+  .profile-container {
+    max-width: 900px;
+  }
+
+  .profile-header {
+    padding: 28px 20px;
+  }
+
+  .profile-content {
+    padding: 28px;
+    gap: 16px 20px;
+  }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  .profile-wrapper {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .profile-container {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+
+  .profile-header {
+    border-radius: 16px 16px 0 0;
+    padding: 24px 20px;
+  }
+
+  .avatar-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-name {
+    font-size: 1.2rem;
+  }
+
+  .edit-btn,
+  .cancel-btn {
+    padding: 7px 16px;
+    font-size: 0.7rem;
+  }
+
+  .profile-content {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 14px;
+  }
+
+  .profile-item {
+    grid-column: span 1;
+  }
+
+  .item-icon-wrapper {
+    padding: 8px;
+  }
+
+  .item-label {
+    font-size: 0.6rem;
+  }
+
+  .item-value {
+    font-size: 0.9rem;
+  }
+
+  .input-wrapper input {
+    padding: 10px 12px 10px 38px;
+    font-size: 0.8rem;
+  }
+
+  .save-btn {
+    grid-column: span 1;
+    padding: 11px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+  .profile-wrapper {
+    padding: 12px;
+  }
+
+  .profile-header {
+    padding: 20px 16px;
+  }
+
+  .avatar-circle {
+    width: 70px;
+    height: 70px;
+  }
+
+  .avatar-badge {
+    width: 20px;
+    height: 20px;
+  }
+
+  .profile-name {
+    font-size: 1.1rem;
+  }
+
+  .profile-role {
+    font-size: 0.7rem;
+  }
+
+  .edit-btn,
+  .cancel-btn {
+    padding: 6px 14px;
+    font-size: 0.65rem;
+  }
+
+  .profile-content {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .profile-item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .item-icon-wrapper {
+    padding: 7px;
+  }
+
+  .item-label {
+    font-size: 0.55rem;
+  }
+
+  .item-value {
+    font-size: 0.85rem;
+  }
+}
+
+/* ================= PRINT STYLES ================= */
+@media print {
+  .profile-wrapper {
+    padding: 0;
+  }
+
+  .edit-btn,
+  .cancel-btn,
+  .save-btn {
+    display: none;
+  }
+
+  .profile-container {
+    box-shadow: none;
+    border: 1px solid var(--border);
+  }
+}
+
+/* ================= ACCESSIBILITY ================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.edit-btn:focus-visible,
+.cancel-btn:focus-visible,
+.save-btn:focus-visible,
+.input-wrapper input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .profile-item {
+    border-width: 2px;
+  }
+
+  .edit-btn,
+  .cancel-btn {
+    border-width: 3px;
+  }
+}/* ================= VIEW MODE ITEMS (Default Display) ================= */
+.profile-item {
+  grid-column: span 1;
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #fafafa;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+/* Special handling for address field to span 2 columns */
+.profile-item.address-item {
+  grid-column: span 2;
+}
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f6f7f9;
+}
+
+/* ================= ROOT ================= */
+:root {
+  --gold: #ffd700;
+  --black: #000000;
+  --white: #ffffff;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+}
+
+/* ================= PAGE WRAPPER ================= */
+.profile-wrapper {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+}
+
+/* ================= MAIN CARD ================= */
+.profile-container {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+}
+
+/* ================= LEFT PANEL ================= */
+.profile-header {
+  background: #000;
+  color: #fff;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= RIGHT PANEL ================= */
+.profile-content {
+  padding: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 24px;
+  align-content: start;
+}
+
+/* ================= SAVE BUTTON (DESKTOP / TABLET) ================= */
+.save-btn {
+  grid-column: span 2;
+  margin: 12px auto 0;
+  width: auto;              /* ← remove fixed width */
+  min-width: 180px;         /* ← keeps it neat */
+  max-width: 260px;
+  padding: 12px 28px;
+  background: var(--gold);
+  border: none;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  filter: brightness(0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.save-btn:active {
+  transform: translateY(0);
 }
 
 /* ================= MOBILE ================= */
@@ -248,20 +586,27 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .profile-header {
-    border-radius: 16px 16px 0 0;
-  }
-
   .profile-content {
     grid-template-columns: 1fr;
     padding: 20px;
+    gap: 14px;
   }
 
-  .profile-item {
-    grid-column: span 1;
-  }
-
+  /* 🔥 AUTO BUTTON SIZE ON MOBILE */
   .save-btn {
     grid-column: span 1;
+    width: 100%;          /* ← auto full width */
+    max-width: none;      /* ← remove desktop cap */
+    margin: 12px 0 0;
+    padding: 14px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+  .save-btn {
+    padding: 15px;
+    font-size: 0.95rem;
   }
 }
