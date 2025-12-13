@@ -1,203 +1,285 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-// import { fetchBanners } from '../../api/api'; // Removed/Commented: API is currently failing
-import './CategoryRail.css';
+import React, { useState, useEffect } from 'react';
+import { getImageUrl } from '../../api/config'; // 🟢 Updated import name
+import { fetchBanners } from '../../api/api'; // 🟢 Updated import path
+import { ChevronLeft, ChevronRight, Loader, Tag } from 'lucide-react';
 
-// --- Default Banner (Moved outside for cleaner state logic) ---
-const defaultBanner = {
-    badge: 'Limited Time Offer',
-    title: 'Organic & Fresh',
-    subtitle: 'Delivered Daily',
-    description: 'Shop the best quality vegetables and fruits directly from farmers.',
-    promoCode: 'FRESH20',
-    buttonText: 'Shop Now',
-    emoji: '🥦',
-    // Added an image placeholder for the default case, replace with a real local image path if available
-    image: 'https://via.placeholder.com/300x300?text=Fresh+Produce' 
+const BannerCarousel = () => {
+    const [banners, setBanners] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // 1. Fetch Banners on Load
+    useEffect(() => {
+        const loadBanners = async () => {
+            try {
+                // 🟢 Updated function call
+                const data = await fetchBanners();
+                
+                // Safety check: ensure data is an array before filtering
+                const activeBanners = Array.isArray(data) ? data.filter(b => b.is_active) : [];
+                setBanners(activeBanners);
+            } catch (err) {
+                console.error("Failed to load banners:", err);
+                setError("Failed to load offers.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadBanners();
+    }, []);
+
+    // 2. Auto-Slide Logic (Runs every 5 seconds)
+    useEffect(() => {
+        if (banners.length <= 1) return; 
+
+        const timer = setInterval(() => {
+            setCurrentIndex((prevIndex) => 
+                prevIndex === banners.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 5000);
+
+        return () => clearInterval(timer);
+    }, [banners.length]);
+
+    // 3. Navigation Functions
+    const nextSlide = () => {
+        setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    };
+
+    const prevSlide = () => {
+        setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    };
+
+    const goToSlide = (index) => {
+        setCurrentIndex(index);
+    };
+
+    // --- Loading & Error States ---
+    if (loading) {
+        return (
+            <div className="banner-skeleton">
+                <Loader className="spin" size={24} />
+                <style>{`
+                    .banner-skeleton {
+                        width: 100%;
+                        max-width: 1200px;
+                        aspect-ratio: 16/7;
+                        margin: 20px auto;
+                        background: #eee;
+                        border-radius: 16px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .spin { animation: spin 1s linear infinite; color: #888; }
+                    @keyframes spin { 100% { transform: rotate(360deg); } }
+                `}</style>
+            </div>
+        );
+    }
+
+    if (error || banners.length === 0) {
+        return null; 
+    }
+
+    return (
+        <div className="carousel-container">
+            {/* --- Inline CSS --- */}
+            <style>{`
+                .carousel-container {
+                    position: relative;
+                    width: 100%;
+                    max-width: 1200px;
+                    margin: 20px auto;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                    background: #000;
+                    aspect-ratio: 16/7;
+                }
+
+                @media (max-width: 768px) {
+                    .carousel-container {
+                        aspect-ratio: 16/9;
+                        margin: 10px auto;
+                        border-radius: 12px;
+                    }
+                }
+
+                .carousel-slide {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                    transition: opacity 0.8s ease-in-out;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .carousel-slide.active {
+                    opacity: 1;
+                    z-index: 1;
+                }
+
+                .banner-image {
+                    width: 100%;
+                    height: 100%;
+                    // object-fit: cover;
+                    filter: brightness(0.75); 
+                }
+
+                .banner-content {
+                    position: absolute;
+                    bottom: 40px;
+                    left: 40px;
+                    right: 40px;
+                    z-index: 2;
+                    color: white;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+                }
+
+                .banner-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: #ffd700;
+                    color: #000;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-weight: 700;
+                    font-size: 14px;
+                    margin-bottom: 12px;
+                    text-transform: uppercase;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                }
+
+                .banner-title {
+                    font-size: 36px;
+                    font-weight: 800;
+                    margin: 0 0 8px 0;
+                    line-height: 1.1;
+                }
+
+                .banner-desc {
+                    font-size: 18px;
+                    font-weight: 400;
+                    opacity: 0.9;
+                    max-width: 600px;
+                }
+
+                @media (max-width: 768px) {
+                    .banner-content { bottom: 20px; left: 20px; right: 20px; }
+                    .banner-title { font-size: 24px; }
+                    .banner-desc { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+                }
+
+                .nav-btn {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: rgba(255, 255, 255, 0.2);
+                    backdrop-filter: blur(5px);
+                    border: none;
+                    color: white;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    z-index: 10;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }
+
+                .nav-btn:hover {
+                    background: #fff;
+                    color: #000;
+                }
+
+                .prev-btn { left: 20px; }
+                .next-btn { right: 20px; }
+
+                .carousel-dots {
+                    position: absolute;
+                    bottom: 15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    display: flex;
+                    gap: 8px;
+                    z-index: 10;
+                }
+
+                .dot {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.5);
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+
+                .dot.active {
+                    background: #ffd700;
+                    transform: scale(1.2);
+                    width: 24px;
+                    border-radius: 10px;
+                }
+            `}</style>
+
+            {banners.map((banner, index) => (
+                <div 
+                    key={banner.id} 
+                    className={`carousel-slide ${index === currentIndex ? 'active' : ''}`}
+                >
+                    <img 
+                        src={getImageUrl(banner.image)} 
+                        alt={banner.title} 
+                        className="banner-image"
+                        onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/1200x500?text=Offer"; // Fallback
+                        }}
+                    />
+                    
+                    <div className="banner-content">
+                        {banner.prize_offer && (
+                            <div className="banner-tag">
+                                <Tag size={14} />
+                                {banner.prize_offer}
+                            </div>
+                        )}
+                        <h2 className="banner-title">{banner.title}</h2>
+                        <p className="banner-desc">{banner.description}</p>
+                    </div>
+                </div>
+            ))}
+
+            {banners.length > 1 && (
+                <>
+                    <button className="nav-btn prev-btn" onClick={prevSlide}>
+                        <ChevronLeft size={24} />
+                    </button>
+                    <button className="nav-btn next-btn" onClick={nextSlide}>
+                        <ChevronRight size={24} />
+                    </button>
+
+                    <div className="carousel-dots">
+                        {banners.map((_, index) => (
+                            <span 
+                                key={index} 
+                                className={`dot ${index === currentIndex ? 'active' : ''}`}
+                                onClick={() => goToSlide(index)}
+                            ></span>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    );
 };
 
-const HeroBanner = () => {
-    // Initialize banners as empty array, which will guarantee the default banner is used
-    const [banners, setBanners] = useState([]); 
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadBanners = async () => {
-            setLoading(true);
-
-            // --- SIMULATED API FAILURE / TEMPORARY FIX ---
-            // Simulating a network delay to show the loading state
-            await new Promise(resolve => setTimeout(resolve, 800)); 
-
-            // Since the API is broken (404/500) and commented out, 
-            // we intentionally set banners to an empty array.
-            // console.error("API failed (404/500). Forcing display of default banner.");
-            setBanners([]); 
-            // --- END OF FIX ---
-            
-            setLoading(false);
-        };
-
-        loadBanners();
-        
-        // Cleanup function is not strictly needed here but good practice
-        // return () => {}; 
-    }, []); // Dependency array is empty, runs once on mount
-
-    // Auto-slide functionality is now effectively disabled since banners.length is always 0 or 1
-    useEffect(() => {
-        if (banners.length > 1) {
-            const timer = setInterval(() => {
-                setCurrentIndex((prev) => (prev + 1) % banners.length);
-            }, 5000);
-
-            return () => clearInterval(timer);
-        }
-    }, [banners.length]);
-
-    // Navigation handlers are not strictly needed when length <= 1, but kept for completeness
-    const handleDotClick = (index) => {
-        setCurrentIndex(index);
-    };
-
-    const handleNextSlide = () => {
-        setCurrentIndex((prev) => (prev + 1) % banners.length);
-    };
-
-    const handlePrevSlide = () => {
-        setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
-    };
-
-    // Crucial fallback: If banners array is empty, use defaultBanner object.
-    const currentBanner = banners.length > 0 ? banners[currentIndex] : defaultBanner;
-
-    // Optional: Show a simple loader while simulating API attempt
-    if (loading && banners.length === 0) {
-        return <div className="hero-banner-container loading-state">Loading Banners...</div>;
-    }
-
-    return (
-        <div className="hero-banner-container">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="hero-banner"
-                >
-                    {/* Background Decorative Elements */}
-                    <div className="hero-banner-decor hero-banner-decor-top"></div>
-                    <div className="hero-banner-decor hero-banner-decor-bottom"></div>
-
-                    {/* Content Section */}
-                    <div className="hero-banner-content">
-                        {currentBanner.badge && (
-                            <motion.span
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: 0.2 }}
-                                className="hero-banner-badge"
-                            >
-                                {currentBanner.badge}
-                            </motion.span>
-                        )}
-
-                        <motion.h2
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="hero-banner-title"
-                        >
-                            {currentBanner.title || 'Organic & Fresh'}
-                            <br />
-                            <span className="hero-banner-subtitle">
-                                {currentBanner.subtitle || 'Delivered Daily'}
-                            </span>
-                        </motion.h2>
-
-                        <motion.p
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className="hero-banner-description"
-                        >
-                            {currentBanner.description || 'Shop the best quality vegetables and fruits directly from farmers.'}
-                            {currentBanner.promoCode && (
-                                <> Use code <b>{currentBanner.promoCode}</b>.</>
-                            )}
-                        </motion.p>
-
-                        <motion.button
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className="hero-banner-button"
-                            onClick={() => currentBanner.link && (window.location.href = currentBanner.link)}
-                        >
-                            {currentBanner.buttonText || 'Shop Now'}
-                        </motion.button>
-                    </div>
-
-                    {/* Graphic Section */}
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
-                        animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                        transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-                        className="hero-banner-graphic"
-                    >
-                        {currentBanner.image ? (
-                            <img
-                                src={currentBanner.image}
-                                alt={currentBanner.title || 'Banner'}
-                                className="hero-banner-image"
-                                // Add error fallback for the image just in case
-                                onError={(e) => {e.target.style.display='none'; e.target.parentNode.querySelector('.hero-banner-emoji').style.display='block';}}
-                            />
-                        ) : (
-                            <span className="hero-banner-emoji">
-                                {currentBanner.emoji || '🥦'}
-                            </span>
-                        )}
-                    </motion.div>
-
-                    {/* Navigation Arrows and Dots are now hidden as banners.length is 0 */}
-                    {banners.length > 1 && (
-                        <>
-                            <button
-                                className="hero-banner-arrow hero-banner-arrow-left"
-                                onClick={handlePrevSlide}
-                                aria-label="Previous banner"
-                            >
-                                ‹
-                            </button>
-                            <button
-                                className="hero-banner-arrow hero-banner-arrow-right"
-                                onClick={handleNextSlide}
-                                aria-label="Next banner"
-                            >
-                                ›
-                            </button>
-                        </>
-                    )}
-                    {banners.length > 1 && (
-                        <div className="hero-banner-pagination">
-                            {banners.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handleDotClick(index)}
-                                    className={`hero-banner-dot ${index === currentIndex ? 'active' : ''}`}
-                                    aria-label={`Go to banner ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </motion.div>
-            </AnimatePresence>
-        </div>
-    );
-};
-
-export default HeroBanner;
+export default BannerCarousel;

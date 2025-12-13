@@ -144,6 +144,8 @@ const LandingPage = ({ searchTerm }) => {
                     />
                 </div>
             )}
+            {/* 3. Hero Banner (Only if no search or category filter) */}
+            <h1 className="part">Our Partners</h1>
             {!searchTerm && !activeFilter && <HeroBanner />}
 
             {/* Product Grid Section */}
