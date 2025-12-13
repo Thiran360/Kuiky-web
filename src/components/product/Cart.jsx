@@ -75,17 +75,85 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isProcessing }) => {
 
                 <div className="item-subtotal">₹{(price * localQty).toFixed(0)}</div>
 
-                <button 
-                    className="remove-item-btn" 
-                    disabled={isProcessing} 
-                    onClick={() => onRemove(item)}
-                >
-                    <Trash2 size={18} />
-                </button>
-            </div>
+    try {
+      // Ensure payload matches backend expectations (address_id is correct)
+      const order = await placeOrderFromCart({
+        address_id: defaultAddress.id
+      });
+
+      alert(`Order Placed! ID: ${order?.order_id}`);
+      navigate("/orders");
+    } catch (err) {
+      console.error("Order failed:", err);
+      alert("Order failed.");
+    }
+  };
+
+//   const handlePlaceOrder = async () => {
+//     if (!defaultAddress) {
+//         // Still check if an address is selected, but this time to extract data
+//         setIsManagingAddresses(true);
+//         return;
+//     }
+
+//     try {
+//         // Construct the address data payload required for the direct order endpoint
+//         const addressDataPayload = {
+//             address: defaultAddress.address,
+//             pincode: defaultAddress.pincode,
+//             latitude: defaultAddress.latitude,
+//             longitude: defaultAddress.longitude,
+//         };
+        
+//         // Use the new context function
+//         const order = await placeOrderDirectly(addressDataPayload); 
+
+//         alert(`Order Placed! ID: ${order?.order_id}`);
+//         navigate("/orders");
+//     } catch (err) {
+//         console.error("Order failed:", err);
+//         alert(`Order failed: ${err.message || 'Unknown error'}`);
+//     }
+// };
+
+  // ============= EMPTY CART UI (Conditional Return) =============
+  // This MUST come after all hooks are called.
+  if (!cartItems.length) {
+  return (
+    <div className="checkout-page">
+      <div className="empty-checkout">
+        <ShoppingBag size={80} />
+        <h2>Your cart is empty</h2>
+
+        <button
+          className="btn-yellow-primary"
+          onClick={() => navigate("/")}
+        >
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+  return (
+    <div className="checkout-page">
+      <div className="checkout-container">
+
+        <div className="checkout-header">
+          <h1>
+            <ShoppingCart size={28} /> Your Cart
+          </h1>
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> Back
+          </button>
         </div>
-    );
-};
+
+        <div className="checkout-content">
+
+          {/* LEFT SIDE */}
+          <div className="checkout-items-section">
 
 
 // ============= ADDRESS MODAL (Unchanged) ==================
