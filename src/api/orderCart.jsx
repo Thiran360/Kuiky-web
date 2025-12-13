@@ -71,9 +71,7 @@ export const orderApi = {
 
     // ⭐️ NEW: POST to add a product review ⭐️
     /**
-     * Sends a request to add a new review for a product.
-     * Endpoint: reviews/add/
-     * Payload: { productId, review, command }
+     
      * @param {Object} reviewData
      * @param {number} reviewData.productId The ID of the product being reviewed.
      * @param {string} reviewData.review The text content of the review.

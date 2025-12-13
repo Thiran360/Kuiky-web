@@ -90,11 +90,11 @@ const handleKeyPress = useCallback((e) => {
         setOpenUserDropdown(false);
         setOpenMobileMenu(false);
     }, [navigate]);
-    const goHistory = useCallback(() => {
-        navigate("/history");
-        setOpenUserDropdown(false);
-        setOpenMobileMenu(false);
-    }, [navigate]);
+    // const goHistory = useCallback(() => {
+    //     navigate("/history");
+    //     setOpenUserDropdown(false);
+    //     setOpenMobileMenu(false);
+    // }, [navigate]);
     const goLogin = useCallback(() => {
         navigate("/login");
         setOpenMobileMenu(false); // Close menu after navigation
@@ -210,7 +210,7 @@ const handleKeyPress = useCallback((e) => {
                                             <User size={16} /> Profile
                                         </button>
                                         <button onClick={goOrders}>🛍 Orders</button>
-                                        <button onClick={goHistory}>📜 History</button>
+                                        {/* <button onClick={goHistory}>📜 History</button> */}
                                         <button onClick={handleLogout}>
                                             <LogOut size={16} /> Logout
                                         </button>
@@ -264,7 +264,7 @@ const handleKeyPress = useCallback((e) => {
                                             <User size={16} /> Profile ({userName})
                                         </button>
                                         <button onClick={goOrders}>🛍 Orders</button>
-                                        <button onClick={goHistory}>📜 History</button>
+                                        {/* <button onClick={goHistory}>📜 History</button> */}
                                         <button onClick={handleLogout} className="logout-btn">
                                             <LogOut size={16} /> Logout
                                         </button>
