@@ -1389,10 +1389,9 @@ textarea:focus-visible {
   .item-image{ width:64px; height:64px; }
 }
 
-/* accessibility and reduced motion */
-@media (prefers-reduced-motion: reduce){ *{ animation-duration:0 !important; transition-duration:0 !important; } }
+@media (min-width: 1280px) {
+    .products-grid {
+        grid-template-columns: repeat(5, 1fr); /* Large: 5 cards */
+    }
+}
 
-/* final note: utility for adding spacing around lists */
-.list-spacing { padding: var(--gap-md); gap: var(--gap-md); }
-
-/* End of merged enhanced CSS */
