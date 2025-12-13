@@ -94,7 +94,7 @@ export const fetchSubCategories = async (categoryId, parentSubcategoryId) => {
 
 export const fetchBanners = async () => {
   try {
-    const res = await api.get("/banners/");
+    const res = await api.get("/Banners/");
     return res.data;
   } catch {
     return [];
