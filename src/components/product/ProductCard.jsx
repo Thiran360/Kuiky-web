@@ -284,16 +284,6 @@ const ProductCard = ({ product }) => {
                         {React.createElement(cartIcon, { className: "product-btn-icon" })}
                         <span>{buttonText}</span>
                     </button>
-
-                    <button
-                        className="product-buy-btn"
-                        onClick={handleBuyNow}
-                        disabled={isDisabled}
-                        aria-label="Buy now"
-                    >
-                        <Zap className="product-btn-icon" />
-                        <span>Buy</span>
-                    </button>
                 </div>
             </div>
         </div>
