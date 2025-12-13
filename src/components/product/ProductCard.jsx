@@ -189,7 +189,7 @@ const ProductCard = ({ product }) => {
     );
 
     // Determine the button state and content using the persistent status (isInCart)
-    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add");
+    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add To Cart");
     const cartIcon = isInCart ? Check : ShoppingCart;
     const isDisabled = isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist || isInCart;
     // Use 'added-once' class for the permanent "Added" visual state

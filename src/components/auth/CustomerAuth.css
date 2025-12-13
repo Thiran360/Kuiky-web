@@ -1,164 +1,525 @@
+/* ===================================
+   CUSTOMER AUTH - CLEAN VERSION
+   Yellow & Black Theme (No Animations)
+   =================================== */
+
 /* --- 1. RESET & VARIABLES --- */
 *, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 :root {
-  --primary-brand: #facc15; 
-  --primary-brand-hover: #eab308;
-  --text-dark: #111827;
-  --text-gray: #6b7280;
-  --bg-white: #ffffff;
-  --bg-light: #f9fafb;
-  --border-color: #e5e7eb; 
-  --success-green: #22c55e;
-  --error-red: #ef4444;
+    --primary-brand: #facc15; 
+    --primary-brand-hover: #eab308;
+    --text-dark: #111827;
+    --text-gray: #6b7280;
+    --bg-white: #ffffff;
+    --bg-light: #f9fafb;
+    --border-color: #e5e7eb; 
+    --success-green: #22c55e;
+    --error-red: #ef4444;
 }
 
 /* --- 2. CONTAINER --- */
 .auth-container {
-  min-height: 100vh;
-  width: 100%;
-  background-color: var(--bg-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  position: relative;
-  overflow-x: hidden; /* Critical for blobs */
-  font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--bg-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Background Blobs */
+/* Background Blobs - Static (No Animation) */
 .blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 0;
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
 }
-.blob-1 { top: -10%; right: -10%; width: 50vw; height: 50vw; background-color: #fef08a; }
-.blob-2 { bottom: -10%; left: -10%; width: 50vw; height: 50vw; background-color: #fde047; }
+
+.blob-1 { 
+    top: -10%; 
+    right: -10%; 
+    width: 50vw; 
+    height: 50vw; 
+    background-color: #fef08a; 
+}
+
+.blob-2 { 
+    bottom: -10%; 
+    left: -10%; 
+    width: 50vw; 
+    height: 50vw; 
+    background-color: #fde047; 
+}
 
 /* --- 3. CARD LAYOUT --- */
 .auth-card {
-  width: 100%;
-  max-width: 950px;
-  background-color: var(--bg-white);
-  border-radius: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-  border: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  z-index: 10;
+    width: 100%;
+    max-width: 950px;
+    background-color: var(--bg-white);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
 }
 
 @media (min-width: 900px) {
-  .auth-card { flex-direction: row; min-height: 600px; }
+    .auth-card { 
+        flex-direction: row; 
+        min-height: 600px; 
+    }
 }
 
 /* --- 4. PANELS --- */
 .left-panel {
-  width: 100%;
-  background-color: var(--primary-brand);
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: var(--text-dark);
+    width: 100%;
+    background-color: var(--primary-brand);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-dark);
 }
 
 .right-panel {
-  width: 100%;
-  padding: 2rem 1.5rem;
-  background-color: var(--bg-white);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    background-color: var(--bg-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 @media (min-width: 900px) {
-  .left-panel { width: 40%; padding: 3rem; }
-  .right-panel { width: 60%; padding: 3rem; }
+    .left-panel { 
+        width: 40%; 
+        padding: 3rem; 
+    }
+    .right-panel { 
+        width: 60%; 
+        padding: 3rem; 
+    }
 }
 
 /* --- 5. TYPOGRAPHY & FEATURES --- */
-.brand-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
-.brand-text { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em; }
+.brand-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    margin-bottom: 1.5rem; 
+}
 
-.hero-title { font-size: 1.75rem; font-weight: 800; line-height: 1.1; margin-bottom: 0.75rem; }
-.hero-subtitle { font-size: 0.95rem; line-height: 1.5; opacity: 0.9; font-weight: 500; }
+.brand-text { 
+    font-size: 1.25rem; 
+    font-weight: 800; 
+    letter-spacing: -0.02em; 
+}
 
-.form-header { margin-bottom: 2rem; }
-.form-header h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.25rem; }
-.form-header p { color: var(--text-gray); font-size: 0.875rem; }
+.hero-title { 
+    font-size: 1.75rem; 
+    font-weight: 800; 
+    line-height: 1.1; 
+    margin-bottom: 0.75rem; 
+}
+
+.hero-subtitle { 
+    font-size: 0.95rem; 
+    line-height: 1.5; 
+    opacity: 0.9; 
+    font-weight: 500; 
+}
+
+.form-header { 
+    margin-bottom: 2rem; 
+}
+
+.form-header h2 { 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    color: var(--text-dark); 
+    margin-bottom: 0.25rem; 
+}
+
+.form-header p { 
+    color: var(--text-gray); 
+    font-size: 0.875rem; 
+}
 
 /* Features (Hidden on mobile) */
-@media (max-width: 899px) { .feature-list { display: none; } }
-@media (min-width: 900px) {
-  .feature-list { display: flex; flex-direction: column; gap: 1rem; margin-top: auto; }
-  .hero-title { font-size: 2.5rem; margin-bottom: 1rem; }
+@media (max-width: 899px) { 
+    .feature-list { 
+        display: none; 
+    } 
 }
-.feature-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; font-weight: 600; }
+
+@media (min-width: 900px) {
+    .feature-list { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 1rem; 
+        margin-top: auto; 
+    }
+    .hero-title { 
+        font-size: 2.5rem; 
+        margin-bottom: 1rem; 
+    }
+}
+
+.feature-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.75rem; 
+    font-size: 0.95rem; 
+    font-weight: 600; 
+}
 
 /* --- 6. INPUTS --- */
-.form-stack { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
-.input-wrapper { position: relative; width: 100%; }
+.form-stack { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 1rem; 
+    width: 100%; 
+}
+
+.input-wrapper { 
+    position: relative; 
+    width: 100%; 
+}
 
 .input-icon {
-  position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
-  color: #9ca3af; pointer-events: none; z-index: 2; display: flex; align-items: center;
+    position: absolute; 
+    left: 1rem; 
+    top: 50%; 
+    transform: translateY(-50%);
+    color: #9ca3af; 
+    pointer-events: none; 
+    z-index: 2; 
+    display: flex; 
+    align-items: center;
 }
 
 .status-icon {
-  position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
-  z-index: 2; display: flex; align-items: center;
+    position: absolute; 
+    right: 1rem; 
+    top: 50%; 
+    transform: translateY(-50%);
+    z-index: 2; 
+    display: flex; 
+    align-items: center;
 }
 
 .custom-input {
-  width: 100%;
-  padding: 0.875rem 2.75rem;
-  border-radius: 0.75rem;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-light);
-  outline: none;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  appearance: none; /* iOS Reset */
+    width: 100%;
+    padding: 0.875rem 2.75rem;
+    border-radius: 0.75rem;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-light);
+    outline: none;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    appearance: none;
 }
 
-.custom-input:focus { border-color: var(--primary-brand); background-color: #fff; }
-.custom-input.valid { border-color: var(--success-green); }
-.custom-input.invalid, .custom-input.duplicate { border-color: var(--error-red); }
+.custom-input:focus { 
+    border-color: var(--primary-brand); 
+    background-color: #fff; 
+}
 
-.validation-msg { font-size: 0.75rem; margin-top: 0.25rem; margin-left: 0.25rem; font-weight: 600; }
-.text-green { color: var(--success-green); }
-.text-red { color: var(--error-red); }
+.custom-input.valid { 
+    border-color: var(--success-green); 
+}
+
+.custom-input.invalid, 
+.custom-input.duplicate { 
+    border-color: var(--error-red); 
+}
+
+.validation-msg { 
+    font-size: 0.75rem; 
+    margin-top: 0.25rem; 
+    margin-left: 0.25rem; 
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.text-green { 
+    color: var(--success-green); 
+}
+
+.text-red { 
+    color: var(--error-red); 
+}
 
 /* --- 7. BUTTONS & LINKS --- */
 .btn-primary {
-  width: 100%; padding: 1rem; border-radius: 0.75rem;
-  font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;
+    width: 100%; 
+    padding: 1rem; 
+    border-radius: 0.75rem;
+    font-weight: 700; 
+    font-size: 1rem; 
+    border: none; 
+    cursor: pointer;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 0.5rem; 
+    margin-top: 0.5rem;
+    transition: all 0.3s ease;
 }
 
-.btn-black { background-color: var(--text-dark); color: var(--bg-white); }
-.btn-brand { background-color: var(--primary-brand); color: var(--text-dark); }
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-black { 
+    background-color: var(--text-dark); 
+    color: var(--bg-white); 
+}
+
+.btn-brand { 
+    background-color: var(--primary-brand); 
+    color: var(--text-dark); 
+}
+
+.btn-location {
+    background-color: var(--primary-brand);
+    color: var(--text-dark);
+    margin-top: 0;
+}
+
+.btn-location:hover {
+    background-color: var(--primary-brand-hover);
+}
 
 .toggle-link {
-  color: #ca8a04; font-weight: 700; border: none; background: none; cursor: pointer; transition: color 0.2s;
+    color: #ca8a04; 
+    font-weight: 700; 
+    border: none; 
+    background: none; 
+    cursor: pointer; 
+    transition: color 0.2s;
 }
-.toggle-link:hover { color: #a16207; }
-.toggle-link.small { font-size: 0.85rem; font-weight: 500; }
 
-.forgot-pass-wrapper { text-align: right; margin-top: -0.5rem; }
-.switch-text { text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 1.5rem; }
+.toggle-link:hover { 
+    color: #a16207; 
+    text-decoration: underline;
+}
 
-/* Animation Utility */
-@keyframes spin { to { transform: rotate(360deg); } }
-.spin { animation: spin 1s linear infinite; }
+.toggle-link.small { 
+    font-size: 0.85rem; 
+    font-weight: 500; 
+}
+
+.forgot-pass-wrapper { 
+    text-align: right; 
+    margin-top: -0.5rem; 
+}
+
+.switch-text { 
+    text-align: center; 
+    font-size: 0.9rem; 
+    color: #6b7280; 
+    margin-top: 1.5rem; 
+}
+
+/* --- 8. LOCATION FETCH SECTION --- */
+.location-fetch-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* --- 9. RESPONSIVE DESIGN --- */
+
+/* Tablet (768px - 899px) */
+@media (max-width: 899px) and (min-width: 768px) {
+    .auth-card {
+        max-width: 700px;
+    }
+
+    .left-panel {
+        padding: 2.5rem;
+    }
+
+    .right-panel {
+        padding: 2.5rem;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile (576px - 767px) */
+@media (max-width: 767px) and (min-width: 576px) {
+    .auth-container {
+        padding: 1.5rem;
+    }
+
+    .auth-card {
+        border-radius: 1.25rem;
+    }
+
+    .left-panel {
+        padding: 1.75rem;
+    }
+
+    .right-panel {
+        padding: 1.75rem;
+    }
+
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.35rem;
+    }
+}
+
+/* Small Mobile (480px and below) */
+@media (max-width: 575px) {
+    .auth-container {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        border-radius: 1rem;
+    }
+
+    .left-panel {
+        padding: 1.5rem;
+    }
+
+    .right-panel {
+        padding: 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.875rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .brand-text {
+        font-size: 1.125rem;
+    }
+
+    .custom-input {
+        padding: 0.75rem 2.5rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .validation-msg {
+        font-size: 0.7rem;
+    }
+}
+
+/* Extra Small Mobile (360px and below) */
+@media (max-width: 359px) {
+    .auth-container {
+        padding: 0.75rem;
+    }
+
+    .left-panel,
+    .right-panel {
+        padding: 1.25rem;
+    }
+
+    .hero-title {
+        font-size: 1.35rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .custom-input {
+        padding: 0.7rem 2.25rem;
+        font-size: 0.825rem;
+    }
+
+    .btn-primary {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .auth-container {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        min-height: auto;
+    }
+
+    .left-panel,
+    .right-panel {
+        padding: 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-header {
+        margin-bottom: 1rem;
+    }
+
+    .form-stack {
+        gap: 0.75rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .blob,
+    .blob-1,
+    .blob-2 {
+        display: none;
+    }
+
+    .auth-container {
+        background-color: white;
+    }
+}
