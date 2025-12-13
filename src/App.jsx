@@ -14,23 +14,27 @@ import { CartProvider } from "./context/CartContext";
 import { AddressProvider } from "./context/AddressContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrderProvider } from "./context/OrderContext";
-import ProductDetailPage from "./components/product/ProductDetailPage";  
-// --- Components & Pages ---
+
+// --- Layout ---
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+
+// --- Pages & Components ---
 import LandingPage from "./pages/LandingPage";
 import CustomerAuth from "./components/auth/CustomerAuth";
-// import ProductListingPage from "./components/product/ProductListingPage";
 import Cart from "./components/product/Cart";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import AddressManager from "./components/Profile/AddressManager";
 import OrderHistoryPage from "./components/product/OrderHistoryPage";
+import ProductDetailPage from "./components/product/ProductDetailPage";
 
-// Global Styles
+// --- Global Styles ---
 import "./styles/Global.css";
-import { Import } from "lucide-react";
 
-// Wrap inside Router so we can use useNavigate + useLocation
+// ------------------------------
+// APP CONTENT (inside Router)
+// ------------------------------
 const AppContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -47,36 +51,43 @@ const AppContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 antialiased">
-
-      {/* Global Header */}
+    <div className="min-h-screen bg-white font-sans text-gray-900 antialiased flex flex-col">
+      
+      {/* HEADER */}
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <LandingPage
-              searchTerm={searchTerm}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-          }
-        />
+      {/* MAIN CONTENT */}
+      <main className="flex-grow">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LandingPage
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+            }
+          />
+          <Route path="/login" element={<CustomerAuth />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/address" element={<AddressManager />} />
+          <Route path="/orders" element={<OrderHistoryPage />} />
+          <Route path="/product/:id" element={<ProductDetailPage />} />
+        </Routes>
+      </main>
 
-        <Route path="/login" element={<CustomerAuth />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/address" element={<AddressManager />} />
-        <Route path="/orders" element={<OrderHistoryPage />} />
-        <Route path="/product/:id" element={<ProductDetailPage />} />
-
-      </Routes>
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 };
 
+// ------------------------------
+// ROOT APP
+// ------------------------------
 function App() {
   return (
     <Router>
