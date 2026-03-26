@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAddress } from '../../context/AddressContext';
-import { Plus, MapPin, Edit, Trash2, Home, CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { Plus, MapPin, Edit, Trash2, Home, CheckCircle, Loader2, XCircle, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ---------------- ADDRESS FORM ----------------
 const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
@@ -13,7 +14,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
         state: "",
         postal_code: "",
         country: "India",
-        is_default: false,
+        is_default: true,
         latitude: "",
         longitude: "",
     });
@@ -51,7 +52,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
             },
             (error) => {
                 setLocationLoading(false);
-                let msg = "Failed to get location.";
+                let msg = "Failed to synchronize location.";
                 if (error.code === error.PERMISSION_DENIED) {
                     msg = "Location access denied. Please enable it in your browser settings.";
                 } else if (error.code === error.TIMEOUT) {
@@ -66,974 +67,694 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        if (!formData.full_name || !formData.address_line_1 ||
-            !formData.city || !formData.state || !formData.postal_code || !formData.country) {
-            alert("Please fill in all required fields.");
-            return;
-        }
-
         onSubmit(formData);
     };
 
     return (
-        <form onSubmit={handleSubmit} className="address-form-box">
-            <div className="form-header-row">
-                <h3 className="form-header">{isEditMode ? "Edit Address" : "Add New Address"}</h3>
-                <button type="button" onClick={onCancel} className="form-cancel-btn">
-                    Cancel
+        <motion.form 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            onSubmit={handleSubmit} 
+            className="address-premium-form"
+        >
+            <div className="form-head-elite">
+                <div className="head-text-col">
+                    <h3 className="form-title-luxe">{isEditMode ? "Update Delivery Protocol" : "Add New Destination"}</h3>
+                    <p className="form-subtitle-luxe">Ensure your luxury items arrive at the precise coordinates.</p>
+                </div>
+                <button type="button" onClick={onCancel} className="close-form-luxe">
+                    <XCircle size={24} />
                 </button>
             </div>
 
-            <div className="form-grid">
-                <div className="form-field">
-                    <label>Full Name *</label>
-                    <input 
-                        name="full_name" 
-                        value={formData.full_name} 
+            <div className="form-quad-grid">
+                <div className="luxe-input-group">
+                    <label>Recipient Name</label>
+                    <input
+                        name="full_name"
+                        value={formData.full_name}
                         onChange={handleChange}
-                        placeholder="Enter full name" 
-                        required 
+                        placeholder="e.g. Alexander Pierce"
+                        required
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>Phone Number</label>
-                    <input 
-                        name="phone_number" 
-                        value={formData.phone_number} 
+                <div className="luxe-input-group">
+                    <label>Contact Phone</label>
+                    <input
+                        name="phone_number"
+                        value={formData.phone_number}
                         onChange={handleChange}
-                        placeholder="Enter phone number" 
+                        placeholder="+91 00000 00000"
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>Address Line 1 *</label>
-                    <input 
-                        name="address_line_1" 
-                        value={formData.address_line_1} 
+                <div className="luxe-input-group full">
+                    <label>Primary Address Line</label>
+                    <input
+                        name="address_line_1"
+                        value={formData.address_line_1}
                         onChange={handleChange}
-                        placeholder="House no., Building, Street" 
-                        required 
+                        placeholder="Street, Suite, or Landmark"
+                        required
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>Address Line 2 (Optional)</label>
-                    <input 
-                        name="address_line_2" 
-                        value={formData.address_line_2} 
+                <div className="luxe-input-group full">
+                    <label>Secondary Address (Optional)</label>
+                    <input
+                        name="address_line_2"
+                        value={formData.address_line_2}
                         onChange={handleChange}
-                        placeholder="Area, Locality" 
+                        placeholder="Apartment, Floor, etc."
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>City *</label>
-                    <input 
-                        name="city" 
-                        value={formData.city} 
+                <div className="luxe-input-group">
+                    <label>City / Hub</label>
+                    <input
+                        name="city"
+                        value={formData.city}
                         onChange={handleChange}
-                        placeholder="Enter city" 
-                        required 
+                        placeholder="Enter City"
+                        required
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>State *</label>
-                    <input 
-                        name="state" 
-                        value={formData.state} 
+                <div className="luxe-input-group">
+                    <label>State / Region</label>
+                    <input
+                        name="state"
+                        value={formData.state}
                         onChange={handleChange}
-                        placeholder="Enter state" 
-                        required 
+                        placeholder="Enter State"
+                        required
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>Postal Code *</label>
-                    <input 
-                        name="postal_code" 
-                        value={formData.postal_code} 
+                <div className="luxe-input-group">
+                    <label>Postal Code</label>
+                    <input
+                        name="postal_code"
+                        value={formData.postal_code}
                         onChange={handleChange}
-                        placeholder="Enter postal code" 
-                        required 
+                        placeholder="6-digit ZIP"
+                        required
                     />
                 </div>
 
-                <div className="form-field">
-                    <label>Country *</label>
-                    <input 
-                        name="country" 
-                        value={formData.country} 
+                <div className="luxe-input-group">
+                    <label>Country</label>
+                    <input
+                        name="country"
+                        value={formData.country}
                         onChange={handleChange}
-                        placeholder="Enter country" 
-                        required 
+                        placeholder="Country"
+                        required
                     />
                 </div>
             </div>
 
-            {/* Geolocation Button */}
-            <div className="location-fetch-wrapper">
+            <div className="geo-sync-section">
                 <button
                     type="button"
-                    className="btn-location"
+                    className="btn-sync-geo"
                     onClick={handleGetLocation}
                     disabled={locationLoading || isSaving}
                 >
                     {locationLoading ? (
-                        <>
-                            <Loader2 size={16} className="spin" /> Getting Location...
-                        </>
+                        <Loader2 size={18} className="spin" />
                     ) : (
-                        <>
-                            <MapPin size={16} /> Use Current Location (Optional)
-                        </>
+                        <MapPin size={18} />
+                    )}
+                    <span>Sync Precise GPS Coordinates</span>
+                </button>
+
+                {formData.latitude && formData.longitude && !locationLoading && (
+                    <div className="geo-status-elite success">
+                        <CheckCircle size={14} /> Coordinates Locked
+                    </div>
+                )}
+                
+                {locationError && (
+                    <div className="geo-status-elite error">
+                        <XCircle size={14} /> {locationError}
+                    </div>
+                )}
+            </div>
+
+            <div className="form-footer-elite">
+                <label className="luxe-checkbox">
+                    <input
+                        type="checkbox"
+                        name="is_default"
+                        checked={formData.is_default}
+                        onChange={handleChange}
+                    />
+                    <div className="check-box-luxe">
+                         <CheckCircle size={16} className="checked-icon" />
+                    </div>
+                    Establish as Default Destination
+                </label>
+
+                <button type="submit" className="btn-luxe-submit" disabled={isSaving}>
+                    {isSaving ? (
+                        <><Loader2 size={20} className="spin mr-2" /> PROCESSING...</>
+                    ) : (
+                        isEditMode ? "CONFIRM ALLOCATION" : "DEPLOY ADDRESS"
                     )}
                 </button>
-                
-                {formData.latitude && formData.longitude && !locationLoading ? (
-                    <p className="location-status success">
-                        <CheckCircle size={14} /> Lat: {parseFloat(formData.latitude).toFixed(4)}, Long: {parseFloat(formData.longitude).toFixed(4)}
-                    </p>
-                ) : locationError ? (
-                    <p className="location-status error">
-                        <XCircle size={14} /> {locationError}
-                    </p>
-                ) : null}
             </div>
-
-            <div className="default-checkbox-wrapper">
-                <label className="default-checkbox">
-                    <input 
-                        type="checkbox" 
-                        name="is_default"
-                        checked={formData.is_default} 
-                        onChange={handleChange} 
-                    />
-                    Set as default shipping address
-                </label>
-            </div>
-
-            <div className="form-actions">
-                <button type="submit" className="btn-primary-save" disabled={isSaving}>
-                    {isSaving ? "Saving..." : isEditMode ? "Update Address" : "Save Address"}
-                </button>
-            </div>
-        </form>
+        </motion.form>
     );
 };
 
-// ---------------- ADDRESS CARD WITH RADIO BUTTON ----------------
+// ---------------- ADDRESS CARD ----------------
 const AddressCard = ({ address, onEdit, onDelete, onSelect, isSelected }) => {
-    // Handle card click for selection
     const handleCardClick = (e) => {
-        // Don't trigger selection if clicking on edit/delete buttons
-        if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) {
-            return;
-        }
+        if (e.target.closest('.luxe-action-btn')) return;
         onSelect(address);
     };
 
-    // Handle edit button click
-    const handleEditClick = (e) => {
-        e.stopPropagation(); // Prevent card selection
-        onEdit(address);
-    };
-
-    // Handle delete button click
-    const handleDeleteClick = (e) => {
-        e.stopPropagation(); // Prevent card selection
-        onDelete(address.id);
-    };
-
     return (
-        <div 
-            className={`address-card ${isSelected ? "selected" : ""}`}
+        <motion.div
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`destination-card-luxe ${isSelected ? "active" : ""}`}
             onClick={handleCardClick}
-            role="radio"
-            aria-checked={isSelected}
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onSelect(address);
-                }
-            }}
         >
-            <div className="address-radio-wrapper">
-                <input
-                    type="radio"
-                    id={`address-${address.id}`}
-                    name="selectedAddress"
-                    checked={isSelected}
-                    onChange={() => onSelect(address)}
-                    className="address-radio-input"
-                />
-                <span className="radio-custom"></span>
+            <div className="destination-visual">
+                <div className="selector-ring-luxe">
+                    <div className="inner-dot"></div>
+                </div>
+                <div className="icon-shield">
+                    <ShieldCheck size={24} />
+                </div>
             </div>
 
-            <div className="address-content">
-                <div className="address-header-row">
-                    <div className="address-info-left">
-                        <h4 className="address-name">{address.full_name}</h4>
-                        {address.is_default && (
-                            <span className="address-tag default-tag">
-                                <Home size={14} /> Default
-                            </span>
-                        )}
-                        {isSelected && (
-                            <span className="address-tag selected-tag">
-                                <CheckCircle size={14} /> Selected
-                            </span>
-                        )}
+            <div className="destination-details">
+                <div className="dest-header-row">
+                    <h4 className="dest-user-name">{address.full_name || address.name}</h4>
+                    <div className="dest-tags-row">
+                        {address.is_default && <span className="luxe-badge gold">DEFAULT</span>}
+                        {isSelected && <span className="luxe-badge blue">SELECTED</span>}
                     </div>
                 </div>
 
-                <div className="address-details">
-                    <p className="address-text">
-                        {address.address_line_1}
+                <div className="dest-body-luxe">
+                    <p className="dest-main-line">
+                        {address.address || address.address_line_1}
                         {address.address_line_2 && `, ${address.address_line_2}`}
                     </p>
-                    <p className="address-text">
-                        {address.city}, {address.state} - {address.country} - {address.postal_code}
+                    <p className="dest-sub-line">
+                        {address.city}, {address.state} - {address.country}
                     </p>
-                    
-                    {(address.latitude && address.longitude) && (
-                        <p className="address-geo small-text">
-                            Geo: Lat {parseFloat(address.latitude).toFixed(4)}, Long {parseFloat(address.longitude).toFixed(4)}
-                        </p>
-                    )}
-
-                    <p className="address-phone">Phone: {address.phone_number}</p>
+                    <div className="dest-footer-row">
+                        <span className="dest-pincode">PIN {address.pincode || address.postal_code}</span>
+                        <span className="dest-phone">PH {address.phone_number || address.mobile}</span>
+                    </div>
                 </div>
 
-                <div className="address-actions">
-                    <button onClick={handleEditClick} className="action-btn edit-btn">
-                        <Edit size={14} /> Edit
+                <div className="dest-actions-overlay">
+                    <button onClick={() => onEdit(address)} className="luxe-action-btn edit">
+                        <Edit size={14} /> <span>MODIFY</span>
                     </button>
-                    <button onClick={handleDeleteClick} className="action-btn delete-btn">
-                        <Trash2 size={14} /> Delete
+                    <button onClick={() => onDelete(address.id)} className="luxe-action-btn delete">
+                        <Trash2 size={14} /> <span>PURGE</span>
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
-// ---------------- MAIN COMPONENT ----------------
 const AddressManager = () => {
-    const {
-        addresses,
-        selectedAddress,
-        setSelectedAddress,
-        addAddress,
-        updateAddress,
-        deleteAddress,
-        loadAddresses
+    const { 
+        addresses, 
+        selectedAddress, 
+        setSelectedAddress, 
+        addAddress, 
+        updateAddress, 
+        deleteAddress, 
+        loadAddresses 
     } = useAddress();
 
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [editingAddress, setEditingAddress] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
 
-    useEffect(() => {
-        loadAddresses();
-    }, [loadAddresses]);
+    useEffect(() => { loadAddresses(); }, []);
 
     const handleSaveAddress = async (formData) => {
         try {
             setIsSaving(true);
-            
-            const payload = {
-                ...formData,
-                latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-                longitude: formData.longitude ? parseFloat(formData.longitude) : null,
-            };
-
-            if (payload.id) {
-                await updateAddress(payload.id, payload);
-            } else {
-                await addAddress(payload);
-            }
-
+            const payload = { ...formData, pincode: String(formData.postal_code) };
+            if (payload.id) await updateAddress(payload.id, payload);
+            else await addAddress(payload);
             setIsFormVisible(false);
             setEditingAddress(null);
-
         } catch (err) {
-            alert("Failed to save address.");
+            alert("Administrative Error: " + (err?.response?.data?.message || err.message));
         } finally {
             setIsSaving(false);
         }
-    };
-
-    const handleEditAddress = (address) => {
-        const formattedAddress = {
-            ...address,
-            latitude: address.latitude?.toString() || "",
-            longitude: address.longitude?.toString() || "",
-        };
-        setEditingAddress(formattedAddress);
-        setIsFormVisible(true);
-    };
-
-    const handleDeleteAddress = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this address?")) return;
-
-        setDeleteId(id);
-        try {
-            await deleteAddress(id);
-        } catch (err) {
-            alert("Failed to delete address.");
-        } finally {
-            setDeleteId(null);
-        }
-    };
-
-    const handleSelectAddress = (address) => {
-        setSelectedAddress(address);
     };
 
     return (
         <div className="address-manager-wrapper">
             <style>{AddressManagerStyles}</style>
 
-            {isFormVisible && (
-                <AddressForm
-                    initialData={editingAddress}
-                    onSubmit={handleSaveAddress}
-                    onCancel={() => {
-                        setIsFormVisible(false);
-                        setEditingAddress(null);
-                    }}
-                    isSaving={isSaving}
-                />
-            )}
+            <AnimatePresence>
+                {isFormVisible && (
+                    <AddressForm
+                        initialData={editingAddress}
+                        onSubmit={handleSaveAddress}
+                        onCancel={() => { setIsFormVisible(false); setEditingAddress(null); }}
+                        isSaving={isSaving}
+                    />
+                )}
+            </AnimatePresence>
 
             <div className="address-list-header">
-                <h3 className="section-title">Saved Addresses ({addresses.length})</h3>
-                
+                <h3 className="section-title">Verified Destinations ({addresses.length})</h3>
                 {!isFormVisible && (
-                    <button 
-                        className="btn-add-address"
-                        onClick={() => {
-                            setEditingAddress(null);
-                            setIsFormVisible(true);
-                        }}
-                    >
-                        <Plus size={16} /> Add New Address
+                    <button className="btn-add-address" onClick={() => setIsFormVisible(true)}>
+                        <Plus size={18} /> New Coordinate
                     </button>
                 )}
             </div>
 
-            <div className="address-list">
+            <motion.div layout className="address-list">
                 {addresses.length === 0 ? (
-                    <div className="empty-addresses">
-                        <MapPin size={40} />
-                        <p>No addresses found. Click 'Add New' to create one.</p>
+                    <div className="empty-addresses-premium">
+                        <div className="pulsing-pin"><MapPin size={48} /></div>
+                        <h3>No Destination Protocol Established</h3>
+                        <p>Begin your procurement journey by defining a delivery point.</p>
+                        <button className="btn-add-address" onClick={() => setIsFormVisible(true)}>Establish First Protocol</button>
                     </div>
                 ) : (
                     addresses.map(address => (
                         <AddressCard
                             key={address.id}
                             address={address}
-                            onEdit={handleEditAddress}
-                            onDelete={handleDeleteAddress}
-                            onSelect={handleSelectAddress}
+                            onEdit={(addr) => { setEditingAddress(addr); setIsFormVisible(true); }}
+                            onDelete={(id) => window.confirm("Terminate this destination protocol?") && deleteAddress(id)}
+                            onSelect={setSelectedAddress}
                             isSelected={selectedAddress?.id === address.id}
                         />
                     ))
                 )}
-            </div>
-
-            {addresses.length > 0 && !isFormVisible && (
-                <div className="address-manager-note">
-                    * Click anywhere on the address card to select it for shipping
-                </div>
-            )}
+            </motion.div>
         </div>
     );
 };
 
-export default AddressManager;
-
-// --- COMPONENT STYLES ---
 const AddressManagerStyles = `
-    /* Base Styles */
     .address-manager-wrapper {
-        padding: 0;
-        max-width: 850px;
+        padding: 2.5rem;
+        max-width: 1200px;
         margin: 0 auto;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Outfit', sans-serif;
     }
 
-    /* Header */
     .address-list-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 20px 0;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #E5E5E5;
+        margin-bottom: 3.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
     }
 
     .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #000000;
-        margin: 0;
+        font-size: 2rem;
+        font-weight: 900;
+        color: #0f172a;
+        letter-spacing: -1.5px;
     }
 
     .btn-add-address {
-        background: #FFD700;
-        color: #000000;
+        background: #0f172a;
+        color: #ffffff;
         border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: 600;
+        padding: 14px 30px;
+        border-radius: 100px;
+        font-weight: 850;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 8px;
-        transition: background 0.2s ease;
+        gap: 12px;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.2);
     }
 
-    .btn-add-address:hover:not(:disabled) {
-        background: #F0C800;
+    .btn-add-address:hover {
+        background: #4f46e5;
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.3);
     }
 
-    .btn-add-address:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    /* Address Form */
-    .address-form-box {
-        background: #FFFFFF;
-        border: 1px solid #E5E5E5;
-        border-radius: 8px;
-        padding: 25px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-
-    .form-header {
-        font-size: 20px;
-        font-weight: 600;
-        color: #000000;
-        margin: 0;
-        padding-bottom: 8px;
-        border-bottom: 2px solid #FFD700;
-    }
-
-    .form-cancel-btn {
-        background: transparent;
-        color: #666666;
-        border: 1px solid #E5E5E5;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .form-cancel-btn:hover {
-        border-color: #000000;
-        color: #000000;
-    }
-
-    /* Form Grid */
-    .form-grid {
+    .address-list {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2.5rem;
     }
 
-    @media (max-width: 768px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
+    /* PREMIUM DESTINATION CARD */
+    .destination-card-luxe {
+        background: #ffffff;
+        border-radius: 3rem;
+        padding: 3rem;
+        display: flex;
+        gap: 2.5rem;
+        cursor: pointer;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.02);
     }
 
-    .form-field {
+    .destination-card-luxe:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.06);
+        border-color: rgba(79, 70, 229, 0.2);
+    }
+
+    .destination-card-luxe.active {
+        background: #f8fafc;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 40px 90px rgba(79, 70, 229, 0.1);
+    }
+
+    .destination-visual {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-    }
-
-    .form-field label {
-        font-size: 14px;
-        font-weight: 500;
-        color: #000000;
-    }
-
-    .form-field input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #E5E5E5;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #000000;
-        background: #FFFFFF;
-        transition: border-color 0.2s ease;
-    }
-
-    .form-field input:focus {
-        outline: none;
-        border-color: #FFD700;
-        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
-    }
-
-    /* Default Checkbox */
-    .default-checkbox-wrapper {
-        margin: 20px 0;
-    }
-
-    .default-checkbox {
-        display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        color: #000000;
-        cursor: pointer;
+        gap: 2rem;
     }
 
-    .default-checkbox input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: #FFD700;
-    }
-
-    /* Form Actions */
-    .form-actions {
-        margin-top: 25px;
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .btn-primary-save {
-        background: #FFD700;
-        color: #000000;
-        border: none;
-        padding: 14px 32px;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s ease;
-        min-width: 150px;
-    }
-
-    .btn-primary-save:hover:not(:disabled) {
-        background: #F0C800;
-    }
-
-    .btn-primary-save:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    /* Location Button */
-    .location-fetch-wrapper {
-        margin: 20px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .btn-location {
-        background: #FFD700;
-        color: #000000;
-        border: none;
-        padding: 12px;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
+    .selector-ring-luxe {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #e2e8f0;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        transition: background 0.2s ease;
+        transition: 0.4s;
     }
 
-    .btn-location:hover:not(:disabled) {
-        background: #F0C800;
+    .active .selector-ring-luxe {
+        border-color: #4f46e5;
+        background: #4f46e5;
     }
 
-    .btn-location:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    .location-status {
-        font-size: 13px;
-        padding: 10px 12px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .location-status.success {
-        background: #F0F8E0;
-        color: #4A7C00;
-        border: 1px solid #D4E6A3;
-    }
-
-    .location-status.error {
-        background: #FFE5E5;
-        color: #CC0000;
-        border: 1px solid #FFCCCC;
-    }
-
-    .spin {
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    /* Address List */
-    .address-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    /* Address Card - CLICKABLE */
-    .address-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 15px;
-        padding: 20px;
-        border: 1px solid #E5E5E5;
-        border-radius: 8px;
-        background: #FFFFFF;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .address-card:hover {
-        border-color: #FFD700;
-        background: #FFFDF5;
-    }
-
-    .address-card.selected {
-        border-color: #FFD700;
-        border-width: 2px;
-        background: #FFFDF5;
-        box-shadow: 0 0 0 1px #FFD700;
-    }
-
-    /* Radio Button */
-    .address-radio-wrapper {
-        position: relative;
-        margin-top: 3px;
-        flex-shrink: 0;
-    }
-
-    .address-radio-input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-    }
-
-    .radio-custom {
-        display: block;
-        width: 18px;
-        height: 18px;
-        border: 2px solid #D9D9D9;
+    .inner-dot {
+        width: 10px;
+        height: 10px;
+        background: white;
         border-radius: 50%;
-        background: #FFFFFF;
-        position: relative;
-        transition: all 0.2s ease;
+        transform: scale(0);
+        transition: 0.4s;
     }
 
-    .address-card:hover .radio-custom {
-        border-color: #FFD700;
-    }
+    .active .inner-dot { transform: scale(1); }
 
-    .address-card.selected .radio-custom {
-        border-color: #FFD700;
-        background: #FFD700;
-    }
-
-    .radio-custom::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #000000;
-        display: none;
-    }
-
-    .address-card.selected .radio-custom::after {
-        display: block;
-    }
-
-    /* Address Content */
-    .address-content {
-        flex: 1;
-    }
-
-    .address-info-left {
+    .icon-shield {
+        width: 64px;
+        height: 64px;
+        background: #f1f5f9;
+        border-radius: 1.5rem;
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-        flex-wrap: wrap;
+        justify-content: center;
+        color: #94a3b8;
+        transition: 0.4s;
     }
 
-    .address-name {
-        font-size: 16px;
-        font-weight: 600;
-        color: #000000;
-        margin: 0;
+    .active .icon-shield {
+        background: #4f46e5;
+        color: white;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
     }
 
-    .address-tag {
-        font-size: 12px;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
+    .destination-details { flex: 1; }
 
-    .default-tag {
-        background: #FFF3CD;
-        color: #000000;
-        border: 1px solid #FFD700;
-    }
-
-    .selected-tag {
-        background: #FFF3CD;
-        color: #000000;
-        border: 1px solid #FFD700;
-    }
-
-    .address-details {
-        margin-bottom: 15px;
-    }
-
-    .address-text {
-        font-size: 14px;
-        color: #666666;
-        margin: 4px 0;
-        line-height: 1.5;
-    }
-
-    .address-geo {
-        font-size: 12px;
-        color: #888888;
-        margin-top: 8px;
-    }
-
-    .address-phone {
-        font-size: 13px;
-        color: #666666;
-        margin-top: 8px;
-    }
-
-    /* Address Actions */
-    .address-actions {
+    .dest-header-row {
         display: flex;
-        gap: 10px;
-        padding-top: 15px;
-        border-top: 1px solid #F0F0F0;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
     }
 
-    .action-btn {
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s ease;
+    .dest-user-name {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+
+    .luxe-badge {
+        font-size: 0.6rem;
+        font-weight: 900;
+        padding: 5px 12px;
+        border-radius: 100px;
+        letter-spacing: 1.5px;
+    }
+    .luxe-badge.gold { background: #fef3c7; color: #92400e; }
+    .luxe-badge.blue { background: #e0f2fe; color: #0369a1; }
+
+    .dest-main-line {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #334155;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+
+    .dest-sub-line {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+
+    .dest-footer-row {
+        display: flex;
+        gap: 25px;
+        font-size: 0.85rem;
+        font-weight: 850;
+        color: #1e293b;
+    }
+
+    .dest-actions-overlay {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px dashed #e2e8f0;
+        display: flex;
+        gap: 15px;
+    }
+
+    .luxe-action-btn {
+        padding: 10px 20px;
+        border-radius: 1rem;
         border: 1px solid transparent;
-    }
-
-    .edit-btn {
-        background: #FFD700;
-        color: #000000;
-        border-color: #FFD700;
-    }
-
-    .edit-btn:hover {
-        background: #F0C800;
-        border-color: #F0C800;
-    }
-
-    .delete-btn {
-        background: transparent;
-        color: #FF0000;
-        border-color: #FFCCCC;
-    }
-
-    .delete-btn:hover {
-        background: #FFE5E5;
-    }
-
-    /* Make sure edit/delete buttons don't trigger card selection */
-    .edit-btn, .delete-btn {
+        background: #f8fafc;
+        font-size: 0.75rem;
+        font-weight: 900;
         cursor: pointer;
-        position: relative;
-        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.3s;
     }
 
-    /* Empty State */
-    .empty-addresses {
-        text-align: center;
-        padding: 40px 20px;
-        color: #666666;
-        background: #FAFAFA;
+    .luxe-action-btn.edit:hover { background: #fff; border-color: #0f172a; }
+    .luxe-action-btn.delete:hover { background: #fef2f2; border-color: #ef4444; color: #ef4444; }
+
+    /* PREMIUM FORM BOX */
+    .address-premium-form {
+        background: #ffffff;
+        border-radius: 4rem;
+        padding: 4rem;
+        margin-bottom: 5rem;
+        box-shadow: 0 50px 120px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .form-head-elite {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4rem;
+    }
+
+    .form-title-luxe {
+        font-size: 2.25rem;
+        font-weight: 950;
+        color: #0f172a;
+        letter-spacing: -2px;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle-luxe { color: #64748b; font-size: 1rem; }
+
+    .close-form-luxe {
+        background: transparent;
+        border: none;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: 0.4s ease;
+    }
+    .close-form-luxe:hover { color: #ef4444; transform: rotate(90deg) scale(1.2); }
+
+    .form-quad-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .luxe-input-group { display: flex; flex-direction: column; gap: 10px; }
+    .luxe-input-group.full { grid-column: 1 / -1; }
+
+    .luxe-input-group label {
+        font-size: 0.75rem;
+        font-weight: 900;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-left: 5px;
+    }
+
+    .luxe-input-group input {
+        padding: 1.3rem;
+        background: #f8fafc;
+        border: 2px solid transparent;
+        border-radius: 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.4s;
+    }
+
+    .luxe-input-group input:focus {
+        background: #ffffff;
+        border-color: #4f46e5;
+        box-shadow: 0 0 25px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+
+    .geo-sync-section {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 4rem;
+        padding: 2rem;
+        background: #eef2ff;
+        border-radius: 2.5rem;
+        border: 1px dashed #c7d2fe;
+    }
+
+    .btn-sync-geo {
+        background: #0f172a;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 1.25rem;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .btn-sync-geo:hover:not(:disabled) { background: #4f46e5; transform: scale(1.05); }
+
+    .form-footer-elite {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 3rem;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    .luxe-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #334155;
+        cursor: pointer;
+    }
+
+    .check-box-luxe {
+        width: 30px;
+        height: 30px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+
+    .check-box-luxe {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #e2e8f0;
         border-radius: 8px;
-        border: 1px dashed #E5E5E5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
     }
 
-    .empty-addresses svg {
-        margin-bottom: 15px;
-        color: #CCCCCC;
+    .luxe-checkbox input:checked + .check-box-luxe {
+        background: var(--elite-blue, #2563eb);
+        border-color: var(--elite-blue, #2563eb);
     }
 
-    .empty-addresses p {
-        margin-bottom: 15px;
+    .btn-luxe-submit {
+        background: var(--elite-slate, #0f172a);
+        color: white;
+        border: none;
+        padding: 1.5rem 4rem;
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        font-weight: 950;
+        cursor: pointer;
+        transition: 0.5s;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
     }
+    .btn-luxe-submit:hover:not(:disabled) { background: var(--elite-blue, #2563eb); transform: translateY(-5px); }
 
-    /* Note */
-    .address-manager-note {
-        font-size: 13px;
-        color: #666666;
-        margin-top: 20px;
+    .empty-addresses-premium {
+        grid-column: 1 / -1;
+        padding: 6rem;
         text-align: center;
-        font-style: italic;
+        background: #f8fafc;
+        border-radius: 4rem;
+        border: 2px dashed #e2e8f0;
     }
 
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .address-list-header {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 15px;
-        }
-
-        .btn-add-address {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .address-card {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .address-radio-wrapper {
-            margin-top: 0;
-        }
-
-        .address-info-left {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-        }
-
-        .address-actions {
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .action-btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .form-header-row {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        .form-cancel-btn {
-            align-self: flex-start;
-        }
-
-        .form-actions {
-            justify-content: center;
-        }
-
-        .btn-primary-save {
-            width: 100%;
-        }
+    .pulsing-pin {
+        color: var(--elite-blue, #2563eb);
+        margin-bottom: 2rem;
+        animation: pinFloat 3s infinite ease-in-out;
     }
 
-    @media (max-width: 480px) {
-        .address-form-box {
-            padding: 20px;
-        }
-
-        .form-field label {
-            font-size: 13px;
-        }
-
-        .form-field input {
-            padding: 10px;
-            font-size: 13px;
-        }
-
-        .btn-location {
-            padding: 10px;
-            font-size: 14px;
-        }
-
-        .btn-primary-save {
-            padding: 12px 24px;
-            font-size: 15px;
-        }
+    @keyframes pinFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
     }
 
-    /* Focus States */
-    .address-card:focus {
-        outline: 2px solid #FFD700;
-        outline-offset: 2px;
-    }
-
-    button:focus,
-    input:focus,
-    textarea:focus,
-    select:focus {
-        outline: 2px solid #FFD700;
-        outline-offset: 2px;
-    }
-
-    /* Disabled States */
-    button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
+    .spin { animation: spin 2s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 `;
+
+export default AddressManager;

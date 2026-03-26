@@ -1,0 +1,444 @@
+/* src/components/product/OrderHistoryPage.css */
+
+:root {
+    --elite-slate: #0f172a;
+    --elite-blue: #4f46e5;
+    --elite-emerald: #10b981;
+    --elite-rose: #f43f5e;
+    --elite-amber: #f59e0b;
+}
+
+.order-history-page {
+    min-height: 100vh;
+    background: #f8fafc;
+    padding: 4rem 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.order-history-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* --- ELITE HEADER --- */
+.order-history-luxe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.protocol-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 950;
+    letter-spacing: 2px;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+}
+
+.header-title-luxe {
+    font-size: 3rem;
+    font-weight: 950;
+    color: var(--elite-slate);
+    letter-spacing: -2px;
+    margin: 0;
+}
+
+.order-stats-ecom360 {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.stat-dossier {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #64748b;
+}
+
+.stat-dossier svg {
+    color: var(--elite-blue);
+}
+
+.stat-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-data .val {
+    font-size: 1.4rem;
+    font-weight: 950;
+    color: var(--elite-slate);
+    line-height: 1;
+}
+
+.stat-data .lbl {
+    font-size: 0.6rem;
+    font-weight: 850;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* --- ORDER ITEM ECOM360 CARD --- */
+.orders-ecom360-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.order-item-ecom360-card {
+    background: #ffffff;
+    border-radius: 2.5rem;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+
+.order-item-ecom360-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.06);
+    border-color: #cbd5e1;
+}
+
+.card-radium-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.05) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.6s;
+}
+
+.order-item-ecom360-card:hover .card-radium-glow {
+    opacity: 1;
+    width: 600px;
+    height: 600px;
+}
+
+/* --- DOSSIER (TOP BAR) --- */
+.order-institutional-dossier {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 2rem;
+}
+
+.dossier-id-block, .dossier-date-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dossier-label {
+    font-size: 0.6rem;
+    font-weight: 950;
+    color: #94a3b8;
+    letter-spacing: 1px;
+}
+
+.dossier-value {
+    font-size: 0.9rem;
+    font-weight: 850;
+    color: var(--elite-slate);
+}
+
+.dossier-status-pill {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 950;
+    letter-spacing: 0.5px;
+}
+
+.dossier-status-pill.emerald { background: #ecfdf5; color: #047857; }
+.dossier-status-pill.blue { background: #eff6ff; color: #1d4ed8; }
+.dossier-status-pill.amber { background: #fffbeb; color: #b45309; }
+.dossier-status-pill.slate { background: #f8fafc; color: #475569; }
+.dossier-status-pill.rose { background: #fff1f2; color: #be123c; }
+
+/* --- PRODUCT ECOM360 (BODY) --- */
+.order-product-ecom360 {
+    display: grid;
+    grid-template-columns: 240px 1fr 200px 250px;
+    align-items: center;
+    gap: 2rem;
+}
+
+.order-asset-previews {
+    display: flex;
+    align-items: center;
+    gap: -20px; /* Overlap effect */
+}
+
+.product-visual-shield {
+    width: 60px;
+    height: 60px;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #ffffff;
+    border: 3px solid #ffffff;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.product-visual-shield.mini:not(:first-child) {
+    margin-left: -20px;
+}
+
+.product-visual-shield.mini:hover {
+    transform: translateY(-5px) scale(1.1);
+    z-index: 10;
+    border-color: var(--elite-blue);
+}
+
+.extra-count-badge {
+    margin-left: 10px;
+    font-size: 0.6rem;
+    font-weight: 950;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 100px;
+}
+
+.product-visual-shield img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-identity-ecom360 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-title-luxe {
+    font-size: 1.35rem;
+    font-weight: 950;
+    color: var(--elite-slate);
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.product-specs-dossier {
+    display: flex;
+    gap: 10px;
+}
+
+.spec-chip {
+    font-size: 0.6rem;
+    font-weight: 850;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.order-financial-ecom360 {
+    display: flex;
+    flex-direction: column;
+}
+
+.financial-label {
+    font-size: 0.6rem;
+    font-weight: 950;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.financial-amount {
+    font-size: 1.5rem;
+    font-weight: 950;
+    color: var(--elite-slate);
+}
+
+/* --- ACTIONS --- */
+.order-actions-ecom360 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-luxe-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem 1.5rem;
+    border-radius: 1.25rem;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-luxe-action.review { background: var(--elite-slate); color: white; }
+.btn-luxe-action.review:hover { background: var(--elite-blue); transform: translateY(-3px); }
+
+.btn-luxe-action.invoice { background: #f1f5f9; color: var(--elite-slate); border: 1px solid #e2e8f0; }
+.btn-luxe-action.invoice:hover { background: #e2e8f0; transform: translateY(-3px); }
+
+.btn-luxe-action.track { background: #f1f5f9; color: #64748b; }
+.btn-luxe-action.track:hover { background: #e2e8f0; color: var(--elite-slate); }
+
+.btn-luxe-action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 1.25rem;
+    border: 1px solid #e2e8f0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #94a3b8;
+}
+
+.btn-luxe-action-icon:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+    color: var(--elite-slate);
+    transform: translateX(3px);
+}
+
+/* --- LOADING & ERROR --- */
+.elite-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.elite-loading-ecom360 {
+    text-align: center;
+}
+
+.loading-title {
+    font-size: 1rem;
+    font-weight: 950;
+    letter-spacing: 4px;
+    color: #94a3b8;
+    margin-top: 2rem;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 2rem auto;
+    overflow: hidden;
+}
+
+.loading-progress {
+    width: 100%;
+    height: 100%;
+    background: var(--elite-blue);
+    animation: loadingBarMob 2s infinite ease-in-out;
+}
+
+@keyframes loadingBarMob {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.empty-history-ecom360 {
+    text-align: center;
+    padding: 8rem 2rem;
+    background: white;
+    border-radius: 3rem;
+    border: 1px solid #e2e8f0;
+}
+
+.empty-icon-shield {
+    color: #e2e8f0;
+    margin-bottom: 2.5rem;
+}
+
+.empty-history-ecom360 h2 {
+    font-size: 2rem;
+    font-weight: 950;
+    color: var(--elite-slate);
+    margin-bottom: 1rem;
+}
+
+.empty-history-ecom360 p {
+    color: #64748b;
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    font-weight: 600;
+}
+
+.btn-luxe-primary {
+    padding: 1.25rem 3rem;
+    background: var(--elite-slate);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-weight: 950;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.btn-luxe-primary:hover {
+    background: var(--elite-blue);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+    .order-product-ecom360 {
+        grid-template-columns: 100px 1fr 1fr;
+    }
+    .order-actions-ecom360 {
+        grid-column: span 3;
+        justify-content: flex-start;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f1f5f9;
+    }
+}
+
+@media (max-width: 768px) {
+    .order-history-luxe-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+    .order-institutional-dossier {
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    .order-product-ecom360 {
+        grid-template-columns: 80px 1fr;
+    }
+    .order-financial-ecom360 {
+        grid-column: span 2;
+    }
+}

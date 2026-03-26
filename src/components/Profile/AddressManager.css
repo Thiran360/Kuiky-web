@@ -13,7 +13,7 @@
 .add-new-address-btn {
   border: 1px solid #e0e0e0;
   background: #fff;
-  color: #2874f0;
+  color: var(--primary-brand-dark);
   padding: 14px 20px;
   font-weight: 600;
   font-size: 14px;
@@ -53,7 +53,7 @@
 }
 
 .form-title {
-  color: #2874f0;
+  color: var(--primary-brand-dark);
   font-weight: 600;
   font-size: 14px;
 }
@@ -92,7 +92,7 @@
 }
 
 .fk-input:focus, .fk-textarea:focus {
-  border-color: #2874f0;
+  border-color: var(--primary-brand);
 }
 
 .fk-textarea {
@@ -131,7 +131,7 @@
 .menu-dot-btn {
   background: none;
   border: none;
-  color: #2874f0;
+  color: var(--primary-brand-dark);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;

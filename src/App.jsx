@@ -4,8 +4,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useNavigate,
-  useLocation,
 } from "react-router-dom";
 
 // --- Context Providers ---
@@ -28,31 +26,30 @@ import Wishlist from "./pages/Wishlist";
 import AddressManager from "./components/Profile/AddressManager";
 import OrderHistoryPage from "./components/product/OrderHistoryPage";
 import ProductDetailPage from "./components/product/ProductDetailPage";
+import EnthiranChat from "./components/common/EnthiranChat";
 
 // --- Global Styles ---
+import "./App.css";
 import "./styles/Global.css";
+import CelestialBackground from "./components/common/CelestialBackground";
 
 // ------------------------------
 // APP CONTENT (inside Router)
 // ------------------------------
+
+import { setAuthToken } from "./api/api";
+
+const token = localStorage.getItem("accessToken");
+
+if (token) {
+  setAuthToken(token);
+}
 const AppContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleCategorySelect = (categoryId) => {
-    setSelectedCategory(categoryId);
-
-    if (categoryId && location.pathname !== "/") {
-      navigate("/");
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 antialiased flex flex-col">
-      
+    <div className="min-h-screen bg-transparent font-sans text-gray-900 antialiased flex flex-col">
+      <CelestialBackground />
       {/* HEADER */}
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
@@ -64,8 +61,6 @@ const AppContent = () => {
             element={
               <LandingPage
                 searchTerm={searchTerm}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
               />
             }
           />
@@ -81,6 +76,9 @@ const AppContent = () => {
 
       {/* FOOTER */}
       <Footer />
+
+      {/* ENTHIRAN ASSISTANT */}
+      <EnthiranChat />
     </div>
   );
 };

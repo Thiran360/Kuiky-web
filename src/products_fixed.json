@@ -1,0 +1,70 @@
+﻿{
+    "value":  [
+                  {
+                      "id":  1,
+                      "name":  "India Gate Basmati Rice",
+                      "brand":  "India Gate",
+                      "description":  "qwerty",
+                      "warranty":  "7",
+                      "return_policy":  "1 week",
+                      "is_active":  true,
+                      "created_at":  "2026-01-24T13:25:01.027842+05:30",
+                      "updated_at":  "2026-01-24T13:25:01.027842+05:30",
+                      "shop_name":  "MEAT \u0026 EAT",
+                      "category_id":  1,
+                      "category":  "Super Market",
+                      "subcategory_id":  1,
+                      "subcategory":  "Grocery \u0026 Staples",
+                      "min_price":  2558,
+                      "min_offer_price":  2358,
+                      "variations":  [
+                                         {
+                                             "id":  1,
+                                             "variation_type":  "weight",
+                                             "value":  "1kg",
+                                             "price":  "5000.00",
+                                             "offer_price":  "4000.00",
+                                             "stock":  190,
+                                             "product":  1,
+                                             "product_name":  "India Gate Basmati Rice"
+                                         },
+                                         {
+                                             "id":  2,
+                                             "variation_type":  "weight",
+                                             "value":  "4kg",
+                                             "price":  "2558.00",
+                                             "offer_price":  "2358.00",
+                                             "stock":  3,
+                                             "product":  1,
+                                             "product_name":  "India Gate Basmati Rice"
+                                         }
+                                     ],
+                      "image_url":  null,
+                      "image":  "/media/product_images/WhatsApp_Image_2026-01-05_at_10.17.42_PM.jpeg"
+                  },
+                  {
+                      "id":  2,
+                      "name":  "Electrical Wire",
+                      "brand":  "Polycab Green Wire",
+                      "description":  "Polycab is a leading name in the Indian market, widely regarded as one of the top wire companies in India. Their Green Wire series is known for its eco-friendly composition and superior safety features, making it a top choice for modern homes where safety and sustainability are priorities.",
+                      "warranty":  "one year",
+                      "return_policy":  "no",
+                      "is_active":  true,
+                      "created_at":  "2026-03-04T11:38:41.889576+05:30",
+                      "updated_at":  "2026-03-04T11:38:41.889613+05:30",
+                      "shop_name":  "MEAT \u0026 EAT",
+                      "category_id":  6,
+                      "category":  "Electrical",
+                      "subcategory_id":  2,
+                      "subcategory":  "Electrical Wire",
+                      "min_price":  null,
+                      "min_offer_price":  null,
+                      "variations":  [
+
+                                     ],
+                      "image_url":  null,
+                      "image":  "/media/product_images/2.jpg"
+                  }
+              ],
+    "Count":  2
+}

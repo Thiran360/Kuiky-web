@@ -1,228 +1,168 @@
-// src/pages/LandingPage.jsx
-import React, { useEffect, useState, useMemo } from 'react';
-import { fetchProducts, fetchCategories } from '../api/api'; 
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutGrid, Sparkles, ShoppingBag, TrendingUp, Package } from 'lucide-react';
 import CategoryRail from '../components/home/CategoryRail';
 import HeroBanner from '../components/home/HeroBanner';
 import ProductCard from '../components/product/ProductCard';
-import { X } from 'lucide-react';
+import { fetchProducts } from '../api/api';
+import './LandingPage.css';
 
 const LandingPage = ({ searchTerm }) => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-    // --- Category State ---
-    const [mainCategories, setMainCategories] = useState([]); // All categories, including nested sub-categories
-    const [selectedMainCategory, setSelectedMainCategory] = useState(null); // The parent category (e.g., Electronics)
-    const [selectedSubCategory, setSelectedSubCategory] = useState(null); // The actual filter (e.g., Laptops or Home Goods)
-
-    // --- Data Loading: Products and Categories ---
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                // Fetch Categories first to set up the rails
-                const categories = await fetchCategories();
-                if (Array.isArray(categories)) {
-                    setMainCategories(categories);
-                }
-
-                // Fetch Products
-                const productData = await fetchProducts();
-                if (Array.isArray(productData)) {
-                    setProducts(productData);
-                } else {
-                    setProducts([]);
-                }
-            } catch (err) {
-                console.error("Data load error:", err);
-                setError("Unable to connect to the store or fetch data.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, []);
-
-    // --- Category Selection Handler ---
-    const handleCategorySelect = (category) => {
-        // This handler receives a category object from CategoryRail
-
-        if (!category) {
-            // This case should ideally not happen if CategoryRail is used correctly, 
-            // but is a safety net for clearing all category filters.
-            setSelectedMainCategory(null);
-            setSelectedSubCategory(null);
-            return;
-        }
-        
-        // 1. Check if the clicked item is a main category (i.e., has sub_categories array)
-        if (category.sub_categories && category.sub_categories.length > 0) {
-            
-            // Check for Deselection (if they click the active main category again)
-            if (selectedMainCategory && selectedMainCategory.id === category.id) {
-                setSelectedMainCategory(null);
-                setSelectedSubCategory(null);
-            } else {
-                // Select new Main Category, which shows the Sub Rail
-                setSelectedMainCategory(category);
-                setSelectedSubCategory(null); // Clear product filter
-            }
-            
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const productData = await fetchProducts();
+        if (Array.isArray(productData)) {
+          setProducts(productData);
         } else {
-            // 2. This is a leaf category (either a top-level without subs, or a sub-category)
-            
-            // If the user clicks the currently active sub-category, deselect it.
-            if (selectedSubCategory && selectedSubCategory.id === category.id) {
-                setSelectedSubCategory(null);
-            } else {
-                // Select this category for product filtering
-                setSelectedSubCategory(category);
-            }
+          setProducts([]);
         }
+      } catch (err) {
+        console.error("Products load error:", err);
+        setError("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    // --- Determine Active Filter ID for Product Filtering ---
-    const activeFilterId = selectedSubCategory ? selectedSubCategory.id : (selectedMainCategory && !selectedMainCategory.sub_categories?.length ? selectedMainCategory.id : null);
-    
-    // --- Filtered Products (Memoized) ---
-    const filteredProducts = useMemo(() => {
-        return products.filter(product => {
-            // Search Term Check
-            const term = searchTerm ? searchTerm.toLowerCase() : '';
-            const matchesSearch = 
-                (product.name && product.name.toLowerCase().includes(term)) || 
-                (product.category && product.category.toLowerCase().includes(term));
+    loadData();
+  }, []);
 
-            // Category Selection Check
-            let matchesCategory = true;
-            
-            if (activeFilterId) {
-                matchesCategory = (product.category_id === activeFilterId || product.main_category_id === activeFilterId); 
-            }
-            
-            return matchesSearch && matchesCategory;
-        });
-    }, [products, searchTerm, activeFilterId]);
+  // Sync with CategoryRail for absolute discovery
+  const handleNavSelect = (catId, subName) => {
+    setSelectedCategory(catId);
+    setSelectedSubCategory(subName);
+  };
 
-    // --- Clear All Filters ---
-    const clearFilters = () => {
-        setSelectedMainCategory(null);
-        setSelectedSubCategory(null);
-    };
-    
-    // --- Determine Header and Filter Info ---
-    const activeFilter = selectedSubCategory || selectedMainCategory;
-    const headerTitle = activeFilter 
-        ? activeFilter.name 
-        : (searchTerm ? `Results for "${searchTerm}"` : "Fresh Recommendations");
+  const filteredProducts = useMemo(() => {
+    let result = products;
 
-    // --- RENDER ---
-    return ( 
-        <div className="landing-container">
-            
-            {/* 1. Main Category Rail (Always Visible) */}
-            <CategoryRail 
-                categories={mainCategories} // Top-level categories
-                onCategorySelect={handleCategorySelect} 
-                // Highlight the selected Main Category or the Sub Category if its parent is visible
-                selectedCategoryId={selectedMainCategory?.id || selectedSubCategory?.id}
-                title="Shop by Category"
-            />
-            
-            {/* 2. Sub-Category Rail (Conditional Visibility) */}
-            {selectedMainCategory && selectedMainCategory.sub_categories && selectedMainCategory.sub_categories.length > 0 && (
-                <div className="sub-category-rail-wrapper mt-4">
-                    <div className="category-header-wrapper">
-                        
-                        <h3 className="rail-title-sub">Sub-Categories of **{selectedMainCategory.name}**</h3>
-                    </div>
-                    <CategoryRail 
-                        categories={selectedMainCategory.sub_categories}
-                        onCategorySelect={handleCategorySelect}
-                        selectedCategoryId={selectedSubCategory?.id} // Only highlight the specific sub-category
-                        isSubRail={true} 
-                    />
-                </div>
-            )}
-            {/* 3. Hero Banner (Only if no search or category filter) */}
-            <h1 className="part">Our Partners</h1>
-            {!searchTerm && !activeFilter && <HeroBanner />}
+    // 1. Filter by Search Term (Global search)
+    if (searchTerm) {
+      const query = searchTerm.toLowerCase();
+      result = result.filter(p => 
+        p.name?.toLowerCase().includes(query) || 
+        p.brand?.toLowerCase().includes(query) ||
+        p.description?.toLowerCase().includes(query)
+      );
+    }
 
-            {/* Product Grid Section */}
-            <div className="page-content mt-6">
-                
-                {/* Section Header */}
-                <div className="section-header">
-                    <h2 className="section-title">
-                        {activeFilter ? (
-                            <>
-                                <span>{headerTitle}</span>
-                                <span className="section-title-count">({filteredProducts.length})</span>
-                            </>
-                        ) : (
-                            headerTitle
-                        )}
-                    </h2>
+    // 2. Filter by Category ID (Primary Sector)
+    if (selectedCategory) {
+      result = result.filter(p => {
+          const pCatId = p.category?.id || p.category_id || p.category;
+          return String(pCatId) === String(selectedCategory);
+      });
+    }
 
-                    {/* Clear Filter Button */}
-                    {(activeFilter || searchTerm) && (
-                        <button 
-                            onClick={clearFilters}
-                            className="clear-filter-btn"
-                            aria-label="Clear filters"
-                        >
-                            <X size={14} /> Clear {activeFilter ? "Category" : "Search"}
-                        </button>
-                    )}
-                </div>
+    // 3. Filter by SubCategory / Sector (Granular Sector)
+    if (selectedSubCategory) {
+      result = result.filter(p => {
+        const subName = typeof p.subcategory === 'string' ? p.subcategory : (p.subcategory?.name || p.subcategory_name);
+        return subName?.toLowerCase() === selectedSubCategory.toLowerCase();
+      });
+    }
 
-                {/* Error, Loading, and Product Grid */}
-                {error && (
-                    <div className="error-message animate-fade-in">
-                        {error} Showing cached data.
-                    </div>
-                )}
+    return result;
+  }, [products, selectedCategory, selectedSubCategory, searchTerm]);
 
-                {loading ? (
-                    <div className="loading-container">
-                        <div className="spinner"></div>
-                    </div>
-                ) : (
-                    <>
-                        {/* Product Grid */}
-                        <div className="product-grid animate-fade-in">
-                            {filteredProducts.map((product, index) => (
-                                <div 
-                                    key={product.id}
-                                    className="animate-scale-in"
-                                    style={{ animationDelay: `${index * 0.05}s` }}
-                                >
-                                    <ProductCard product={product} />
-                                </div>
-                            ))}
-                        </div>
+  return (
+    <div className="landing-container">
+      <CategoryRail onNavSelect={handleNavSelect} />
+      <HeroBanner />
 
-                        {/* Empty State */}
-                        {filteredProducts.length === 0 && (
-                            <div className="empty-state animate-fade-in">
-                                <div className="empty-state-icon">🔎</div>
-                                <p className="empty-state-title">No products found.</p>
-                                <p className="empty-state-description">
-                                    Try selecting a different category or checking your spelling.
-                                </p>
-                                <button 
-                                    onClick={clearFilters}
-                                    className="empty-state-btn"
-                                >
-                                    View All Products
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+      <main className="page-content">
+        <section className="products-section" id="products-section">
+          <div className="prem-section-header">
+            <div className="prem-section-title-group">
+              <div className="prem-section-icon-wrap">
+                <LayoutGrid size={22} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h2 className="prem-section-title">
+                  {selectedSubCategory || "Curated Products"}
+                </h2>
+                <p className="prem-section-subtitle">
+                  {selectedSubCategory 
+                    ? `Showing results for "${selectedSubCategory}"` 
+                    : "Handpicked selections just for you"}
+                </p>
+              </div>
             </div>
-        </div>
-    );
+            
+            {!loading && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="prem-count-badge"
+              >
+                <Package size={14} />
+                <span>{filteredProducts.length} Items</span>
+              </motion.div>
+            )}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div 
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="prem-loading-state"
+              >
+                <div className="prem-loader">
+                  <div className="prem-loader-ring"></div>
+                  <Sparkles size={20} className="prem-loader-icon" />
+                </div>
+                <p className="prem-loading-text">Discovering premium products...</p>
+              </motion.div>
+            ) : error ? (
+              <motion.div 
+                key="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="prem-error-state"
+              >
+                <p>{error}</p>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="prem-product-grid"
+              >
+                {filteredProducts.map((product, index) => (
+                  <ProductCard key={product.id || index} product={product} index={index} />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!loading && filteredProducts.length === 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="prem-empty-state"
+            >
+              <div className="prem-empty-icon">
+                <ShoppingBag size={48} strokeWidth={1.5} />
+              </div>
+              <h3 className="prem-empty-title">No products found</h3>
+              <p className="prem-empty-desc">Try adjusting your filters or browse other categories to discover new items.</p>
+            </motion.div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
 };
 
 export default LandingPage;

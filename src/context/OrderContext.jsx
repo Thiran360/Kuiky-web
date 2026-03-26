@@ -1,6 +1,6 @@
 // src/context/OrderContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-// ⭐️ Ensure the import path is correct: orderApi should be imported from its location
+import { useUser } from './UserContext';
 import { orderApi } from '../api/orderCart'; 
 
 const OrderContext = createContext();
@@ -9,38 +9,35 @@ export const useOrder = () => useContext(OrderContext);
 
 /**
  * Provides order state and fetching logic.
- * Requires the userId to be passed in from the parent component (e.g., from Auth/Profile Context).
  */
-export const OrderProvider = ({ children, userId }) => {
+export const OrderProvider = ({ children }) => {
+    const { user, isAuthenticated } = useUser();
+    const userId = user?.id || null;
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // ⭐️ FIX: Removed 'userId' argument from the function, relying on the closure variable
-    // and correctly using 'userId' from the provider's props.
     const fetchOrders = useCallback(async () => {
-        if (!userId) {
+        if (!isAuthenticated) {
             setLoading(false);
-            // Stop execution if no user ID is available
+            setOrders([]);
             return; 
         }
         
         setLoading(true);
         setError(null);
         try {
-            // Use the userId from the provider's scope
             const fetchedOrders = await orderApi.fetchOrders(userId); 
             setOrders(fetchedOrders);
         } catch (err) {
             console.error("Failed to fetch orders:", err);
-            // Improved error message for the user
-            // Use err.message as the API layer now throws a proper Error object
             setError(err.message || "Failed to load your order history. Please try again.");
             setOrders([]);
         } finally {
             setLoading(false);
         }
-    }, [userId]); // Dependency on userId is correct here
+    }, [userId, isAuthenticated]); // Dependency on userId is correct here
 
     // ⭐️ EXISTING: Function to cancel an order ⭐️
     const cancelUserOrder = async (orderId) => {
@@ -95,9 +92,7 @@ export const OrderProvider = ({ children, userId }) => {
 
     const updateProductReview = async (reviewId, { rating, description }) => {
         try {
-            // Note: The API function expects an object { rating, comment: description }
             const response = await orderApi.updateReview(reviewId, { rating, comment: description });
-            
             return { 
                 success: true, 
                 message: "Review updated successfully!",
@@ -105,22 +100,53 @@ export const OrderProvider = ({ children, userId }) => {
             };
         } catch (err) {
             console.error(`Failed to update review ${reviewId}:`, err);
-            const errorMessage = err.message || "Could not update review. Please try again.";
             return { 
                 success: false, 
-                message: errorMessage 
+                message: err.message || "Could not update review. Please try again."
             };
         }
     };
-    
+
+    // ⭐️ DELETE: Remove a product review
+    // DELETE /reviews/delete/<reviewId>/
+    const deleteProductReview = async (reviewId) => {
+        try {
+            await orderApi.deleteReview(reviewId);
+            return { success: true, message: "Review deleted successfully!" };
+        } catch (err) {
+            console.error(`Failed to delete review ${reviewId}:`, err);
+            return {
+                success: false,
+                message: err.message || "Could not delete review. Please try again."
+            };
+        }
+    };
+
+    // ⭐️ POST: Update order status (e.g. customer marks as received)
+    // POST /orders/<orderId>/update-status/
+    const updateUserOrderStatus = async (orderId, status) => {
+        try {
+            const response = await orderApi.updateOrderStatus(orderId, status);
+            await fetchOrders(); // Refresh orders list
+            return {
+                success: true,
+                message: response.message || `Order status updated to '${status}'.`
+            };
+        } catch (err) {
+            console.error(`Failed to update order ${orderId} status:`, err);
+            return {
+                success: false,
+                message: err.message || "Could not update order status. Please try again."
+            };
+        }
+    };
+
     // ⭐️ Function to fetch a specific product review for the user ⭐️
     const fetchProductReview = async (productId) => {
         try {
             const review = await orderApi.fetchReviewByProductId(productId);
             return review; 
         } catch (err) {
-            // A 404 (no review found) is typically handled by the API returning null.
-            // If it's a true network/server error, we log it and return null for graceful fallback.
             console.error(`Error fetching review for product ${productId}:`, err);
             return null; 
         }
@@ -136,11 +162,12 @@ export const OrderProvider = ({ children, userId }) => {
         loading,
         error,
         fetchOrders,
-        cancelUserOrder, 
+        cancelUserOrder,
         addProductReview,
         fetchProductReview,
         updateProductReview,
-        // Optional: deleteReview can be added here if you want that functionality
+        deleteProductReview,      // DELETE /reviews/delete/<id>/
+        updateUserOrderStatus,    // POST /orders/<id>/update-status/
     };
 
     return (

@@ -1,0 +1,57 @@
+.celestial-bg-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; 
+    background: #0f172a; /* IMPERIAL NAVY BASE */
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.celestial-video-engine {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140vw; /* OVER-SCALE FOR ABSOLUTE COVERAGE */
+    height: 140vh;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 1;
+}
+
+.aura-glass-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.02); /* DEEP NEUTRAL FLOOR */
+    backdrop-filter: blur(2px); /* TIGHTER FOR VIDEO CLARITY */
+    z-index: 10;
+}
+
+@keyframes orb-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(150px, 80px) scale(1.05); }
+    66%  { transform: translate(-80px, 120px) scale(0.95); }
+    100% { transform: translate(40px, -40px) scale(1.02); }
+}
+
+@keyframes spark-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50%      { opacity: 1;   transform: scale(1.2) rotate(45deg); }
+}
+
+@keyframes celestial-drift {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    33% {
+        transform: translate(100px, 50px) scale(1.1) rotate(10deg);
+    }
+    66% {
+        transform: translate(-50px, 120px) scale(0.9) rotate(-10deg);
+    }
+    100% {
+        transform: translate(20px, -40px) scale(1.05) rotate(5deg);
+    }
+}

@@ -4,7 +4,7 @@ export const profileService = {
   // GET logged-in user profile
   getProfile: async () => {
     try {
-      const res = await api.get("/profiles/me/");
+      const res = await api.get("/profiles/");
       return res.data;
     } catch (error) {
       console.error("GET Profile Error:", error.response?.data || error);
@@ -16,7 +16,7 @@ export const profileService = {
   updateProfile: async (payload) => {
     try {
       // Endpoint used in your screenshots: /user-profile/edit/
-      const res = await api.put("/user-profile/edit/", payload); 
+      const res = await api.put("/user-profile/edit/", payload);
       return res.data; // CRUCIAL: Must return the COMPLETE, updated user object
     } catch (error) {
       console.error("PUT Update Error:", error.response?.data || error);

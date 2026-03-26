@@ -1,27 +1,16 @@
-// src/api/orderApi.js
-import axios from "axios";
-
-// Assuming BASE_URL_ORDER is your base URL up to the root of the API
-
-const BASE_URL_ORDER = "https://snappier-reapply-kieth.ngrok-free.dev/ecomapp";
-
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem("accessToken");
-    return { headers: { 
-        "ngrok-skip-browser-warning": "true",
-        Authorization: `Bearer ${token}` } };
-};
+import api from "./api";
+import { API_ENDPOINTS } from "./endpoints";
 
 export const orderApi = {
     // GET: Fetch all orders for a user
-    fetchOrders: async () => {
-        const userId = JSON.parse(localStorage.getItem("user_id"));
+    fetchOrders: async (userId) => {
         try {
-            const response = await axios.get(
-                `${BASE_URL_ORDER}/user-orders/?user_id=${userId}`,
-                getAuthHeader()
-            );
+            const params = {};
+            if (userId && !isNaN(parseInt(userId))) {
+                params.user_id = parseInt(userId);
+            }
+            
+            const response = await api.get(API_ENDPOINTS.USER_ORDERS, { params });
 
             const data = response.data;
 
@@ -44,39 +33,25 @@ export const orderApi = {
             return [];
         } catch (error) {
             console.error("Failed to fetch orders:", error);
-            throw error; // Re-throw for context/component handling
+            throw error;
         }
     },
 
-    // ⭐️ EXISTING: POST to cancel a specific order ⭐️
-    /**
-     * Sends a request to cancel a specific order.
-     * @param {number} orderId The ID of the order to cancel.
-     */
+    // ⭐️ POST to cancel a specific order ⭐️
     cancelOrder: async (orderId) => {
         try {
-            // NOTE: Using POST for an action endpoint is common. 
-            const response = await axios.post(
-                `${BASE_URL_ORDER}/orders/${orderId}/cancel/`,
-                {}, // Empty body, as cancellation often doesn't require payload
-                getAuthHeader()
+            const response = await api.post(
+                API_ENDPOINTS.CANCEL_ORDER(orderId),
+                {} // Empty body
             );
-            return response.data; // Should return success message or updated order status
+            return response.data;
         } catch (error) {
             console.error(`Failed to cancel order ${orderId}:`, error.response?.data || error);
-            // Throw error to be caught by the component/hook using this function
             throw error.response?.data || new Error("Order cancellation failed.");
         }
     },
 
-    // ⭐️ NEW: POST to add a product review ⭐️
-    /**
-     
-     * @param {Object} reviewData
-     * @param {number} reviewData.productId The ID of the product being reviewed.
-     * @param {string} reviewData.review The text content of the review.
-     * @param {string} reviewData.command A command string (e.g., 'ADD_REVIEW').
-     */
+    // ⭐️ POST to add a product review ⭐️
     addReview: async ({ productId, review, comment }) => {
         try {
             const payload = {
@@ -85,36 +60,24 @@ export const orderApi = {
                 comment: comment
             };
 
-            const response = await axios.post(
-                `${BASE_URL_ORDER}/reviews/add/`,
-                payload,
-                getAuthHeader()
-            );
-
-
+            const response = await api.post(API_ENDPOINTS.REVIEWS_ADD, payload);
             return response.data;
         } catch (error) {
             console.error("Failed to add review:", error.response?.data || error);
-            // Throw error for context/component handling
             throw error.response?.data || new Error("Failed to add product review.");
         }
     },
 
+    // GET: Fetch reviews for a product
     fetchReviewByProductId: async (productId) => {
         try {
-            const response = await axios.get(
-                `${BASE_URL_ORDER}/reviews/${productId}/`,
-                getAuthHeader()
-            );
-
+            const response = await api.get(API_ENDPOINTS.PRODUCT_REVIEWS(productId));
             const data = response.data;
 
-
-            // Assuming the backend returns an array of reviews (usually just one for the current user/product combo)
             if (Array.isArray(data) && data.length > 0) {
-                return data[0]; // Return the existing review object
+                return data[0];
             }
-            return null; // No review found
+            return null;
         } catch (error) {
             console.error(`Failed to fetch review for product ${productId}:`, error);
             throw error;
@@ -124,16 +87,14 @@ export const orderApi = {
     // ⭐️ PUT: Update an existing review ⭐️
     updateReview: async (reviewId, { rating, description }) => {
         try {
-
             const payload = {
                 rating: rating,
                 comment: description
             };
 
-            const response = await axios.put(
-                `${BASE_URL_ORDER}/reviews/update/${reviewId}/`,
-                payload,
-                getAuthHeader()
+            const response = await api.put(
+                API_ENDPOINTS.UPDATE_REVIEW(reviewId),
+                payload
             );
 
             return Array.isArray(response.data) && response.data.length > 0
@@ -142,6 +103,30 @@ export const orderApi = {
         } catch (error) {
             console.error(`Failed to update review ${reviewId}:`, error.response?.data || error);
             throw error.response?.data || new Error("Failed to update product review.");
+        }
+    },
+
+    // ⭐️ DELETE: Remove a product review ⭐️
+    // DELETE /reviews/delete/<reviewId>/
+    deleteReview: async (reviewId) => {
+        try {
+            const response = await api.delete(API_ENDPOINTS.DELETE_REVIEW(reviewId));
+            return response.data;
+        } catch (error) {
+            console.error(`Failed to delete review ${reviewId}:`, error.response?.data || error);
+            throw error.response?.data || new Error("Failed to delete product review.");
+        }
+    },
+
+    // ⭐️ POST: Update order status (customer-facing — e.g. mark as received) ⭐️
+    // POST /orders/<orderId>/update-status/
+    updateOrderStatus: async (orderId, status) => {
+        try {
+            const response = await api.post(API_ENDPOINTS.UPDATE_ORDER_STATUS(orderId), { status });
+            return response.data;
+        } catch (error) {
+            console.error(`Failed to update order ${orderId} status:`, error.response?.data || error);
+            throw error.response?.data || new Error("Failed to update order status.");
         }
     },
 };

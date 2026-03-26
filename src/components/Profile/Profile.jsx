@@ -1,256 +1,211 @@
-// src/pages/Profile/Profile.jsx
-import React, { useState, useEffect } from 'react';
-import { useProfile } from '../../context/ProfileContext';
-import { User, Package, Heart, Power, Folder, ChevronRight, Wallet } from 'lucide-react';
-import './Profile.css';
+import React, { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useUser } from "../../context/UserContext"; // Path adjusted
+import { profileService } from "../../api/profileService"; // Path adjusted
+import {
+  User,
+  Phone,
+  Mail,
+  Shield,
+  Pencil,
+  Save,
+  X,
+  CheckCircle,
+  Home,
+  Building,
+  Map,
+  MapPin,
+  Hash,
+} from "lucide-react";
+import "./Profile.css";
+
+const ADDRESS_SEPARATOR = ", ";
 
 const Profile = () => {
-  const { user, loading, updateUserProfile } = useProfile();
-  
-  // Local state for form editing
-  const [isEditing, setIsEditing] = useState(false);
+  const { user, accessToken, handleLoginSuccess } = useUser();
+  const [mode, setMode] = useState("view"); // "view", "edit"
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  /* ---------------- FORM STATE ---------------- */
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    gender: 'Male',
-    email: '',
-    phone: ''
+    username: "",
+    mobile_number: "",
+    email: "",
+    address_line1: "",
+    address_line2: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
 
-  // Sync context user data to local form state
+  /* ---------------- LOAD USER ---------------- */
   useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        gender: user.gender || 'Male',
-        email: user.email || '',
-        phone: user.phone || ''
-      });
-    }
-  }, [user]);
+    if (!user) return;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const parts = (user.user_address || "")
+      .split(ADDRESS_SEPARATOR)
+      .map((p) => p.trim());
+
+    setFormData({
+      username: user.username || user.first_name || "",
+      mobile_number: user.mobile_number || user.phone || "",
+      email: user.email || "",
+      address_line1: parts[0] || "",
+      address_line2: parts[1] || "",
+      city: parts[2] || "",
+      state: parts[3] || "",
+      pincode: parts[4] || "",
+    });
+  }, [user, mode]);
+
+  /* ---------------- HANDLERS ---------------- */
+  const handleChange = useCallback(
+    (key) => (e) =>
+      setFormData((prev) => ({ ...prev, [key]: e.target.value })),
+    []
+  );
 
   const handleSave = async () => {
-    const result = await updateUserProfile(formData);
-    if (result.success) {
-      setIsEditing(false);
-      // Optional: Add toast success message here
-    }
-  };
+    try {
+      const combinedAddress = [
+        formData.address_line1,
+        formData.address_line2,
+        formData.city,
+        formData.state,
+        formData.pincode,
+      ]
+        .map((v) => v?.trim())
+        .filter(Boolean)
+        .join(`${ADDRESS_SEPARATOR}`);
 
-  const handleCancel = () => {
-    // Revert changes
-    if (user) {
-      setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        gender: user.gender,
-        email: user.email,
-        phone: user.phone
+      const payload = {
+        username: formData.username,
+        mobile_number: formData.mobile_number,
+        email: formData.email,
+        user_address: combinedAddress,
+      };
+
+      const response = await profileService.updateProfile(payload);
+      const updatedUserData = response.user || response;
+
+      handleLoginSuccess({
+        access: accessToken,
+        user: updatedUserData,
       });
+
+      setShowSuccess(true);
+      setMode("view");
+      setTimeout(() => setShowSuccess(false), 2500);
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      alert("Profile update failed. Please try again.");
     }
-    setIsEditing(false);
   };
 
-  if (loading) return <div style={{padding: '50px', textAlign: 'center'}}>Loading Profile...</div>;
+  if (!user) return <div className="p-10">Please Login to View Profile</div>;
 
   return (
-    <>
-    
-    <div className="profile-page-wrapper">
+    <div className="profile-wrapper">
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            className="success-toast"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
+            <CheckCircle size={20} />
+            Profile updated successfully
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="profile-container">
-        
-        {/* --- LEFT SIDEBAR --- */}
-        <div className="profile-sidebar">
-          {/* Hello User Card */}
-          <div className="user-hello-card">
-            <img 
-              src={user?.avatar || "https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/profile-pic-male_4811a1.svg"} 
-              alt="User" 
-              className="user-avatar" 
-            />
-            <div>
-              <div className="hello-text">Hello,</div>
-              <div className="user-name-bold">{user?.firstName} {user?.lastName}</div>
-            </div>
-          </div>
-
-          {/* Navigation Menu */}
-          <div className="sidebar-menu">
-            <div className="menu-group">
-              <div className="menu-header">
-                <Package size={18} className="menu-icon" /> &nbsp; MY ORDERS
-              </div>
-            </div>
-
-            <div className="menu-group">
-              <div className="menu-header">
-                <User size={18} className="menu-icon" /> &nbsp; ACCOUNT SETTINGS
-              </div>
-              <a className="menu-item active">Profile Information</a>
-              <a className="menu-item">Manage Addresses</a>
-              <a className="menu-item">PAN Card Information</a>
-            </div>
-
-            <div className="menu-group">
-              <div className="menu-header">
-                <Wallet size={18} className="menu-icon" /> &nbsp; PAYMENTS
-              </div>
-              <a className="menu-item">Gift Cards</a>
-              <a className="menu-item">Saved UPI</a>
-              <a className="menu-item">Saved Cards</a>
-            </div>
-
-            <div className="menu-group">
-              <div className="menu-header">
-                <Folder size={18} className="menu-icon" /> &nbsp; MY STUFF
-              </div>
-              <a className="menu-item">My Coupons</a>
-              <a className="menu-item">My Reviews & Ratings</a>
-              <a className="menu-item">All Notifications</a>
-              <a className="menu-item">My Wishlist</a>
-            </div>
-
-             <div className="menu-group">
-              <div className="menu-header" style={{cursor:'pointer', color: '#2874f0'}}>
-                <Power size={18} className="menu-icon" /> &nbsp; LOGOUT
-              </div>
+        <div className="profile-header-main">
+          <div className="profile-identity">
+            <h1 className="profile-name">{user.username || user.first_name}</h1>
+            <div className="profile-role-badge">
+              <Shield size={14} />
+              <span>Verified Customer Profile</span>
             </div>
           </div>
         </div>
 
-        {/* --- RIGHT MAIN CONTENT --- */}
+        <div className="profile-controls">
+          <div className="profile-nav-tabs">
+            <button className="nav-tab active">General Information</button>
+            <button className="nav-tab">Manage Addresses</button>
+          </div>
+
+          <div className="action-buttons">
+            {mode === "edit" ? (
+              <button className="premium-action-btn cancel-btn" onClick={() => setMode("view")}>
+                <X size={18} /> Cancel Edit
+              </button>
+            ) : (
+              <button className="premium-action-btn edit-btn" onClick={() => setMode("edit")}>
+                <Pencil size={18} /> Edit Profile
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="profile-content">
-          
-          {/* Personal Information Section */}
-          <div className="form-group">
-            <div className="section-header">
-              <span className="section-title">Personal Information</span>
-              {!isEditing && (
-                <button className="edit-btn" onClick={() => setIsEditing(true)}>Edit</button>
-              )}
-            </div>
-
-            <div className="input-row">
-              <div className="input-container">
-                {isEditing && <label className="input-label">First Name</label>}
-                <input 
-                  type="text" 
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className="fk-input" 
-                  disabled={!isEditing}
-                />
+          {mode === "view" ? (
+            <div className="info-grid">
+              <PremiumInfoCard icon={<User size={20} />} label="Username" value={formData.username} />
+              <PremiumInfoCard icon={<Phone size={20} />} label="Mobile Number" value={formData.mobile_number} />
+              <div className="full-width-field">
+                <PremiumInfoCard icon={<Mail size={20} />} label="Email Address" value={formData.email} />
               </div>
-              <div className="input-container">
-                {isEditing && <label className="input-label">Last Name</label>}
-                <input 
-                  type="text" 
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="fk-input" 
-                  disabled={!isEditing}
-                />
+              <div className="full-width-field">
+                <PremiumInfoCard icon={<MapPin size={20} />} label="Associated Address" value={user.user_address || "No address set"} />
               </div>
             </div>
-
-            {/* Gender Selection */}
-            <div className="radio-group" style={{marginTop: '20px'}}>
-              <label className="input-label" style={{marginRight: '20px'}}>Your Gender</label>
-              <label className="radio-label">
-                <input 
-                  type="radio" 
-                  name="gender" 
-                  value="Male" 
-                  checked={formData.gender === 'Male'} 
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                /> 
-                Male
-              </label>
-              <label className="radio-label">
-                <input 
-                  type="radio" 
-                  name="gender" 
-                  value="Female" 
-                  checked={formData.gender === 'Female'} 
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                /> 
-                Female
-              </label>
-            </div>
-          </div>
-
-          {/* Email Address Section */}
-          <div className="form-group">
-             <div className="section-header">
-              <span className="section-title">Email Address</span>
-              {!isEditing && <button className="edit-btn" onClick={() => setIsEditing(true)}>Edit</button>}
-            </div>
-             <div className="input-row">
-              <div className="input-container">
-                <input 
-                  type="email" 
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="fk-input" 
-                  disabled={!isEditing}
-                />
+          ) : (
+            <div className="edit-form">
+              <PremiumInputField label="Username" icon={<User size={18} />} value={formData.username} onChange={handleChange("username")} />
+              <PremiumInputField label="Mobile" icon={<Phone size={18} />} value={formData.mobile_number} onChange={handleChange("mobile_number")} />
+              <div className="full-width-field">
+                <PremiumInputField label="Email" icon={<Mail size={18} />} value={formData.email} onChange={handleChange("email")} />
               </div>
-            </div>
-          </div>
 
-          {/* Mobile Number Section */}
-          <div className="form-group">
-             <div className="section-header">
-              <span className="section-title">Mobile Number</span>
-              {!isEditing && <button className="edit-btn" onClick={() => setIsEditing(true)}>Edit</button>}
-            </div>
-             <div className="input-row">
-              <div className="input-container">
-                <input 
-                  type="text" 
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="fk-input" 
-                  disabled={!isEditing}
-                />
-              </div>
-            </div>
-          </div>
+              <div className="form-divider">Location Details (Optional Sync)</div>
+              <PremiumInputField label="House / Flat No" icon={<Home size={18} />} value={formData.address_line1} onChange={handleChange("address_line1")} />
+              <PremiumInputField label="Street / Area" icon={<Building size={18} />} value={formData.address_line2} onChange={handleChange("address_line2")} />
+              <PremiumInputField label="City" icon={<Map size={18} />} value={formData.city} onChange={handleChange("city")} />
+              <PremiumInputField label="State" icon={<MapPin size={18} />} value={formData.state} onChange={handleChange("state")} />
+              <PremiumInputField label="Pincode" icon={<Hash size={18} />} value={formData.pincode} onChange={handleChange("pincode")} />
 
-          {/* Action Buttons */}
-          {isEditing && (
-            <div style={{marginTop: '30px'}}>
-              <button className="save-btn" onClick={handleSave}>SAVE</button>
-              <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+              <button className="save-changes-btn" onClick={handleSave}>
+                <Save size={20} /> Update Profile Information
+              </button>
             </div>
           )}
-
-          {/* Footer Links */}
-          <div className="faq-links">
-            <div className="section-title" style={{fontSize: '14px', marginBottom: '15px'}}>FAQs</div>
-            <a>What happens when I update my email address (or mobile number)?</a>
-            <a>When will my account be updated with the new email address (or mobile number)?</a>
-            <a>What happens to my existing account when I update my email address (or mobile number)?</a>
-            <a style={{marginTop: '20px', fontWeight: '600'}}>Deactivate Account</a>
-          </div>
-
         </div>
       </div>
     </div>
-    </>
   );
 };
+
+const PremiumInfoCard = ({ icon, label, value }) => (
+  <div className="premium-info-card">
+    <div className="icon-box">{icon}</div>
+    <div className="info-details">
+      <span className="info-label">{label}</span>
+      <span className="info-value">{value || "-"}</span>
+    </div>
+  </div>
+);
+
+const PremiumInputField = ({ label, icon, value, onChange }) => (
+  <div className="input-field-group">
+    <label>{label}</label>
+    <div className="premium-input-wrapper">
+      <span className="input-prefix-icon">{icon}</span>
+      <input value={value} onChange={onChange} spellCheck="false" autoComplete="off" />
+    </div>
+  </div>
+);
 
 export default Profile;

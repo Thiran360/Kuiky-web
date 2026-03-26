@@ -1,53 +1,46 @@
-// src/api/profileApi.js
-import axios from 'axios';
-
-const BASE_URL = 'https://snappier-reapply-kieth.ngrok-free.dev/ecomapp'; // Your API Base URL
-
-// Helper to get token
-const getAuthHeader = () => {
-    const token = localStorage.getItem('accessToken');
-    return { headers: { Authorization: `Bearer ${token}` } };
-};
-
+import api from './api';
+import { API_ENDPOINTS } from "./endpoints";
 
 export const profileApi = {
     // --- USER PROFILE ---
 
     // Get User Profile
     getProfile: async () => {
-        const response = await axios.get(`${BASE_URL}/profiles/`, getAuthHeader());
+        const response = await api.get(API_ENDPOINTS.PROFILES);
         return response.data;
     },
 
     // Update User Profile
     updateProfile: async (userData) => {
-        const response = await axios.put(`${BASE_URL}/profiles/update/`, userData, getAuthHeader());
+        const response = await api.put(API_ENDPOINTS.USER_PROFILE_EDIT, userData);
         return response.data;
-    }, // <--- Added missing comma here
+    },
 
     // --- ADDRESSES ---
 
     // GET: List all addresses
     fetchAddresses: async (userId) => {
-        const response = await axios.get(`${BASE_URL}/addresses/?user_id=${userId}`, getAuthHeader());
+        const response = await api.get(API_ENDPOINTS.ADDRESSES, {
+            params: { user_id: userId }
+        });
         return response.data;
     },
 
     // POST: Add new address
     addAddress: async (addressData) => {
-        const response = await axios.post(`${BASE_URL}/addresses/add/`, addressData, getAuthHeader());
+        const response = await api.post(API_ENDPOINTS.ADDRESS_ADD, addressData);
         return response.data;
     },
 
     // PUT: Update address
     updateAddress: async (id, addressData) => {
-        const response = await axios.put(`${BASE_URL}/addresses/update/${id}/`, addressData, getAuthHeader());
+        const response = await api.put(API_ENDPOINTS.ADDRESS_UPDATE(id), addressData);
         return response.data;
     },
 
     // DELETE: Delete address
     deleteAddress: async (id) => {
-        const response = await axios.delete(`${BASE_URL}/addresses/delete/${id}/`, getAuthHeader());
+        const response = await api.delete(API_ENDPOINTS.ADDRESS_DELETE(id));
         return response.data;
     }
 };

@@ -1,376 +1,53 @@
-/* Main Application CSS - Import Order Matters! */
+/* Main Application CSS - Reset & Base */
 
-/* 1. Tailwind Base (if using Tailwind) */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* 2. Responsive Utilities - Must come first to prevent horizontal scroll */
-@import './responsive-utilities.css';
-
-/* 3. Global Variables and Base Styles */
-:root {
-  /* Brand Colors */
-  --primary-yellow: #facc15;
-  --primary-yellow-hover: #eab308;
-  --primary-yellow-light: #fef08a;
-  
-  /* Backgrounds */
-  --bg-white: #ffffff;
-  --bg-off-white: #f9fafb;
-  --bg-gray-light: #f3f4f6;
-  
-  /* Text */
-  --text-dark: #111827;
-  --text-gray: #6b7280;
-  --text-light: #9ca3af;
-  
-  /* Borders */
-  --border-light: #e5e7eb;
-  --border-medium: #d1d5db;
-}
-
-/* 4. Reset and Normalize */
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-  scroll-behavior: smooth;
-}
-
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background-color: var(--bg-white);
-  color: var(--text-dark);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-  line-height: 1.5;
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: transparent; /* SURFACING CELESTIAL ENGINE */
+  color: #212121;
 }
 
-#root {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
-/* 5. Global Utility Classes */
-
-/* No Scrollbar */
+/* Common Utilities */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-  height: 0;
 }
 
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  scrollbar-height: none;
 }
 
-/* Container */
-.container {
-  width: 100%;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
 }
 
-@media (min-width: 768px) {
-  .container {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-@media (min-width: 1024px) {
-  .container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .container {
-    max-width: 1440px;
-  }
-}
-
-/* 6. Animations */
-
-/* Fade In */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-/* Soft Pulse */
-@keyframes softPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0);
-  }
-}
-
-.animate-soft-pulse {
-  animation: softPulse 2s infinite;
-}
-
-/* Spin */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2874f0;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-/* Slide In Left */
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.4s ease-out forwards;
-}
-
-/* Slide In Right */
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.4s ease-out forwards;
-}
-
-/* Scale In */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.3s ease-out forwards;
-}
-
-/* Pulse */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-/* 7. Button Utilities */
-
-.btn-yellow {
-  background-color: var(--primary-yellow);
-  color: var(--text-dark);
-  font-weight: 600;
-  padding: 0.625rem 1.5rem;
-  border-radius: 0.75rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.btn-yellow:hover {
-  background-color: var(--primary-yellow-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
-}
-
-.btn-yellow:active {
-  transform: translateY(0);
-}
-
-/* 8. Card Utilities */
-
-.card-hover {
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* 9. Badge Utilities */
-
-.badge-yellow {
-  background-color: var(--primary-yellow-light);
-  color: var(--text-dark);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  display: inline-block;
-}
-
-/* 10. Loading State */
-
-.spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 4px solid var(--primary-yellow);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-/* 11. Scrollbar Styling (for browsers that support it) */
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-off-white);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-medium);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-gray);
-}
-
-/* 12. Selection Color */
-
-::selection {
-  background-color: var(--primary-yellow-light);
-  color: var(--text-dark);
-}
-
-::-moz-selection {
-  background-color: var(--primary-yellow-light);
-  color: var(--text-dark);
-}
-
-/* 13. Focus Outline */
-
-:focus-visible {
-  outline: 2px solid var(--primary-yellow);
-  outline-offset: 2px;
-}
-
-/* 14. Smooth Transitions */
-
-a,
-button,
-input,
-select,
-textarea {
-  transition: all 0.2s ease;
-}
-
-/* 15. Prevent Layout Shift */
-
-img,
-video,
-iframe {
-  max-width: 100%;
-  height: auto;
-}
-
-/* 16. Mobile Touch Improvements */
-
-button,
-a,
-input,
-select {
-  -webkit-tap-highlight-color: rgba(250, 204, 21, 0.2);
-  touch-action: manipulation;
-}
-
-/* 17. Disable User Select on UI Elements */
-
-button,
-.btn-yellow,
-.card-hover {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-}
-
-/* 18. Responsive Images */
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* 19. Print Styles */
-
-@media print {
-  body {
-    background: white;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

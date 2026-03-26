@@ -16,13 +16,30 @@ export const wishlistService = {
   // ADD ITEM
   // ------------------------------
   addToWishlist: async ({ user_id, product_id }) => {
-    if (!user_id || !product_id) {
-      throw new Error("Missing user_id or product_id");
+    // If user_id is missing, we might still succeed if backend uses token, 
+    // but product_id is definitely needed.
+    if (!product_id) {
+      throw new Error("Missing product_id");
     }
 
-    const payload = { user_id, product_id };
-    const res = await api.post(`/wishlist/add/`, payload);
-    return res.data;
+    // Include both 'product_id' and 'product' to support different backend variations
+    const payload = {
+      product_id,
+      product: product_id
+    };
+
+    // Only add user_id if it's provided and not null
+    if (user_id) {
+      payload.user_id = user_id;
+    }
+
+    try {
+      const res = await api.post(`/wishlist/add/`, payload);
+      return res.data;
+    } catch (error) {
+      console.error("Wishlist Add API Error:", error.response?.data || error.message);
+      throw error.response?.data || error;
+    }
   },
 
   // ------------------------------

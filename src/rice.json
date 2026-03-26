@@ -1,0 +1,42 @@
+{
+  "id": 1,
+  "name": "India Gate Basmati Rice",
+  "brand": "India Gate",
+  "description": "qwerty",
+  "warranty": "7",
+  "return_policy": "1 week",
+  "is_active": true,
+  "created_at": "2026-01-24T13:25:01.027842+05:30",
+  "updated_at": "2026-01-24T13:25:01.027842+05:30",
+  "shop_name": "MEAT & EAT",
+  "category_id": 1,
+  "category": "Super Market",
+  "subcategory_id": 1,
+  "subcategory": "Grocery & Staples",
+  "min_price": 2558,
+  "min_offer_price": 2358,
+  "variations": [
+    {
+      "id": 1,
+      "variation_type": "weight",
+      "value": "1kg",
+      "price": "5000.00",
+      "offer_price": "4000.00",
+      "stock": 190,
+      "product": 1,
+      "product_name": "India Gate Basmati Rice"
+    },
+    {
+      "id": 2,
+      "variation_type": "weight",
+      "value": "4kg",
+      "price": "2558.00",
+      "offer_price": "2358.00",
+      "stock": 3,
+      "product": 1,
+      "product_name": "India Gate Basmati Rice"
+    }
+  ],
+  "image_url": null,
+  "image": "/media/product_images/WhatsApp_Image_2026-01-05_at_10.17.42_PM.jpeg"
+}

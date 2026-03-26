@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "../context/UserContext";
 import { profileService } from "../api/profileService";
@@ -6,7 +6,6 @@ import {
   User,
   Phone,
   Mail,
-  MapPin,
   Shield,
   Pencil,
   Save,
@@ -15,18 +14,27 @@ import {
   Home,
   Building,
   Map,
+  MapPin,
   Hash,
+  Activity,
+  LogOut,
+  Settings,
+  CreditCard,
+  Bell,
+  Lock,
+  Package,
+  Star
 } from "lucide-react";
+import { useOrder } from "../context/OrderContext";
 import "./Profile.css";
 
-/* ✅ STATIC PROFILE IMAGE */
-import profileImg from "../assets/image.png";
+import AddressManager from "../components/Profile/AddressManager";
 
 const ADDRESS_SEPARATOR = ", ";
 
 const Profile = () => {
-  const { user, accessToken, handleLoginSuccess } = useUser();
-  const [mode, setMode] = useState("view");
+  const { user, accessToken, handleLoginSuccess, logout } = useUser();
+  const [mode, setMode] = useState("view"); // "view", "edit", or "addresses"
   const [showSuccess, setShowSuccess] = useState(false);
 
   /* ---------------- FORM STATE ---------------- */
@@ -41,7 +49,8 @@ const Profile = () => {
     pincode: "",
   });
 
-  /* ---------------- LOAD USER ---------------- */
+  const { orders } = useOrder() || { orders: [] };
+
   useEffect(() => {
     if (!user) return;
 
@@ -61,6 +70,13 @@ const Profile = () => {
     });
   }, [user]);
 
+  const stats = useMemo(() => {
+    const totalOrders = orders?.length || 0;
+    const totalSpent = orders?.reduce((acc, curr) => acc + (parseFloat(curr.total_amount) || 0), 0) || 0;
+    const reviewCount = orders?.filter(o => o.status === 'delivered').length || 0;
+    return { totalOrders, totalSpent, reviewCount };
+  }, [orders]);
+
   /* ---------------- HANDLERS ---------------- */
   const handleChange = useCallback(
     (key) => (e) =>
@@ -79,7 +95,7 @@ const Profile = () => {
       ]
         .map((v) => v?.trim())
         .filter(Boolean)
-        .join(` ${ADDRESS_SEPARATOR} `);
+        .join(`${ADDRESS_SEPARATOR}`);
 
       const payload = {
         username: formData.username,
@@ -88,18 +104,21 @@ const Profile = () => {
         user_address: combinedAddress,
       };
 
-      const updatedUser = await profileService.updateProfile(payload);
+      const response = await profileService.updateProfile(payload);
+      
+      const updatedUserData = response.user || response;
 
       handleLoginSuccess({
         access: accessToken,
-        user: updatedUser.user,
+        user: updatedUserData,
       });
 
       setShowSuccess(true);
       setMode("view");
       setTimeout(() => setShowSuccess(false), 2500);
-    } catch {
-      alert("Profile update failed");
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      // alert("Profile update failed. Please try again.");
     }
   };
 
@@ -107,115 +126,182 @@ const Profile = () => {
 
   /* ---------------- RENDER ---------------- */
   return (
-    <>
+    <div className="elite-profile-page">
       {/* SUCCESS TOAST */}
       <AnimatePresence>
         {showSuccess && (
           <motion.div
-            className="success-toast"
-            initial={{ opacity: 0, y: -15 }}
+            className="elite-success-toast"
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
+            exit={{ opacity: 0, scale: 0.95 }}
           >
-            <CheckCircle size={18} />
-            Profile updated
+            <Shield size={18} className="toast-glow-icon" />
+            <span>IDENTITY UPDATE AUTHORIZED</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="profile-wrapper">
-        <div className="profile-container">
-          {/* HEADER */}
-          <div className="profile-header">
-            <div className="avatar-wrapper">
-              <div className="avatar-circle">
-                <img src={profileImg} alt="Profile" className="avatar-image" />
-              </div>
-              <div className="avatar-badge">
-                <Shield size={12} />
-              </div>
+      <div className="elite-profile-canvas">
+        {/* CINEMATIC HEADER */}
+        <header className="elite-profile-banner">
+            <div className="banner-visual-overlay"></div>
+            <div className="banner-content">
+                <div className="profile-avatar-ecom360">
+                    <div className="avatar-shield">
+                        <User size={60} strokeWidth={1.5} />
+                    </div>
+                    <div className="identity-dossier">
+                        <span className="protocol-badge">PERSONNEL PROTOCOL</span>
+                        <h1 className="identity-name">{user.username}</h1>
+                        <div className="identity-meta">
+                            <span className="meta-pill"><Shield size={12} /> VERIFIED ENTITY</span>
+                            <span className="meta-pill"><Activity size={12} /> ACTIVE STATUS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="profile-stats-ecom360">
+                    <div className="stat-card-luxe">
+                        <Package size={20} />
+                        <div className="stat-info">
+                            <span className="val">{stats.totalOrders}</span>
+                            <span className="lbl">ACQUISITIONS</span>
+                        </div>
+                    </div>
+                    <div className="stat-card-luxe">
+                        <CreditCard size={20} />
+                        <div className="stat-info">
+                            <span className="val">₹{stats.totalSpent.toLocaleString()}</span>
+                            <span className="lbl">LOGISTICS VALUE</span>
+                        </div>
+                    </div>
+                    <div className="stat-card-luxe">
+                        <Star size={20} />
+                        <div className="stat-info">
+                            <span className="val">{stats.reviewCount}</span>
+                            <span className="lbl">FEEDBACK NODES</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </header>
 
-            <h1 className="profile-name">{user.username}</h1>
-
-            <div className="profile-role">
-              <Shield size={12} />
-              Verified Customer
-            </div>
-
-            <button
-              className={mode === "view" ? "edit-btn" : "cancel-btn"}
-              onClick={() => setMode(mode === "view" ? "edit" : "view")}
-            >
-              {mode === "view" ? (
-                <>
-                  <Pencil size={14} /> Edit Profile
-                </>
-              ) : (
-                <>
-                  <X size={14} /> Cancel
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* CONTENT */}
-          <div className="profile-content">
-            {mode === "view" ? (
-              <>
-                <ProfileItem icon={<User size={16} />} label="Username" value={user.username} />
-                <ProfileItem icon={<Phone size={16} />} label="Mobile" value={user.mobile_number} />
-                <ProfileItem icon={<Mail size={16} />} label="Email" value={user.email} />
-                <ProfileItem icon={<Home size={16} />} label="House / Flat No" value={formData.address_line1} />
-                <ProfileItem icon={<Building size={16} />} label="Street / Area" value={formData.address_line2} />
-                <ProfileItem icon={<Map size={16} />} label="City" value={formData.city} />
-                <ProfileItem icon={<MapPin size={16} />} label="State" value={formData.state} />
-                <ProfileItem icon={<Hash size={16} />} label="Pincode" value={formData.pincode} />
-              </>
-            ) : (
-              <>
-                <InputField label="Username" icon={<User size={14} />} value={formData.username} onChange={handleChange("username")} />
-                <InputField label="Mobile" icon={<Phone size={14} />} value={formData.mobile_number} onChange={handleChange("mobile_number")} />
-                <InputField label="Email" icon={<Mail size={14} />} value={formData.email} onChange={handleChange("email")} />
-
-                <InputField label="House / Flat No" icon={<Home size={14} />} value={formData.address_line1} onChange={handleChange("address_line1")} />
-                <InputField label="Street / Area" icon={<Building size={14} />} value={formData.address_line2} onChange={handleChange("address_line2")} />
-                <InputField label="City" icon={<Map size={14} />} value={formData.city} onChange={handleChange("city")} />
-                <InputField label="State" icon={<MapPin size={14} />} value={formData.state} onChange={handleChange("state")} />
-                <InputField label="Pincode" icon={<Hash size={14} />} value={formData.pincode} onChange={handleChange("pincode")} />
-
-                <button className="save-btn" onClick={handleSave}>
-                  <Save size={16} /> Save Changes
+        <div className="elite-profile-layout">
+          {/* NAVIGATION SIDEBAR */}
+          <aside className="elite-profile-sidebar">
+             <nav className="sidebar-nav-ecom360">
+                <button className={`nav-link-luxe ${mode === 'view' ? 'active' : ''}`} onClick={() => setMode('view')}>
+                    <User size={18} /> <span>IDENTITY METRICS</span>
                 </button>
-              </>
-            )}
-          </div>
+                <button className={`nav-link-luxe ${mode === 'edit' ? 'active' : ''}`} onClick={() => setMode('edit')}>
+                    <Pencil size={18} /> <span>MODIFY AUTHENTICATION</span>
+                </button>
+                <button className={`nav-link-luxe ${mode === 'addresses' ? 'active' : ''}`} onClick={() => setMode('addresses')}>
+                    <MapPin size={18} /> <span>LOGISTICS STATIONS</span>
+                </button>
+                <div className="nav-divider"></div>
+                <button className="nav-link-luxe logout-danger" onClick={logout}>
+                    <LogOut size={18} /> <span>TERMINATE SESSION</span>
+                </button>
+             </nav>
+          </aside>
+
+          {/* MAIN CONTENT ECOM360 */}
+          <main className="elite-profile-ecom360">
+            <AnimatePresence mode="wait">
+              {mode === "view" && (
+                <motion.div 
+                    key="view"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    className="metrics-grid"
+                >
+                    <div className="metrics-header-ecom360">
+                        <h2 className="ecom360-subtitle">Identity Portfolio</h2>
+                        <p className="ecom360-desc">Public-facing credentials and institutional identifiers.</p>
+                    </div>
+                    <div className="ecom360-cards-container">
+                        <EliteInfoCard icon={<User />} label="LEGAL DESIGNATION" value={user.username} />
+                        <EliteInfoCard icon={<Mail />} label="COMMUNICATION NODE" value={user.email} />
+                        <EliteInfoCard icon={<Phone />} label="MOBILE HANDSHAKE" value={user.mobile_number} />
+                        <EliteInfoCard icon={<MapPin />} label="REGIONAL CENTER" value={user.user_address || "NOT SPECIFIED"} />
+                    </div>
+                </motion.div>
+              )}
+
+              {mode === "edit" && (
+                <motion.div 
+                    key="edit"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    className="auth-modify-ecom360"
+                >
+                    <div className="metrics-header-ecom360">
+                        <h2 className="ecom360-subtitle">Modify Authentication</h2>
+                        <p className="ecom360-desc">Update your institutional credentials for secure procurement.</p>
+                    </div>
+                    <div className="lite-form-grid">
+                        <EliteInput icon={<User />} label="USERNAME" value={formData.username} onChange={handleChange("username")} />
+                        <EliteInput icon={<Phone />} label="MOBILE" value={formData.mobile_number} onChange={handleChange("mobile_number")} />
+                        <EliteInput icon={<Mail />} label="EMAIL" value={formData.email} fullWidth onChange={handleChange("email")} />
+                        
+                        <div className="form-sub-protocol">LOCATION PARAMETERS (SYNC)</div>
+                        <EliteInput icon={<Home />} label="FLAT/HOUSE" value={formData.address_line1} onChange={handleChange("address_line1")} />
+                        <EliteInput icon={<Building />} label="STREET/AREA" value={formData.address_line2} onChange={handleChange("address_line2")} />
+                        <EliteInput icon={<Map />} label="CITY" value={formData.city} onChange={handleChange("city")} />
+                        <EliteInput icon={<MapPin />} label="STATE" value={formData.state} onChange={handleChange("state")} />
+                        <EliteInput icon={<Hash />} label="PINCODE" value={formData.pincode} onChange={handleChange("pincode")} />
+                    </div>
+                    <div className="ecom360-form-actions">
+                        <button className="btn-cancel-elite" onClick={() => setMode('view')}>TERMINATE EDIT</button>
+                        <button className="btn-save-elite" onClick={handleSave}><Save size={18} /> AUTHORIZE CHANGES</button>
+                    </div>
+                </motion.div>
+              )}
+
+              {mode === "addresses" && (
+                <motion.div 
+                    key="addresses"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                >
+                    <div className="metrics-header-ecom360">
+                        <h2 className="ecom360-subtitle">Logistics Stations</h2>
+                        <p className="ecom360-desc">Manage destination nodes for high-speed procurement distribution.</p>
+                    </div>
+                    <AddressManager />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </main>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-/* ---------------- SUB COMPONENTS ---------------- */
-
-const ProfileItem = ({ icon, label, value, isAddress }) => (
-  <div className={`profile-item ${isAddress ? 'address-item' : ''}`}>
-    <div className="item-icon-wrapper">{icon}</div>
-    <div className="item-content">
-      <div className="item-label">{label}</div>
-      <div className="item-value">{value || "-"}</div>
+const EliteInfoCard = ({ icon, label, value }) => (
+    <div className="elite-info-card-luxe">
+        <div className="card-icon-halo">{icon}</div>
+        <div className="card-details">
+            <span className="card-label">{label}</span>
+            <span className="card-value">{value || "LOGS EMPTY"}</span>
+        </div>
     </div>
-  </div>
 );
 
-const InputField = ({ label, icon, value, onChange }) => (
-  <div className="input-group">
-    <label>{label}</label>
-    <div className="input-wrapper">
-      <span className="input-icon">{icon}</span>
-      <input value={value} onChange={onChange} />
+const EliteInput = ({ icon, label, value, onChange, fullWidth }) => (
+    <div className={`elite-input-field ${fullWidth ? 'full' : ''}`}>
+        <label className="field-label-luxe">{label}</label>
+        <div className="field-input-wrapper">
+             <span className="field-icon">{icon}</span>
+             <input value={value} onChange={onChange} spellCheck="false" />
+        </div>
     </div>
-  </div>
 );
 
 export default Profile;

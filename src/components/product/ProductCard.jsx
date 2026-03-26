@@ -1,292 +1,157 @@
-// src/components/ProductCard/ProductCard.js
-// Removed: import {fetchSubCategories} from "../../api/api";
-// This is not needed here
-
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Heart, ShoppingCart, Zap, Check } from "lucide-react"; // Import Check icon
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ShoppingCart, Check, Star, Eye, Zap, Package, Loader } from "lucide-react"; 
+import { useSmartImage } from "../../api/imageService";
 import { getImageUrl } from "../../api/config";
 import "./ProductCard.css";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
+import { useUser } from "../../context/UserContext";
 
-const ProductCard = ({ product }) => {
-    // --- HOOKS ---
+/** Safe price parser — returns '0' instead of NaN */
+const safePrice = (val) => {
+    const n = parseFloat(val);
+    return isNaN(n) ? 0 : n;
+};
+
+const ProductCard = ({ product, index = 0 }) => {
     const { addItemToCart, findItemInCart } = useCart();
     const navigate = useNavigate();
     const { isProductWishlisted, toggleWishlist } = useWishlist();
+    const { isAuthenticated } = useUser();
 
     const hasVariations = product.variations && product.variations.length > 0;
-
     const [selectedVariant, setSelectedVariant] = useState(
         hasVariations ? product.variations[0] : null
     );
     const [isAddingToCart, setIsAddingToCart] = useState(false);
-    const [isTogglingWishlist, setIsTogglingWishlist] = useState(false); 
-    const [error, setError] = useState(null);
-    
-    // NOTE: Removed isAddedOnce state as the status will be derived from the cart.
+    const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
-    // Update selected variant if product changes
+    // 🛡️ Data Priority: Browser testing confirms 'image_url' is more reliable than 'image' on this backend
+    const { src: imageSrc, loaded: imgLoaded } = useSmartImage(
+        product.image_url || product.image
+    );
+
     useEffect(() => {
         setSelectedVariant(hasVariations ? product.variations[0] : null);
     }, [product, hasVariations]);
 
-    const getVariantId = useCallback(() => selectedVariant?.id || null, [selectedVariant]);
-
-    // --- CART STATUS & PRICE CALCULATION ---
-    
-    // 1. Calculate persistent cart status based on selected variant
     const isInCart = useMemo(() => {
-        const productVariantId = getVariantId();
-        // Check if the currently selected variant exists in the cart with quantity > 0
-        return !!findItemInCart(product.id, productVariantId);
-    }, [product.id, getVariantId, findItemInCart]);
+        return !!findItemInCart(product.id, selectedVariant?.id || null);
+    }, [product.id, selectedVariant, findItemInCart]);
 
-    // 2. Derive wishlisted status
-    const isWishlistedStatus = useMemo(() => isProductWishlisted(product.id), [
-        isProductWishlisted,
-        product.id,
-    ]);
+    const isWishlisted = useMemo(() => isProductWishlisted(product.id), [isProductWishlisted, product.id]);
 
-    // 3. Price calculation (unchanged)
     const { displayPrice, originalPrice, discountPercent } = useMemo(() => {
         const dPrice = selectedVariant
-            ? parseFloat(selectedVariant.offer_price)
-            : parseFloat(product.min_offer_price || product.min_price || product.price || "0");
-        
+            ? safePrice(selectedVariant.offer_price)
+            : safePrice(product.min_offer_price || product.price || 0);
         const oPrice = selectedVariant
-            ? parseFloat(selectedVariant.price)
-            : parseFloat(product.min_price || product.price || "0");
-
-        const dPercent =
-            oPrice > dPrice
-                ? Math.round(((oPrice - dPrice) / oPrice) * 100)
-                : 0;
-        
-        return {
-            displayPrice: dPrice.toFixed(0),
-            originalPrice: oPrice.toFixed(0),
-            discountPercent: dPercent
-        };
+            ? safePrice(selectedVariant.price)
+            : safePrice(product.min_price || product.price || 0);
+        const dPercent = oPrice > dPrice ? Math.round(((oPrice - dPrice) / oPrice) * 100) : 0;
+        return { displayPrice: dPrice.toFixed(0), originalPrice: oPrice.toFixed(0), discountPercent: dPercent };
     }, [product, selectedVariant]);
 
+    const handleAddToCart = async (e) => {
+        e.stopPropagation();
+        if (!isAuthenticated) { navigate("/login"); return; }
+        if (isInCart) return;
+        setIsAddingToCart(true);
+        try {
+            await addItemToCart(selectedVariant?.id || null, 1, product);
+        } catch (err) { console.error(err); } finally { setIsAddingToCart(false); }
+    };
 
-    // --- HANDLERS ---
-
-    const handleCardClick = useCallback(() => {
-        navigate(`/product/${product.id}`, { 
-            state: { 
-                product,
-                selectedVariant 
-            } 
-        });
-    }, [navigate, product, selectedVariant]);
-
-    const handleVariationChange = useCallback(
-        (e) => {
-            e.stopPropagation();
-            const variantId = parseInt(e.target.value);
-            const variant = product.variations.find(
-                (v) => v.id === variantId
-            );
-            setSelectedVariant(variant);
-            setError(null);
-        },
-        [product.variations]
-    );
-
-    const handleWishlistClick = useCallback(async (e) => {
+    const handleWishlist = async (e) => {
         e.stopPropagation();
         if (isTogglingWishlist) return;
-        
         setIsTogglingWishlist(true);
-        try {
-            await toggleWishlist(product.id);
-        } catch (err) {
-            console.error("Failed to toggle wishlist:", err);
-        } finally {
-            setIsTogglingWishlist(false);
-        }
-    }, [isTogglingWishlist, toggleWishlist, product.id]);
+        try { await toggleWishlist(product.id, product); } finally { setIsTogglingWishlist(false); }
+    };
 
-    const handleAddToCart = useCallback(
-        async (e) => {
-            e.stopPropagation();
-
-            if (!selectedVariant && hasVariations) {
-                setError("Please select a variant");
-                return;
-            }
-            if (isInCart) return; // Prevent adding if already in cart
-
-            setIsAddingToCart(true);
-            setError(null);
-
-            try {
-                const productVariantId = getVariantId();
-                const existingItem = findItemInCart(product.id, productVariantId);
-                // If it's in the cart, increment. If not (or quantity is 0), add 1.
-                const currentQty = existingItem ? existingItem.quantity : 0;
-                const nextQty = currentQty + 1;
-
-                await addItemToCart(productVariantId, nextQty);
-                // isInCart will automatically update due to useMemo
-                
-            } catch (error) {
-                console.error("addItemToCart error:", error);
-                setError("Failed to add. Try again.");
-            } finally {
-                setTimeout(() => setIsAddingToCart(false), 500); 
-            }
-        },
-        [addItemToCart, hasVariations, findItemInCart, product.id, getVariantId, selectedVariant, isInCart]
-    );
-
-    const handleBuyNow = useCallback(
-        async (e) => {
-            e.stopPropagation();
-
-            const token = localStorage.getItem("accessToken");
-            if (!token) {
-                setError("Please login to continue");
-                setTimeout(
-                    () => navigate("/login", { state: { from: "/cart" } }),
-                    1500
-                );
-                return;
-            }
-
-            if (!selectedVariant && hasVariations) {
-                setError("Please select a variant");
-                return;
-            }
-
-            setIsAddingToCart(true); 
-
-            try {
-                const productVariantId = getVariantId();
-                const existingItem = findItemInCart(product.id, productVariantId);
-                
-                if (!existingItem) {
-                    await addItemToCart(productVariantId, 1);
-                }
-
-                navigate("/cart", {
-                    state: {
-                        buyNowProduct: product.id,
-                        buyNowVariant: selectedVariant?.id,
-                    },
-                });
-            } catch (error) {
-                console.error("Buy now failed:", error);
-                setError("Failed to proceed.");
-            } finally {
-                setIsAddingToCart(false);
-            }
-        },
-        [product.id, selectedVariant, navigate, addItemToCart, hasVariations, findItemInCart, getVariantId]
-    );
-
-    // Determine the button state and content using the persistent status (isInCart)
-    const buttonText = isAddingToCart ? "Adding..." : (isInCart ? "Added" : "Add To Cart");
-    const cartIcon = isInCart ? Check : ShoppingCart;
-    const isDisabled = isAddingToCart || (!selectedVariant && hasVariations) || isTogglingWishlist || isInCart;
-    // Use 'added-once' class for the permanent "Added" visual state
-    const buttonClass = `product-cart-btn ${isAddingToCart ? "adding" : ""} ${isInCart ? "added-once" : ""}`;
-
-
-    // --- RENDER ---
     return (
-        <div className="product-card product-card-animate" onClick={handleCardClick}>
-            {/* Discount Badge */}
-            {discountPercent > 0 && (
-                <div className="product-discount-badge">{discountPercent}% OFF</div>
-            )}
-
-            {/* Image Section */}
-            <div className="product-image-container">
-                <img
-                    src={getImageUrl(product.image || product.image_url)}
-                    alt={product.name}
-                    className="product-image"
-                    loading="lazy"
-                    onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                    }}
-                />
-
-                {/* Wishlist Button */}
-                <button
-                    className={`product-wishlist-btn ${isWishlistedStatus ? "wishlisted" : ""}`}
-                    onClick={handleWishlistClick}
-                    disabled={isTogglingWishlist} 
-                    aria-label={isWishlistedStatus ? "Remove from wishlist" : "Add to wishlist"}
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className={`elite-asset-capsule ${isHovered ? 'capsule-active' : ''}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => navigate(`/product/${product.id}`)}
+        >
+            <div className="capsule-hologram-shimmer"></div>
+            
+            {/* PROCUREMENT STATUS */}
+            <div className="capsule-status-ecom360">
+                {discountPercent > 0 && <span className="status-pill discount"><Zap size={10} /> {discountPercent}% YIELD</span>}
+                <button 
+                    className={`status-pill wishlist ${isWishlisted ? 'active' : ''}`}
+                    onClick={handleWishlist}
                 >
-                    <Heart
-                        className="product-wishlist-icon"
-                        fill={isWishlistedStatus ? "currentColor" : "none"}
-                    />
+                    <Heart size={14} fill={isWishlisted ? "currentColor" : "none"} />
                 </button>
             </div>
 
-            {/* Details Section */}
-            <div className="product-details">
-                <div className="product-brand">
-                    {product.brand && product.brand !== "null" ? product.brand : "Fresh"}
+            {/* ASSET VISUAL */}
+            <div className="capsule-visual-ecom360">
+                {!imgLoaded && <div className="visual-skeleton"><div className="shimmer"></div></div>}
+                <motion.img
+                    animate={{ scale: isHovered ? 1.08 : 1 }}
+                    src={imageSrc}
+                    alt={product.name}
+                    className="asset-visual"
+                    onError={(e) => { e.target.src = "/images/no-image.png"; }}
+                />
+            </div>
+
+            {/* ASSET DOSSIER */}
+            <div className="capsule-dossier-ecom360">
+                <div className="dossier-meta">
+                    <span className="brand-badge">{product.brand || "ELITE ASSET"}</span>
+                    <div className="rating-mini"><Star size={10} fill="currentColor" /> <span>{product.rating || "5.0"}</span></div>
                 </div>
 
-                <h3 className="product-name">{product.name}</h3>
+                <h3 className="asset-title-luxe">{product.name}</h3>
+                
+                <div className="asset-specs-preview">
+                    <div className="spec-node"><Package size={12} /> <span>LOGISTICS READY</span></div>
+                    <div className="spec-node"><Check size={12} /> <span>AUTH SECURED</span></div>
+                </div>
 
-                {/* Variation Dropdown */}
-                {hasVariations ? (
-                    <select
-                        className="product-variation-select"
-                        onChange={handleVariationChange}
-                        value={selectedVariant?.id}
-                        disabled={isAddingToCart || isTogglingWishlist || isInCart}
-                        aria-label="Select variant"
-                        onClick={(e) => e.stopPropagation()} 
-                    >
-                        {product.variations.map((v) => (
-                            <option key={v.id} value={v.id}>
-                                {v.value} - ₹{parseFloat(v.offer_price).toFixed(0)}
-                            </option>
+                {hasVariations && (
+                    <div className="variant-ecom360-mini" onClick={e => e.stopPropagation()}>
+                        {product.variations.slice(0, 3).map(v => (
+                            <button 
+                                key={v.id} 
+                                className={`v-pill-mini ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                                onClick={() => setSelectedVariant(v)}
+                            >
+                                {v.weight || v.value}
+                            </button>
                         ))}
-                    </select>
-                ) : (
-                    <div className="product-variation-spacer"></div>
+                    </div>
                 )}
 
-                {/* Error Message */}
-                {error && <div className="product-error-message">{error}</div>}
-
-                {/* Price Section */}
-                <div className="product-price-container">
-                    <span className="product-price">
-                        ₹{displayPrice}
-                    </span>
-                    {originalPrice > displayPrice && (
-                        <span className="product-original-price">
-                            ₹{originalPrice}
-                        </span>
-                    )}
-                </div>
-
-                {/* Action Buttons - ALWAYS SHOW ADD & BUY */}
-                <div className="product-actions">
-                    <button
-                        className={buttonClass}
+                <div className="asset-financial-ecom360">
+                    <div className="price-block">
+                        <span className="price-current">₹{displayPrice}</span>
+                        {originalPrice > displayPrice && <span className="price-strike">₹{originalPrice}</span>}
+                    </div>
+                    <button 
+                        className={`btn-procure-action ${isInCart ? 'authorized' : ''}`}
                         onClick={handleAddToCart}
-                        disabled={isDisabled}
-                        aria-label={isInCart ? "Item added to cart" : "Add to cart"}
+                        disabled={isAddingToCart || isInCart}
                     >
-                        {React.createElement(cartIcon, { className: "product-btn-icon" })}
-                        <span>{buttonText}</span>
+                        {isAddingToCart ? <Loader size={16} className="spin" /> : 
+                         isInCart ? <><Check size={16} /> <span>IN CART</span></> : 
+                         <><ShoppingCart size={16} /> <span>ADD TO CART</span></>}
                     </button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

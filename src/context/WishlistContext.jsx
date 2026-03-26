@@ -18,21 +18,41 @@ export const useWishlist = () => useContext(WishlistContext);
 
 export const WishlistProvider = ({ children }) => {
   const { user, isAuthenticated, isLoading: isUserLoading } = useUser();
-  const [wishlist, setWishlist] = useState([]);
+
+  // Initialize from local storage for persistence and fallback
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const saved = localStorage.getItem("localWishlist");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [loading, setLoading] = useState(false);
+
+  // Sync to local storage whenever wishlist changes
+  useEffect(() => {
+    localStorage.setItem("localWishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
 
   // Normalize product ID from any possible shape
   const extractProductId = (item) => {
     if (!item) return null;
-    const product = item.product || item;
-    return (
-      product?.id ??
-      product?.product_id ??
-      item.product_id ??
-      item.product?.id ??
-      item.product?.product_id ??
-      null
-    );
+    try {
+      const product = item.product || item;
+      return (
+        product?.id ??
+        product?.product_id ??
+        item.id ??
+        item.product_id ??
+        item.product?.id ??
+        item.product?.product_id ??
+        null
+      );
+    } catch {
+      return null;
+    }
   };
 
   // Check if a given productId is already in wishlist
@@ -50,56 +70,79 @@ export const WishlistProvider = ({ children }) => {
   // Load wishlist from server
   const loadWishlist = useCallback(async () => {
     if (!isAuthenticated || !user?.id) {
-      setWishlist([]);
+      // Don't clear local wishlist on logout, but maybe we should?
+      // For now, keep it local.
       return;
     }
 
     setLoading(true);
     try {
       const data = await wishlistService.fetchWishlist(user.id);
-      setWishlist(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setWishlist(data);
+      }
     } catch (error) {
-      console.error("Failed to load wishlist:", error);
-      setWishlist([]);
+      console.warn("Failed to load wishlist from server. Using local instead.", error);
     } finally {
       setLoading(false);
     }
   }, [isAuthenticated, user]);
 
   useEffect(() => {
-    if (!isUserLoading) {
+    if (!isUserLoading && isAuthenticated) {
       loadWishlist();
+    } else if (!isUserLoading && !isAuthenticated) {
+      // Clear local wishlist if not authenticated to prevent "automatic items"
+      if (wishlist.length > 0) {
+        setWishlist([]);
+        localStorage.removeItem("localWishlist");
+      }
     }
-  }, [isUserLoading, loadWishlist]);
+  }, [isUserLoading, isAuthenticated, loadWishlist]);
 
   // Single source of truth for add/remove
   const toggleWishlist = useCallback(
-    async (productId) => {
+    async (productId, productDetails = null) => {
       if (!productId) return;
 
-      if (!isAuthenticated || !user?.id) {
+      if (!isAuthenticated) {
         alert("Please log in to manage your wishlist.");
         return;
       }
 
       const already = isProductWishlisted(productId);
+      const previousWishlist = [...wishlist];
+
+      // Optimistic update
+      if (already) {
+        setWishlist(prev => prev.filter(item => Number(extractProductId(item)) !== Number(productId)));
+      } else {
+        const newItem = productDetails ? {
+          id: productId,
+          product: productDetails,
+          product_id: productId,
+          ...productDetails
+        } : {
+          id: productId,
+          product_id: productId
+        };
+        setWishlist(prev => [...prev, newItem]);
+      }
 
       try {
         if (already) {
-          // Uses DELETE + { product_id } in body
           await wishlistService.removeFromWishlist(productId);
         } else {
           await wishlistService.addToWishlist({
-            user_id: user.id,
+            user_id: user?.id,
             product_id: productId,
           });
         }
-
-        // Always reload from server to keep it in sync
-        await loadWishlist();
+        // Force refresh from server to ensure IDs are correct (optional but recommended)
+        // loadWishlist();
       } catch (error) {
-        console.error("Wishlist toggle failed:", error);
-        alert("Failed to update wishlist. Please try again.");
+        console.warn("Wishlist API failed, reverting state:", error);
+        setWishlist(previousWishlist);
       }
     },
     [isAuthenticated, user, isProductWishlisted, loadWishlist]
@@ -117,7 +160,8 @@ export const WishlistProvider = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
-      wishlist,
+      wishlist: Array.isArray(wishlist) ? wishlist : [],
+      wishlistCount: (Array.isArray(wishlist) ? wishlist.length : 0),
       loading,
       loadWishlist,
       toggleWishlist,
@@ -140,3 +184,4 @@ export const WishlistProvider = ({ children }) => {
     </WishlistContext.Provider>
   );
 };
+

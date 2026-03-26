@@ -1,229 +1,330 @@
-// services/api.js
 import axios from "axios";
 import { API_BASE_URL, ECOM_API_PATH, COMMON_HEADERS } from "./config";
+import { API_ENDPOINTS } from "./endpoints";
 
 // ===========================
-// 🛠 AXIOS INSTANCE SETUP
+// AXIOS INSTANCE
 // ===========================
 const api = axios.create({
   baseURL: `${API_BASE_URL}${ECOM_API_PATH}`,
-  headers: COMMON_HEADERS,
+  headers: {
+    ...COMMON_HEADERS,
+    "ngrok-skip-browser-warning": "true",
+  },
 });
-const getAccessToken = () => localStorage.getItem("accessToken");
+
 // ===========================
-// 🔐 SAVE TOKEN + SYNC AXIOS
-// ===========================
+// UTILITIES
+// ✅ Set / Remove token
 export const setAuthToken = (token) => {
   if (token) {
-    localStorage.setItem("accessToken", token);
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    localStorage.removeItem("accessToken");
     delete api.defaults.headers.common["Authorization"];
   }
 };
 
+
+const getUserId = () => {
+  const storedId = localStorage.getItem("user_id");
+  if (storedId && storedId !== "undefined" && storedId !== "null") return storedId;
+  
+  const raw = localStorage.getItem("ecom_auth_data");
+  if (raw && raw !== "undefined" && raw !== "null") {
+    try {
+      const parsed = JSON.parse(raw);
+      const uid = parsed.user?.id || parsed.user?.user_id || parsed.id || parsed.user_id;
+      if (uid && uid !== "undefined" && uid !== "null") return String(uid);
+    } catch (e) { return null; }
+  }
+  return null;
+};
+
+const getToken = () => {
+  // 1. Try auth data object (Most Auth Systems store it here)
+  const raw = localStorage.getItem("ecom_auth_data");
+  if (raw && raw !== "undefined" && raw !== "null") {
+    try {
+      const parsed = JSON.parse(raw);
+      const token = parsed.access || parsed.token || parsed.access_token || parsed.jwt_token || parsed.accessToken;
+      if (token && token !== "undefined" && token !== "null") return token;
+    } catch (e) { /* fallback */ }
+  }
+  
+  // 2. Try standalone keys (User requested explicit access_token/accessToken storage)
+  const standalone = localStorage.getItem("access_token") || 
+                     localStorage.getItem("accessToken") || 
+                     localStorage.getItem("token") ||
+                     localStorage.getItem("jwt");
+                     
+  if (standalone && standalone !== "undefined" && standalone !== "null") return standalone;
+  return null;
+};
+
 // ===========================
-// 🛡 INTERCEPTOR — AUTO ATTACH TOKEN
+// INTERCEPTOR - AUTH & USER ID
 // ===========================
 api.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
-    if (token) {
+    const token = getToken();
+    const userId = getUserId();
+
+    // Skip attaching for auth discovery endpoints
+    const url = config.url || "";
+    const isAuthEndpoint = 
+      url.includes(API_ENDPOINTS.LOGIN) || 
+      url.includes(API_ENDPOINTS.REGISTER) ||
+      url.includes(API_ENDPOINTS.BANNERS) ||
+      url.includes("token/refresh/");
+
+    if (!isAuthEndpoint && token) {
+      // ✅ FORCE ATTACH LATEST TOKEN
       config.headers.Authorization = `Bearer ${token}`;
+      
+      // ✅ PASS USER_ID AUTOMATICALLY FOR BACKEND IDENTIFICATION
+      if (userId) {
+         // Some endpoints expect user_id in params (Query String)
+         config.params = { ...config.params, user_id: userId };
+         
+         // Some endpoints expect user_id in body (POST/PUT/PATCH)
+         if (['post', 'put', 'patch'].includes(config.method?.toLowerCase())) {
+            if (config.data instanceof FormData) {
+                // If FormData, append if not present
+                if (!config.data.has('user_id')) {
+                    config.data.append('user_id', userId);
+                }
+            } else if (config.data && typeof config.data === 'object') {
+                // If JSON object, merge
+                config.data = { user_id: userId, ...config.data };
+            } else if (!config.data) {
+                // If no data, provide user_id object
+                config.data = { user_id: userId };
+            }
+         }
+      }
     }
-    config.headers["ngrok-skip-browser-warning"] = "true";
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+// Response Interceptor for 401s
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("Unauthorized API call! Backend responded with 401. Awaiting explicit user logout to clear session.");
+      // ✅ Removed aggressive automatic local storage wipe to prevent premature loss of user_id and tokens.
+      // Session tear-down is now strictly handled by the UserContext logout() or authService logout() method.
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ===========================
-// 📦 PUBLIC API FETCHERS
+// PRODUCTS
 // ===========================
-export const fetchProducts = async () => {
+export const fetchProducts = async (filters = {}) => {
+  const { categoryId, search } = filters;
+  const params = {};
+
+  if (categoryId) params.category_id = categoryId;
+  if (search) params.search = search;
+
   try {
-    const res = await api.get("/products/");
-    return res.data;
-  } catch {
+    const res = await api.get(API_ENDPOINTS.PRODUCTS, { params });
+    return Array.isArray(res.data) ? res.data : res.data.results || [];
+  } catch (error) {
+    console.error("fetchProducts error:", error);
     return [];
   }
 };
 
+export const fetchPopularProducts = async () => {
+  try {
+    const res = await api.get(API_ENDPOINTS.POPULAR_PRODUCTS);
+    return Array.isArray(res.data) ? res.data : res.data.results || [];
+  } catch (error) {
+    console.error("Failed to fetch popular products:", error);
+    return [];
+  }
+};
+
+export const fetchProductDetail = async (productId) => {
+  try {
+    const res = await api.get(API_ENDPOINTS.PRODUCT_DETAIL(productId));
+    return res.data;
+  } catch (error) {
+    console.error("Failed to fetch product:", error);
+    throw error;
+  }
+};
+
+export const fetchProductVariations = async (productId) => {
+  try {
+    const res = await api.get(API_ENDPOINTS.PRODUCT_VARIATIONS(productId));
+    return res.data;
+  } catch (error) {
+    console.error("Failed to fetch variations:", error);
+    return [];
+  }
+};
+
+// ===========================
+// CATEGORIES
+// ===========================
 export const fetchCategories = async () => {
   try {
-    const res = await api.get("/categories/");
+    const res = await api.get(API_ENDPOINTS.CATEGORIES);
     return res.data;
-  } catch {
+  } catch (error) {
     return [];
   }
 };
 
-/**
- * Fetches subcategories with optional filtering based on the provided API structure.
- * * Query Params Supported:
- * 1. category_id: Filters subcategories belonging to a specific category.
- * 2. parent_subcategory_id: Filters by parent ID. Use the string 'null' for top-level subcategories.
- * * @param {number|string} [categoryId] - Filters subcategories by this category ID.
- * @param {number|string|'null'} [parentSubcategoryId] - Filters by parent ID. Use the string 'null' for top-level subcategories.
- * @returns {Promise<Array>} List of subcategories.
- */
 export const fetchSubCategories = async (categoryId, parentSubcategoryId) => {
   try {
     const params = {};
 
-    // 1. Handle category_id (Optional)
-    // Add only if explicitly provided (not undefined and not null)
-    if (categoryId !== undefined && categoryId !== null) {
-      params.category_id = categoryId;
-    }
+    if (categoryId) params.category_id = categoryId;
+    if (parentSubcategoryId) params.parent_subcategory_id = parentSubcategoryId;
 
-    // 2. Handle parent_subcategory_id (Optional, accepts 'null' string)
-    // Add only if explicitly provided (not undefined)
-    if (parentSubcategoryId !== undefined) {
-      params.parent_subcategory_id = parentSubcategoryId;
-    }
+    const res = await api.get(API_ENDPOINTS.SUBCATEGORIES, { params });
 
-    // Axios will automatically serialize the 'params' object into the correct query string
-    const res = await api.get("/subcategories/", { params });
-    return res.data;
-  } catch {
+    return Array.isArray(res.data) ? res.data : res.data.results || [];
+  } catch (error) {
     return [];
   }
 };
 
+// ===========================
+// BANNERS
+// ===========================
 export const fetchBanners = async () => {
   try {
-    const res = await api.get("/Banners/");
-    return res.data;
-  } catch {
+    const res = await api.get(API_ENDPOINTS.BANNERS);
+    return Array.isArray(res.data) ? res.data : res.data.results || [];
+  } catch (error) {
+    console.error("Banners fetch failed:", error);
     return [];
   }
 };
 
 // ===========================
-// 🛒 CART SERVICE (AUTHENTICATED)
+// CART SERVICE
 // ===========================
 export const cartService = {
-  // GET CART ITEMS
   fetchCart: async () => {
+    const userId = getUserId();
+
     try {
-      const res = await api.get("/cart/");
+      const res = await api.get(API_ENDPOINTS.CART, {
+        params: { user_id: userId },
+      });
       return res.data;
     } catch (error) {
       throw error.response?.data || error;
     }
   },
 
-  // ADD ITEM TO CART
   addToCart: async (productVariantId, quantity) => {
+    const userId = getUserId();
+
     const payload = {
-      product_variation: productVariantId || null,
+      user_id: userId,
+      product_variation: productVariantId,
       quantity,
     };
 
     try {
-      const res = await api.post("/cart/add/", payload);
+      const res = await api.post(API_ENDPOINTS.CART_ADD, payload);
       return res.data;
     } catch (error) {
-      if (error.response?.status === 401) {
-        throw { message: "Unauthorized. Please log in again.", status: 401 };
-      }
-      throw error.response?.data || new Error("Add to Cart Failed");
+      throw error.response?.data || "Add to cart failed";
     }
   },
 
-  // UPDATE ITEM QUANTITY
   updateToCart: async (id, quantity) => {
-    const payload = { quantity };
+    const userId = getUserId();
+
     try {
-      const res = await api.put(`/cart/update-quantity/${id}/`, payload);
+      const res = await api.put(API_ENDPOINTS.CART_UPDATE_QUANTITY(id), {
+        user_id: userId,
+        quantity,
+      });
+
       return res.data;
     } catch (error) {
-      throw error.response?.data || new Error("Update to Cart Failed");
+      throw error.response?.data || "Update cart failed";
     }
   },
 
-  // DELETE ITEM FROM CART
   deleteCartItem: async (cartId) => {
+    const userId = getUserId();
+
     try {
-      const res = await api.delete(`/cart/remove/${cartId}/`);
+      const res = await api.delete(API_ENDPOINTS.CART_REMOVE(cartId), {
+        params: { user_id: userId },
+      });
+
       return res.data;
     } catch (error) {
-      throw error.response?.data || new Error("Delete Cart Item Failed");
+      throw error.response?.data || "Delete cart item failed";
     }
   },
 
-  // SUBMIT ORDER FROM CART
+  clearCart: async () => {
+    const userId = getUserId();
+
+    try {
+      const res = await api.delete(API_ENDPOINTS.CART_CLEAR, {
+        params: { user_id: userId },
+      });
+
+      return res.data;
+    } catch (error) {
+      throw error.response?.data || "Clear cart failed";
+    }
+  },
+
   orderFromCart: async (orderData) => {
+    const userId = getUserId();
+
     try {
-      const res = await api.post("/order-from-cart/", orderData);
-      // const res = await api.post("/place-order-directt/", orderData);
+      const res = await api.post(API_ENDPOINTS.PLACE_ORDER_CART, {
+        ...orderData,
+        user_id: userId,
+      });
 
       return res.data;
     } catch (error) {
-      if (error.response?.status === 401) {
-        throw { message: "Unauthorized. Please log in again.", status: 401 };
-      }
-      throw error.response?.data || new Error("Order Submission Failed");
+      throw error.response?.data || "Order failed";
     }
   },
 
-  // RENAMED for clarity to match the direct order endpoint
-orderDirectly: async (orderData) => { 
-    try {
-        // USE THE NEW DIRECT ORDER ENDPOINT
-        const res = await api.post("/place-order-directt/", orderData); 
-
-        return res.data;
-    } catch (error) {
-        if (error.response?.status === 401) {
-            throw { message: "Unauthorized. Please log in again.", status: 401 };
-        }
-        throw error.response?.data || new Error("Direct Order Submission Failed");
-    }
-},
-
-/**
-   * Fetches a list of products, optionally filtered by category or search term.
-   * @param {Object} filters - An object containing filtering parameters.
-   * @param {number} [filters.categoryId] - ID of the category/subcategory to filter by.
-   * @param {string} [filters.search] - Search term for products.
-   * @returns {Promise<Array>} A list of products.
-   */
-  fetchProducts: async ({ categoryId, search, page = 1, pageSize = 20 }) => {
-    let url = "/products/"; // Assuming this is your base product endpoint
-    const params = new URLSearchParams();
-
-    if (categoryId) {
-      params.append("category_id", categoryId);
-    }
-
-    if (search) {
-      params.append("search", search);
-    }
-
-    if (page) {
-        params.append("page", page);
-    }
-
-    if (pageSize) {
-        params.append("page_size", pageSize);
-    }
-
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
+  orderDirectly: async (orderData) => {
+    const userId = getUserId();
 
     try {
-      const res = await api.get(url);
-      // Assuming your product list is in res.data or res.data.results
-      return Array.isArray(res.data) ? res.data : res.data.results || []; 
+      const res = await api.post(API_ENDPOINTS.PLACE_ORDER_DIRECT, {
+        ...orderData,
+        user_id: userId,
+      });
+
+      return res.data;
     } catch (error) {
-      console.error("Failed to fetch products:", error);
-      throw error;
+      throw error.response?.data || "Direct order failed";
     }
   },
 };
+
+// ===========================
+// GENERIC REQUESTS
+// ===========================
+export const getRequest = (url, params = {}) => api.get(url, { params });
+export const postRequest = (url, data = {}) => api.post(url, data);
+export const putRequest = (url, data = {}) => api.put(url, data);
+export const deleteRequest = (url) => api.delete(url);
 
 export default api;

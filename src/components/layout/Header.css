@@ -1,444 +1,351 @@
-/* =======================================================
-   1. VARIABLES & BASE
-   ======================================================= */
-:root {
-    --primary-yellow: #facc15;
-    --primary-yellow-hover: #eab308;
-    --bg-white: #ffffff;
-    --bg-off-white: #f9fafb;
-    --bg-gray-light: #e5e7eb;
-    --border-light: #d1d5db;
-    --border-medium: #9ca3af;
-    --text-dark: #111827;
-    --text-light: #6b7280;
-    --text-accent: #4b5563;
-    --error-red: #ef4444;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-/* =======================================================
-   2. HEADER CONTAINER & LAYOUT
-   ======================================================= */
 .header-container {
+    height: 85px;
+    width: 100%;
     position: sticky;
     top: 0;
-    z-index: 50;
-    background: var(--bg-white);
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    padding: 0.5rem 0; 
+    z-index: 1000;
+    background: #0f172a;
+    backdrop-filter: blur(25px);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.header-container.scrolled {
+    height: 75px;
+    background: rgba(15, 23, 42, 0.98);
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
 .header-content {
-    max-width: 1400px;
+    max-width: 1550px;
+    height: 100%;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 3rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 3rem;
 }
 
-/* =======================================================
-   3. LOGO SECTION
-   ======================================================= */
+/* --- LOGO ECOM360 --- */
 .header-logo-section {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    position: relative;
 }
 
 .header-logo-text {
-  font-style: italic;
-    font-weight: 800;
-    font-size: 1.25rem;
-    color: var(--text-dark);
+    font-size: 1.8rem;
+    font-weight: 950;
+    color: white;
+    letter-spacing: -2px;
     display: flex;
     align-items: center;
-    cursor: pointer;
+    position: relative;
     user-select: none;
 }
+
 .header-logo-accent {
-  font-style: italic;
-    color: var(--primary-yellow-hover);
+    color: var(--elite-gold);
+    margin-left: 2px;
+    position: relative;
 }
+
 .header-logo-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    margin-left: 0.25rem;
+    width: 6px;
+    height: 6px;
+    background: var(--elite-gold);
     border-radius: 50%;
-    background: var(--primary-yellow);
-    animation: softPulse 2s infinite;
-}
-@keyframes softPulse {
-    0%, 100% { 
-        box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.4); 
-    }
-    50% { 
-        box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); 
-    }
+    margin-left: 4px;
+    box-shadow: 0 0 15px var(--elite-gold);
 }
 
-/* =======================================================
-   4. SEARCH BARS (Desktop & Mobile)
-   ======================================================= */
-
-/* Desktop Search */
+/* --- SEARCH ECOM360 --- */
 .header-search-container {
     flex: 1;
-    max-width: 600px;
+    max-width: 700px;
     position: relative;
-    display: none; 
 }
-@media (min-width: 768px) {
-    .header-search-container {
-        display: block; 
-    }
+
+.header-search-input-wrapper {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    transition: all 0.4s;
+}
+
+.header-search-input-wrapper.focused {
+    background: white;
+    border-color: var(--elite-gold);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.header-search-icon {
+    color: #94a3b8;
 }
 
 .header-search-input {
     width: 100%;
-    background-color: var(--bg-off-white);
-    border: 1px solid var(--border-light);
-    border-radius: 9999px;
-    padding: 0.625rem 1rem 0.625rem 2.75rem;
-    font-size: 0.875rem;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
     outline: none;
-    transition: all 0.2s ease;
-    color: var(--text-dark);
-}
-.header-search-input:focus {
-    border-color: var(--primary-yellow);
-    background-color: var(--bg-white);
-    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
-}
-.header-search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--border-medium);
 }
 
-/* Mobile Search (Separate row) */
-.header-mobile-search {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 1rem 0.5rem; 
-    display: block; 
-}
-@media (min-width: 768px) {
-    .header-mobile-search {
-        display: none; 
-    }
+.header-search-input-wrapper.focused .header-search-input {
+    color: #0f172a;
 }
 
-.header-mobile-search-wrapper {
+.header-search-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-action-icon {
+    color: #94a3b8;
+    background: transparent;
+    cursor: pointer;
     position: relative;
 }
-.header-mobile-search-input {
-    width: 100%;
-    background: var(--bg-off-white);
-    border: 1px solid var(--border-light);
-    border-radius: 0.75rem;
-    padding: 0.625rem 1rem 0.625rem 2.5rem;
-    font-size: 0.875rem;
-    outline: none;
-}
-.header-mobile-search-icon {
-    position: absolute;
-    left: 0.875rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--border-medium);
-}
 
-/* =======================================================
-   5. ACTION BUTTONS (DESKTOP)
-   ======================================================= */
+.search-action-icon:hover { color: var(--elite-gold); }
+
+/* --- ACTIONS HUB --- */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem; 
-}
-@media (min-width: 768px) {
-    .header-actions {
-        gap: 0.75rem; 
-    }
+    gap: 1.5rem;
 }
 
-/* Base style for all action buttons */
 .header-action-btn {
-    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    border-radius: 9999px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: var(--text-accent);
-}
-.header-action-btn:hover {
-    background-color: var(--bg-off-white);
-    color: var(--text-dark);
-}
-
-/* Desktop-only action buttons (Wishlist & Cart) */
-.header-desktop-only {
-    display: none; 
     flex-direction: column;
-    padding: 0.5rem 0.75rem;
-}
-@media (min-width: 768px) {
-    .header-desktop-only {
-        display: flex; 
-    }
-    .header-desktop-only:hover {
-        background-color: rgba(250, 204, 21, 0.1); 
-        color: var(--primary-yellow-hover);
-    }
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.5); /* Muted silver for non-active */
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0.5rem 1.25rem;
+    border-radius: 12px;
 }
 
-/* Action Label (Desktop only text) */
-.action-label {
-    display: none;
-    font-size: 0.6875rem; 
-    font-weight: 500;
-    margin-top: 2px;
-    color: var(--text-accent);
-}
-@media (min-width: 1024px) {
-    .action-label {
-        display: block;
-    }
+.header-container.scrolled .header-action-btn { color: #94a3b8; }
+
+.header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.04);
 }
 
-/* Badge Styles */
+.header-action-btn:hover, .header-action-btn.active {
+    color: white;
+}
+
+.header-action-btn.active {
+    color: var(--elite-gold);
+    text-shadow: 0 0 15px var(--elite-gold-glow); /* Radium Neon Glow */
+}
+
+/* Subtle Radium Aura behind active button */
+.header-action-btn.active::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: radial-gradient(circle at center, rgba(251, 191, 36, 0.1), transparent 70%);
+    border-radius: 12px;
+    z-index: -1;
+    animation: radium-pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes radium-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+.header-container.scrolled .header-action-btn:hover { 
+    background: rgba(255, 255, 255, 0.06);
+    color: white; 
+}
+
+.icon-wrapper-premium {
+    position: relative;
+}
+
 .header-action-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: -8px;
+    right: -10px;
+    background: var(--elite-gold);
+    color: #0f172a;
+    font-size: 0.65rem;
+    font-weight: 950;
     min-width: 18px;
     height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9999px;
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: var(--bg-white);
-    padding: 0 4px;
-    box-shadow: 0 0 0 2px var(--bg-white);
-    background: var(--error-red); 
-}
-.header-wishlist-badge {
-    background: #f59e0b; 
-}
-.header-cart-badge {
-    background: var(--primary-yellow-hover); 
-    color: var(--text-dark);
+    border-radius: 50%;
+    border: 2px solid #0f172a;
 }
 
-/* =======================================================
-   6. DESKTOP USER & LOGIN AREA
-   ======================================================= */
-.header-desktop-user-area {
-    display: none; 
-}
-@media (min-width: 768px) {
-    .header-desktop-user-area {
-        display: flex; 
-    }
+.action-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: 0.3s;
 }
 
-.header-user-btn {
-    padding: 0.5rem 0.75rem;
-    background: var(--bg-off-white);
-    border: 1px solid var(--border-light);
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    display: flex; /* Added for alignment */
-    align-items: center; /* Added for alignment */
-    gap: 0.5rem; /* Added for spacing */
-}
-.header-user-btn:hover {
-    background: var(--bg-gray-light);
-}
-.header-user-name {
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.header-chevron {
-    transition: transform 0.2s;
-}
-.header-user-btn[aria-expanded="true"] .header-chevron {
-    transform: rotate(180deg);
+.header-action-btn.active .action-label {
+    color: var(--elite-gold);
+    font-weight: 950;
+    text-shadow: 0 0 8px var(--elite-gold-glow);
 }
 
-/* Login Button */
-.header-login-btn {
-    background: var(--primary-yellow);
-    padding: 0.625rem 1.25rem;
-    border-radius: 9999px;
-    font-weight: 700;
-    color: var(--text-dark);
-    display: flex; /* Added for alignment */
-    align-items: center; /* Added for alignment */
-    gap: 0.5rem; /* Added for spacing */
-}
-.header-login-btn:hover {
-    background: var(--primary-yellow-hover);
-}
-.header-login-btn span {
-    display: none; 
-}
-@media (min-width: 480px) {
-    .header-login-btn span {
-        display: inline; 
-    }
+.active-dot-premium {
+    position: absolute;
+    bottom: 0px;
+    width: 24px;
+    height: 2px;
+    background: var(--elite-gold);
+    border-radius: 100px;
+    box-shadow: 0 4px 12px var(--elite-gold-glow);
 }
 
-/* Desktop Dropdown Menu */
-.header-user-dropdown-wrapper {
+/* --- USER PILL ELITE --- */
+.header-user-section {
     position: relative;
 }
-.header-dropdown-menu {
-    position: absolute;
-    top: 45px;
-    right: 0;
-    background: var(--bg-white);
-    border-radius: 8px;
-    padding: 10px 0;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 60;
-    min-width: 160px;
-}
-.header-dropdown-menu button {
-    width: 100%;
-    padding: 10px 15px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.875rem;
+
+.header-user-pill {
+    background: rgba(255, 255, 255, 0.03); /* Glassmorphic Base */
+    color: white;
+    padding: 0.5rem 1.1rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
     cursor: pointer;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    color: var(--text-dark);
-}
-.header-dropdown-menu button:hover {
-    background: var(--bg-off-white);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* =======================================================
-   7. MOBILE MORE MENU (3-lines/X)
-   ======================================================= */
-.header-mobile-more-wrapper {
-    position: relative;
-    display: flex; 
-}
-@media (min-width: 768px) {
-    .header-mobile-more-wrapper {
-        display: none; 
-    }
+.header-user-pill:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.header-mobile-menu {
-    position: absolute;
-    top: 45px;
-    right: 0;
-    background: var(--bg-white);
-    border-radius: 8px;
-    padding: 8px 0;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 60;
-    min-width: 180px;
+.header-user-pill.open {
+    background: white;
+    color: #0f172a;
+    border-color: white;
 }
 
-.header-mobile-menu-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--border-medium);
-    padding: 4px 15px 8px;
-    margin: 0;
-}
-
-/* Base style for all menu buttons */
-.header-mobile-menu button {
-    width: 100%;
-    padding: 10px 15px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.875rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color: var(--text-dark);
-    gap: 10px;
-    justify-content: flex-start; 
-}
-.header-mobile-menu button:hover {
-    background: var(--bg-off-white);
-}
-
-/* Specific style for items containing a badge (Wishlist/Cart) */
-.header-mobile-menu button.menu-item-with-badge {
-    justify-content: space-between;
-}
-
-.menu-icon-text {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-mobile-menu-divider {
-    height: 1px;
-    background-color: var(--bg-gray-light);
-    margin: 8px 0;
-}
-
-/* Mobile badge in the menu */
-.mobile-menu-badge {
-    min-width: 20px;
-    padding: 0 5px;
-    height: 20px;
+.user-avatar-small {
+    width: 26px;
+    height: 26px;
+    background: rgba(251, 191, 36, 0.1);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9999px;
-    font-size: 0.75rem;
+    color: var(--elite-gold);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.header-user-pill.open .user-avatar-small {
+    background: #0f172a;
+    border-color: #0f172a;
+}
+
+.user-pill-name {
+    font-size: 0.85rem;
     font-weight: 700;
-    color: var(--bg-white);
-    background: var(--error-red);
+    letter-spacing: 0.3px;
 }
 
-.header-mobile-menu button.logout-btn {
-    color: var(--error-red);
-}
-.header-mobile-menu button.login-btn {
-    font-weight: 600;
+.pill-chevron { transition: transform 0.4s; }
+.pill-chevron.rotate { transform: rotate(180deg); color: var(--elite-gold); }
+
+/* --- LOGIN BUTTON --- */
+.header-login-btn-premium {
+    background: #0f172a;
+    color: white;
+    padding: 0.75rem 1.75rem;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 950;
+    font-size: 0.85rem;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
 }
 
-/* =======================================================
-   8. ACCESSIBILITY & UTILITIES
-   ======================================================= */
-button:focus-visible,
-input:focus-visible {
-    outline: 2px solid var(--primary-yellow);
-    outline-offset: 2px;
+/* --- DROPDOWN LUXURY --- */
+.header-user-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    width: 320px;
+    background: #0f172a;
+    border-radius: 2.5rem;
+    padding: 2rem;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 1000;
 }
-button:active {
-    transform: scale(0.98);
+
+.dropdown-header { margin-bottom: 2rem; }
+
+.premium-badge-luxury {
+    display: inline-flex;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    padding: 4px 12px;
+    border-radius: 100px;
 }
+
+.premium-badge-text {
+    font-size: 0.6rem;
+    font-weight: 950;
+    color: var(--elite-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.dropdown-title { font-size: 1.5rem; font-weight: 950; color: white; display: flex; align-items: center; gap: 8px; }
+.dropdown-subtitle { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+
+.dropdown-menu-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.dropdown-item {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #94a3b8;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.dropdown-icon-wrap { color: var(--elite-gold); }
+
+.dropdown-divider { height: 1px; background: rgba(255, 255, 255, 0.05); margin: 0.5rem 0; }
+
+.dropdown-item.logout { color: #f43f5e; }
+.dropdown-item.logout:hover { background: rgba(244, 63, 94, 0.1); }

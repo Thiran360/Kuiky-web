@@ -1,524 +1,422 @@
 // src/components/auth/CustomerAuth.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingBag, Mail, Phone, Lock, User,
   CheckCircle2, XCircle, Loader2, ArrowRight,
-  Truck, Gift, MapPin // <-- ADDED MapPin icon for geolocation
+  Truck, Gift, MapPin, Eye, EyeOff, Star, ShieldCheck, Sparkles, Navigation
 } from "lucide-react";
 
 import "./CustomerAuth.css";
-
-// API + Utilities
+import { setAuthToken } from "../../api/api";
 import { customerService } from "../../api/authService";
-import { validateField } from "../../utils/validation";
 import { useUser } from "../../context/UserContext";
-
 import { useNavigate } from "react-router-dom";
 
+const DYNAMIC_BGS = [
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff", // Dark Nike
+    "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da", // Aesthetic shopping bags
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d", // Model fashion
+    "https://images.unsplash.com/photo-1445205170230-053b83016050", // Coat aesthetic
+    "https://images.unsplash.com/photo-1555529733-0e670560f0e1"  // Clothes rack
+];
+
 const CustomerAuth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+    const [isLogin, setIsLogin] = useState(true);
+    const [bgImage, setBgImage] = useState("");
 
-  return (
-    <div className="auth-container">
-      {/* Background blobs */}
-      <motion.div
-        animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="blob blob-1"
-      />
-      <motion.div
-        animate={{ rotate: -360, scale: [1, 1.2, 1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="blob blob-2"
-      />
+    useEffect(() => {
+        // Dynamically select a premium image on load
+        const randomImg = DYNAMIC_BGS[Math.floor(Math.random() * DYNAMIC_BGS.length)];
+        setBgImage(`${randomImg}?q=80&w=2070&auto=format&fit=crop`);
+    }, []);
 
-      <div className="auth-card">
-        {/* LEFT PANEL */}
-        <div className="left-panel">
-          <div>
-            <div className="brand-header">
-              <ShoppingBag size={28} />
-              <span className="brand-text">ShopConnect</span>
+    return (
+        <div className="premium-auth-container">
+            {/* Mesh Background */}
+            <div className="mesh-gradient">
+                <div className="mesh-circle mc-1"></div>
+                <div className="mesh-circle mc-2"></div>
+                <div className="mesh-circle mc-3"></div>
             </div>
-            <h1 className="hero-title">
-              {isLogin ? "Welcome Back!" : "Join the Club."}
-            </h1>
-            <p className="hero-subtitle">
-              {isLogin
-                ? "Sign in to track orders, manage addresses, and view your wishlist."
-                : "Create an account for exclusive deals, faster checkout, and rewards."}
-            </p>
-          </div>
 
-          <div className="feature-list">
-            <div className="feature-item">
-              <Truck size={20} /> Fast Delivery
-            </div>
-            <div className="feature-item">
-              <Gift size={20} /> Exclusive Member Deals
-            </div>
-            <div className="feature-item">
-              <CheckCircle2 size={20} /> Easy Returns
-            </div>
-          </div>
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="premium-auth-card"
+            >
+                <div className="premium-card-split">
+                    {/* VISUAL SIDE */}
+                    <div className="auth-hero-side">
+                        <div className="hero-overlay">
+                            <div className="hero-brand">
+                                <ShoppingBag size={28} strokeWidth={2.5} />
+                                <span>ShopConnect</span>
+                            </div>
+
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={isLogin ? 'login-h' : 'signup-h'}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="hero-text-block"
+                                >
+                                    <h1 className="hero-title-main">
+                                        {isLogin ? "Exclusive Access." : "Join the Elite."}
+                                    </h1>
+                                    <p className="hero-description">
+                                        {isLogin 
+                                            ? "Welcome back to your curated shopping experience. Access your world of premium benefits." 
+                                            : "Unlock a new realm of shopping. Exclusive deals, early access, and personalized rewards await."}
+                                    </p>
+                                </motion.div>
+                            </AnimatePresence>
+
+                            <div className="hero-stats">
+                                <div className="stat-pill">
+                                    <Star size={14} fill="var(--primary-brand)" />
+                                    <span>4.9/5 Service</span>
+                                </div>
+                                <div className="stat-pill">
+                                    <ShieldCheck size={14} />
+                                    <span>Verified</span>
+                                </div>
+                            </div>
+                        </div>
+                        {/* THE PREMIUM ILLUSTRATION */}
+                        <div 
+                            className="hero-illustration-bg"
+                            style={{ backgroundImage: bgImage ? `url(${bgImage})` : 'none' }}
+                        ></div>
+                    </div>
+
+                    {/* FORM SIDE */}
+                    <div className="auth-form-side">
+                        <div className="form-header-premium">
+                            <nav className="auth-nav-tabs">
+                                <button 
+                                    className={`auth-tab-link ${isLogin ? 'active' : ''}`}
+                                    onClick={() => setIsLogin(true)}
+                                >
+                                    Login
+                                </button>
+                                <button 
+                                    className={`auth-tab-link ${!isLogin ? 'active' : ''}`}
+                                    onClick={() => setIsLogin(false)}
+                                >
+                                    Join Now
+                                </button>
+                            </nav>
+                        </div>
+
+                        <div className="form-content-viewport">
+                            <AnimatePresence mode="wait">
+                                {isLogin ? (
+                                    <motion.div
+                                        key="login-view"
+                                        initial={{ opacity: 0, x: 30 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -30 }}
+                                        className="view-wrapper"
+                                    >
+                                        <LoginForm />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="join-view"
+                                        initial={{ opacity: 0, x: 30 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -30 }}
+                                        className="view-wrapper"
+                                    >
+                                        <RegisterForm />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
         </div>
-
-        {/* RIGHT PANEL */}
-        <div className="right-panel">
-          <div className="form-header">
-            <h2>{isLogin ? "Customer Login" : "Create Account"}</h2>
-            <p>
-              {isLogin
-                ? "Enter your phone number and password."
-                : "Fill in your details to get started."}
-            </p>
-          </div>
-
-          <AnimatePresence mode="wait">
-            {isLogin ? (
-              <LoginForm key="login" switchToRegister={() => setIsLogin(false)} />
-            ) : (
-              <RegisterForm key="register" switchToLogin={() => setIsLogin(true)} />
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ==========================================
-      LOGIN FORM (No changes)
-========================================== */
-const LoginForm = ({ switchToRegister }) => {
-  const [formData, setFormData] = useState({
-    mobile_number: "",
-    password: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
-  const { handleLoginSuccess } = useUser();
-
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.mobile_number || !formData.password) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await customerService.login(
-        formData.mobile_number,
-        formData.password
-      );
-
-      // IMPORTANT → your login API returns { access, user }
-      handleLoginSuccess({
-        access: res.access,
-        user: res.user,
-      });
-
-      navigate("/");
-    } catch (err) {
-      alert(err.message || "Login Failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <motion.form
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="form-stack"
-      onSubmit={handleLoginSubmit}
-    >
-      <InputGroup
-        icon={Phone}
-        type="tel"
-        placeholder="Enter Mobile Number"
-        value={formData.mobile_number}
-        onChange={(e) =>
-          setFormData({ ...formData, mobile_number: e.target.value })
-        }
-      />
-
-      <InputGroup
-        icon={Lock}
-        type="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={(e) =>
-          setFormData({ ...formData, password: e.target.value })
-        }
-      />
-
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="btn-primary btn-black"
-        disabled={loading}
-      >
-        {loading ? "Signing In..." : "Sign In"} <ArrowRight size={18} />
-      </motion.button>
-
-      <p className="switch-text">
-        New here?{" "}
-        <button type="button" onClick={switchToRegister} className="toggle-link">
-          Create Account
-        </button>
-      </p>
-    </motion.form>
-  );
-};
-
-/* ==========================================
-      REGISTER FORM (UPDATED)
-========================================== */
-const RegisterForm = ({ switchToLogin }) => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    mobile_number: "",
-    password: "",
-    latitude: "",
-    longitude: "",
-    user_address: "",
-  });
-
-  const [submitting, setSubmitting] = useState(false);
-  // NEW STATES for geolocation
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [locationError, setLocationError] = useState(null);
-
-  const navigate = useNavigate();
-
-  // NEW: Function to fetch user's location
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    setLocationLoading(true);
-    setLocationError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setFormData((prev) => ({
-          ...prev,
-          // Store as string to be consistent with other form inputs
-          latitude: position.coords.latitude.toString(),
-          longitude: position.coords.longitude.toString(),
-        }));
-        setLocationLoading(false);
-      },
-      (error) => {
-        setLocationLoading(false);
-        let msg = "Failed to get location.";
-        if (error.code === error.PERMISSION_DENIED) {
-          msg = "Location access denied. Please allow it in your browser settings.";
-        } else if (error.code === error.TIMEOUT) {
-          msg = "Timed out waiting for location.";
-        }
-        setLocationError(msg);
-        setFormData((prev) => ({ ...prev, latitude: "", longitude: "" })); // Clear coordinates on error
-      },
-      // Geolocation options for accuracy and timeout
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
-  };
+};
+const LoginForm = () => {
+    const [formData, setFormData] = useState({ mobile_number: "", password: "" });
+    const [isLoading, setIsLoading] = useState(false);
+    const [msg, setMsg] = useState({ type: "", text: "" });
+    const [showPass, setShowPass] = useState(false);
+    
+    const navigate = useNavigate();
+    const { handleLoginSuccess } = useUser();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        if (!formData.mobile_number || !formData.password) {
+            setMsg({ type: "error", text: "All fields are mandatory" });
+            return;
+        }
 
-    if (
-      !formData.username ||
-      !formData.email ||
-      !formData.mobile_number ||
-      !formData.password
-    ) {
-      alert("Please fill all required fields");
-      return;
-    }
+        setIsLoading(true);
+        setMsg({ type: "", text: "" });
 
-    setSubmitting(true);
-
-    const payload = {
-      username: formData.username,
-      email: formData.email,
-      mobile_number: formData.mobile_number,
-      password: formData.password,
-      role: "customer",
-      // Include latitude and longitude only if they are present
-      ...(formData.latitude && { latitude: parseFloat(formData.latitude) }),
-      ...(formData.longitude && { longitude: parseFloat(formData.longitude) }),
-      ...(formData.user_address && { user_address: formData.user_address }),
+        try {
+            const res = await customerService.login(formData.mobile_number, formData.password);
+            handleLoginSuccess(res);
+            navigate("/");
+        } catch (err) {
+            console.error("Caught Login Error:", err);
+            const errorMsg = err.message || (typeof err === 'string' ? err : "Authentication failed. Please check your credentials.");
+            setMsg({ type: "error", text: errorMsg });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    try {
-      await customerService.register(payload);
+    const triggerMessage = (text, type = "success") => {
+        setMsg({ type, text });
+        setTimeout(() => setMsg({ type: "", text: "" }), 5000);
+    };
 
-      alert("Account created successfully!");
-      navigate("/login");
-      switchToLogin();
-    } catch (err) {
-      // In a real app, you would parse the error for specific messages
-      alert("Registration failed. Please check your details and try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    return (
+        <form onSubmit={handleLogin} className="premium-form">
+            <div className="form-greeting">
+                <h2>Welcome Back</h2>
+                <p>Please enter your credentials to proceed</p>
+            </div>
 
-  return (
-    <motion.form
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="form-stack"
-      onSubmit={handleSubmit}
-    >
-      <InputGroup
-        icon={User}
-        type="text"
-        placeholder="Full Name / Username"
-        value={formData.username}
-        onChange={(e) =>
-          setFormData({ ...formData, username: e.target.value })
-        }
-      />
+            <div className="inputs-stack">
+                <ModernInput 
+                    icon={Phone} 
+                    label="Mobile Number" 
+                    type="tel" 
+                    value={formData.mobile_number}
+                    onChange={(val) => setFormData({ ...formData, mobile_number: val })}
+                />
+                <ModernInput 
+                    icon={Lock} 
+                    label="Password" 
+                    type={showPass ? "text" : "password"} 
+                    value={formData.password}
+                    onChange={(val) => setFormData({ ...formData, password: val })}
+                    trailing={
+                        <button type="button" className="eye-toggle" onClick={() => setShowPass(!showPass)}>
+                            {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    }
+                />
+            </div>
 
-      {/* Email Validation */}
-      <ValidatedInput
-        icon={Mail}
-        type="email"
-        placeholder="Email Address"
-        value={formData.email}
-        onChange={(e) =>
-          setFormData({ ...formData, email: e.target.value })
-        }
-        validationType="email"
-      />
+            <div className="form-actions-row">
+                <label className="premium-checkbox">
+                    <input type="checkbox" />
+                    <span className="chk-label">Keep me signed in</span>
+                </label>
+                <button 
+                    type="button" 
+                    className="text-btn"
+                    onClick={() => triggerMessage("Password reset instructions sent to your registered contact!")}
+                >
+                    Forgot Password?
+                </button>
+            </div>
 
-      {/* Mobile Validation */}
-      <ValidatedInput
-        icon={Phone}
-        type="tel"
-        placeholder="Mobile Number"
-        value={formData.mobile_number}
-        onChange={(e) =>
-          setFormData({ ...formData, mobile_number: e.target.value })
-        }
-        validationType="phone"
-      />
+            {msg.text && (
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`form-alert ${msg.type}`}>
+                    {msg.type === 'error' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                    <span>{msg.text}</span>
+                </motion.div>
+            )}
 
-      <InputGroup
-        icon={Lock}
-        type="password"
-        placeholder="Create Password"
-        value={formData.password}
-        onChange={(e) =>
-          setFormData({ ...formData, password: e.target.value })
-        }
-      />
-
-      <InputGroup
-        icon={Truck}
-        type="text"
-        placeholder="Full Address (Optional)"
-        value={formData.user_address}
-        onChange={(e) =>
-          setFormData({ ...formData, user_address: e.target.value })
-        }
-      />
-
-      {/* NEW: Geolocation Button and Status Display */}
-      <div className="location-fetch-wrapper">
-        <motion.button
-          type="button"
-          // Using btn-primary for styling but adding a new class for visual distinction
-          className="btn-primary btn-location" 
-          onClick={handleGetLocation}
-          disabled={locationLoading}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-        >
-          {locationLoading ? (
-            <>
-              <Loader2 className="spin" size={18} /> Getting Location...
-            </>
-          ) : (
-            <>
-              <MapPin size={18} /> Use Current Location (Optional)
-            </>
-          )}
-        </motion.button>
-        
-        <AnimatePresence>
-          {formData.latitude && formData.longitude ? (
-            <motion.p
-              key="location-success"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="validation-msg text-green" // Assuming 'text-green' is defined for success message color
+            <motion.button
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className={`premium-btn black ${isLoading ? 'loading' : ''}`}
+                disabled={isLoading}
             >
-              <CheckCircle2 size={14} color="#22c55e" /> Location Captured! Lat: {parseFloat(formData.latitude).toFixed(4)}, Long:{" "}
-              {parseFloat(formData.longitude).toFixed(4)}
-            </motion.p>
-          ) : locationError ? (
-            <motion.p
-              key="location-error"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="validation-msg text-red"
-            >
-              <XCircle size={14} color="#ef4444" /> {locationError}
-            </motion.p>
-          ) : null}
-        </AnimatePresence>
-      </div>
-      {/* The original Latitude and Longitude InputGroups were removed */}
+                {isLoading ? <Loader2 className="spin" /> : "Sign In to ShopConnect"}
+            </motion.button>
 
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="btn-primary btn-brand"
-        disabled={submitting}
-      >
-        {submitting ? "Creating Account..." : "Sign Up"}
-      </motion.button>
-
-      <p className="switch-text">
-        Already have an account?{" "}
-        <button type="button" onClick={switchToLogin} className="toggle-link">
-          Login
-        </button>
-      </p>
-    </motion.form>
-  );
+            <div className="social-login-group">
+                <span className="divider-text">OR SIGN IN WITH</span>
+                <div className="social-icons">
+                    <button 
+                        type="button" 
+                        className="social-btn-premium"
+                        onClick={() => triggerMessage("Mail login workflow is coming soon!")}
+                    >
+                        <Mail size={20} />
+                    </button>
+                    <button 
+                        type="button" 
+                        className="social-btn-premium fb"
+                        onClick={() => triggerMessage("Facebook login integration requires API keys.")}
+                    >
+                        F
+                    </button>
+                    <button 
+                        type="button" 
+                        className="social-btn-premium google"
+                        onClick={() => triggerMessage("Google OAuth has been successfully requested.")}
+                    >
+                        G
+                    </button>
+                </div>
+            </div>
+        </form>
+    );
 };
 
-/* ==========================================
-      HELPER COMPONENTS (No changes)
-========================================== */
-const ValidatedInput = ({
-  icon: Icon,
-  type,
-  placeholder,
-  value,
-  onChange,
-  validationType,
-}) => {
-  const [status, setStatus] = useState("idle");
-  const [msg, setMsg] = useState("");
+const RegisterForm = () => {
+    const [formData, setFormData] = useState({
+        username: "", email: "", mobile_number: "", password: "",
+        latitude: "", longitude: "", user_address: ""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPass, setShowPass] = useState(false);
+    const [locStatus, setLocStatus] = useState({ state: 'idle', msg: '' });
 
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (!value) {
-        setStatus("idle");
-        setMsg("");
-        return;
-      }
+    const navigate = useNavigate();
+    const { handleLoginSuccess } = useUser();
 
-      // Validate format
-      const isValidFormat = validateField(validationType, value);
-      if (!isValidFormat) {
-        setStatus("invalid");
-        setMsg(`Invalid ${validationType}`);
-        return;
-      }
+    const getGeoLocation = () => {
+        if (!navigator.geolocation) {
+            setLocStatus({ state: 'error', msg: 'Geolocation not supported' });
+            return;
+        }
 
-      setStatus("loading");
-
-      try {
-        const response = await customerService.checkAvailability(
-          validationType,
-          value
+        setLocStatus({ state: 'loading', msg: 'Fetching location...' });
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setFormData(p => ({ ...p, latitude: pos.coords.latitude.toString(), longitude: pos.coords.longitude.toString() }));
+                setLocStatus({ state: 'success', msg: 'Location Captured' });
+            },
+            (err) => setLocStatus({ state: 'error', msg: 'Permission Denied' }),
+            { timeout: 5000 }
         );
+    };
 
-        if (response.isAvailable) {
-          setStatus("valid");
-          setMsg("");
-        } else {
-          setStatus("duplicate");
-          setMsg(`${validationType} already linked to an account`);
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        if (!formData.username || !formData.email || !formData.mobile_number || !formData.password) return;
+
+        setIsSubmitting(true);
+        try {
+            const payload = { ...formData, role: "customer", mobile: formData.mobile_number };
+            const res = await customerService.register(payload);
+            handleLoginSuccess(res);
+            navigate("/");
+        } catch (err) {
+            alert("Registration failed. Please check your data.");
+        } finally {
+            setIsSubmitting(false);
         }
-      } catch {
-        setStatus("valid");
-      }
-    }, 700);
+    };
 
-    return () => clearTimeout(timer);
-  }, [value, validationType]);
+    return (
+        <form onSubmit={handleSignup} className="premium-form register">
+            <div className="form-greeting">
+                <h2>Join the Community</h2>
+                <p>Create your exclusive membership profile</p>
+            </div>
 
-  return (
-    <div className="input-wrapper">
-      <div className="input-icon">
-        <Icon size={18} />
-      </div>
+            <div className="inputs-grid">
+                <ModernInput 
+                    icon={User} 
+                    label="Full Name" 
+                    value={formData.username}
+                    onChange={(val) => setFormData({ ...formData, username: val })}
+                />
+                <ModernInput 
+                    icon={Mail} 
+                    label="Email Address" 
+                    type="email" 
+                    value={formData.email}
+                    onChange={(val) => setFormData({ ...formData, email: val })}
+                />
+            </div>
 
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className={`custom-input ${
-          status === "valid"
-            ? "valid"
-            : status === "invalid"
-            ? "invalid"
-            : status === "duplicate"
-            ? "duplicate"
-            : ""
-        }`}
-      />
+            <ModernInput 
+                icon={Phone} 
+                label="Mobile Number" 
+                type="tel" 
+                value={formData.mobile_number}
+                onChange={(val) => setFormData({ ...formData, mobile_number: val })}
+            />
 
-      <div className="status-icon">
-        {status === "loading" && <Loader2 className="spin" size={18} />}
-        {status === "valid" && <CheckCircle2 size={18} color="#22c55e" />}
-        {(status === "invalid" || status === "duplicate") && (
-          <XCircle size={18} color="#ef4444" />
-        )}
-      </div>
+            <ModernInput 
+                icon={Lock} 
+                label="Secure Password" 
+                type={showPass ? "text" : "password"} 
+                value={formData.password}
+                onChange={(val) => setFormData({ ...formData, password: val })}
+                trailing={
+                    <button type="button" className="eye-toggle" onClick={() => setShowPass(!showPass)}>
+                        {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                }
+            />
 
-      <AnimatePresence>
-        {(status === "invalid" || status === "duplicate") && (
-          <motion.p
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="validation-msg text-red"
-          >
-            {msg}
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+            <div className="location-control-premium">
+                <ModernInput 
+                    icon={MapPin} 
+                    label="Delivery Address" 
+                    value={formData.user_address}
+                    onChange={(val) => setFormData({ ...formData, user_address: val })}
+                    trailing={
+                        <button type="button" onClick={getGeoLocation} className={`geo-btn ${locStatus.state}`}>
+                            {locStatus.state === 'loading' ? <Loader2 className="spin" size={18} /> : 
+                             locStatus.state === 'success' ? <Navigation size={18} fill="currentColor" /> : 
+                             <MapPin size={18} />}
+                        </button>
+                    }
+                />
+                <AnimatePresence>
+                    {locStatus.msg && (
+                        <motion.span initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className={`loc-msg ${locStatus.state}`}>
+                            {locStatus.msg}
+                        </motion.span>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <motion.button
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className={`premium-btn gold ${isSubmitting ? 'loading' : ''}`}
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? <Loader2 className="spin" /> : "Complete Registration"}
+            </motion.button>
+        </form>
+    );
 };
 
-const InputGroup = ({ icon: Icon, type, placeholder, value, onChange }) => (
-  <div className="input-wrapper">
-    <div className="input-icon">
-      <Icon size={18} />
-    </div>
+const ModernInput = ({ icon: Icon, label, type = "text", value, onChange, trailing }) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const id = useMemo(() => `in-${Math.random().toString(36).substr(2, 9)}`, []);
 
-    <input
-      type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      className="custom-input"
-    />
-  </div>
-);
+    return (
+        <div className={`modern-field-group ${isFocused || value ? 'active' : ''} ${isFocused ? 'focused' : ''}`}>
+            <div className="field-icon-wrap">
+                <Icon size={18} strokeWidth={2.2} />
+            </div>
+            <div className="field-main">
+                <label htmlFor={id} className="modern-label">{label}</label>
+                <input 
+                    id={id}
+                    type={type}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    className="modern-input-el"
+                />
+            </div>
+            {trailing && <div className="field-trailing">{trailing}</div>}
+        </div>
+    );
+};
 
 export default CustomerAuth;

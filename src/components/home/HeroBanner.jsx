@@ -1,27 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { getImageUrl } from '../../api/config'; // 🟢 Updated import name
-import { fetchBanners } from '../../api/api'; // 🟢 Updated import path
-import { ChevronLeft, ChevronRight, Loader, Tag } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, ShoppingCart, ArrowRight, Zap, ShieldCheck, Star, ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
+import { fetchBanners } from '../../api/api';
+import { getImageUrl } from '../../api/config';
+import './HeroBanner.css';
 
-const BannerCarousel = () => {
+// Import local assets as reliable fallbacks since backend images are giving 404
+import imgMen from '../../assets/MEN.png';
+import imgBig from '../../assets/big.png';
+import imgBanner from '../../assets/banner.png';
+
+const LOCAL_BANNERS = {
+    'MEN.png': imgMen,
+    'big.png': imgBig,
+    'banner_1fBlQHN.png': imgBanner,
+    'banner': imgBanner
+};
+
+/** Smart image fetcher with ngrok bypass & local fallbacks */
+const useSmartBannerImage = (rawUrl) => {
+    // 1. Resolve local fallbacks synchronously to avoid flicker/404 on first render
+    const getInitialSrc = () => {
+        if (!rawUrl) return null;
+        const filename = rawUrl.split('/').pop();
+        if (LOCAL_BANNERS[filename]) return LOCAL_BANNERS[filename];
+        if (rawUrl.includes('MEN')) return imgMen;
+        if (rawUrl.includes('big')) return imgBig;
+        if (rawUrl.includes('banner')) return imgBanner;
+        return null;
+    };
+
+    const [src, setSrc] = useState(getInitialSrc);
+
+    useEffect(() => {
+        if (!rawUrl) {
+            setSrc(null);
+            return;
+        }
+
+        // Check if already set by initial state to avoid redundant work
+        const filename = rawUrl.split('/').pop();
+        if (LOCAL_BANNERS[filename]) {
+            setSrc(LOCAL_BANNERS[filename]);
+            return;
+        }
+        if (rawUrl.includes('MEN')) { setSrc(imgMen); return; }
+        if (rawUrl.includes('big')) { setSrc(imgBig); return; }
+        if (rawUrl.includes('banner')) { setSrc(imgBanner); return; }
+
+        let blobUrl = '';
+        const load = async () => {
+            try {
+                // Try fetching with CORS-friendly headers
+                const res = await fetch(rawUrl, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                if (res.ok) {
+                    const ct = res.headers.get('content-type') || '';
+                    if (ct.startsWith('image/')) {
+                        const blob = await res.blob();
+                        blobUrl = URL.createObjectURL(blob);
+                        setSrc(blobUrl);
+                        return;
+                    }
+                }
+                // If fetch fails or not an image, use rawUrl (may still 404, handled by img tag)
+                setSrc(rawUrl);
+            } catch {
+                setSrc(rawUrl);
+            }
+        };
+        load();
+        return () => { if (blobUrl) URL.revokeObjectURL(blobUrl); };
+    }, [rawUrl]);
+
+    return src;
+};
+
+const HeroBanner = () => {
     const [banners, setBanners] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
-    // 1. Fetch Banners on Load
     useEffect(() => {
         const loadBanners = async () => {
             try {
-                // 🟢 Updated function call
                 const data = await fetchBanners();
-                
-                // Safety check: ensure data is an array before filtering
-                const activeBanners = Array.isArray(data) ? data.filter(b => b.is_active) : [];
-                setBanners(activeBanners);
+                const rawList = Array.isArray(data) ? data : (data?.results || []);
+                if (rawList.length > 0) {
+                    const activeOnes = rawList.filter(b => b.is_active === true || b.active === true);
+                    const results = activeOnes.length > 0 ? activeOnes : rawList;
+                    const processed = results.map(b => {
+                        const rawImage = b.image || b.image_url || b.banner_image || b.img;
+                        return { ...b, resolvedImage: getImageUrl(rawImage) };
+                    });
+                    setBanners(processed);
+                }
             } catch (err) {
-                console.error("Failed to load banners:", err);
-                setError("Failed to load offers.");
+                console.error("Banner fetch error:", err);
             } finally {
                 setLoading(false);
             }
@@ -29,257 +105,180 @@ const BannerCarousel = () => {
         loadBanners();
     }, []);
 
-    // 2. Auto-Slide Logic (Runs every 5 seconds)
     useEffect(() => {
-        if (banners.length <= 1) return; 
+        if (banners.length > 1) {
+            const timer = setInterval(() => {
+                setCurrentIndex(prev => (prev + 1) % banners.length);
+            }, 7000);
+            return () => clearInterval(timer);
+        }
+    }, [banners]);
 
-        const timer = setInterval(() => {
-            setCurrentIndex((prevIndex) => 
-                prevIndex === banners.length - 1 ? 0 : prevIndex + 1
-            );
-        }, 5000);
-
-        return () => clearInterval(timer);
-    }, [banners.length]);
-
-    // 3. Navigation Functions
-    const nextSlide = () => {
-        setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    const goTo = (dir) => {
+        if (dir === 'prev') setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length);
+        else setCurrentIndex(prev => (prev + 1) % banners.length);
     };
 
-    const prevSlide = () => {
-        setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    const handleShopNow = () => {
+        document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const goToSlide = (index) => {
-        setCurrentIndex(index);
-    };
+    if (loading) return (
+        <div className="hb-skeleton">
+            <div className="hb-skeleton-shimmer"></div>
+        </div>
+    );
 
-    // --- Loading & Error States ---
-    if (loading) {
-        return (
-            <div className="banner-skeleton">
-                <Loader className="spin" size={24} />
-                <style>{`
-                    .banner-skeleton {
-                        width: 100%;
-                        max-width: 1200px;
-                        aspect-ratio: 16/7;
-                        margin: 20px auto;
-                        background: #eee;
-                        border-radius: 16px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .spin { animation: spin 1s linear infinite; color: #888; }
-                    @keyframes spin { 100% { transform: rotate(360deg); } }
-                `}</style>
-            </div>
-        );
-    }
-
-    if (error || banners.length === 0) {
-        return null; 
-    }
+    if (!banners.length) return null;
+    const b = banners[currentIndex % banners.length];
 
     return (
-        <div className="carousel-container">
-            {/* --- Inline CSS --- */}
-            <style>{`
-                .carousel-container {
-                    position: relative;
-                    width: 100%;
-                    max-width: 1200px;
-                    margin: 20px auto;
-                    border-radius: 16px;
-                    overflow: hidden;
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-                    background: #000;
-                    aspect-ratio: 16/7;
-                }
-
-                @media (max-width: 768px) {
-                    .carousel-container {
-                        aspect-ratio: 16/9;
-                        margin: 10px auto;
-                        border-radius: 12px;
-                    }
-                }
-
-                .carousel-slide {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    opacity: 0;
-                    transition: opacity 0.8s ease-in-out;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .carousel-slide.active {
-                    opacity: 1;
-                    z-index: 1;
-                }
-
-                .banner-image {
-                    width: 100%;
-                    height: 100%;
-                    // object-fit: cover;
-                    filter: brightness(0.75); 
-                }
-
-                .banner-content {
-                    position: absolute;
-                    bottom: 40px;
-                    left: 40px;
-                    right: 40px;
-                    z-index: 2;
-                    color: white;
-                    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-                }
-
-                .banner-tag {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    background: #ffd700;
-                    color: #000;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-weight: 700;
-                    font-size: 14px;
-                    margin-bottom: 12px;
-                    text-transform: uppercase;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                }
-
-                .banner-title {
-                    font-size: 36px;
-                    font-weight: 800;
-                    margin: 0 0 8px 0;
-                    line-height: 1.1;
-                }
-
-                .banner-desc {
-                    font-size: 18px;
-                    font-weight: 400;
-                    opacity: 0.9;
-                    max-width: 600px;
-                }
-
-                @media (max-width: 768px) {
-                    .banner-content { bottom: 20px; left: 20px; right: 20px; }
-                    .banner-title { font-size: 24px; }
-                    .banner-desc { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-                }
-
-                .nav-btn {
-                    position: absolute;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    background: rgba(255, 255, 255, 0.2);
-                    backdrop-filter: blur(5px);
-                    border: none;
-                    color: white;
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    z-index: 10;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s ease;
-                }
-
-                .nav-btn:hover {
-                    background: #fff;
-                    color: #000;
-                }
-
-                .prev-btn { left: 20px; }
-                .next-btn { right: 20px; }
-
-                .carousel-dots {
-                    position: absolute;
-                    bottom: 15px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    display: flex;
-                    gap: 8px;
-                    z-index: 10;
-                }
-
-                .dot {
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.5);
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                }
-
-                .dot.active {
-                    background: #ffd700;
-                    transform: scale(1.2);
-                    width: 24px;
-                    border-radius: 10px;
-                }
-            `}</style>
-
-            {banners.map((banner, index) => (
-                <div 
-                    key={banner.id} 
-                    className={`carousel-slide ${index === currentIndex ? 'active' : ''}`}
+        <div className="hb-viewport">
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7 }}
+                    className="hb-slide"
                 >
-                    <img 
-                        src={getImageUrl(banner.image)} 
-                        alt={banner.title} 
-                        className="banner-image"
-                        onError={(e) => {
-                            e.target.src = "https://via.placeholder.com/1200x500?text=Offer"; // Fallback
-                        }}
-                    />
-                    
-                    <div className="banner-content">
-                        {banner.prize_offer && (
-                            <div className="banner-tag">
-                                <Tag size={14} />
-                                {banner.prize_offer}
-                            </div>
-                        )}
-                        <h2 className="banner-title">{banner.title}</h2>
-                        <p className="banner-desc">{banner.description}</p>
-                    </div>
-                </div>
-            ))}
+                    {/* BLURRED BACKDROP */}
+                    <BannerBackdrop url={b.resolvedImage} />
 
+                    <div className="hb-content">
+                        {/* LEFT — TEXT */}
+                        <div className="hb-text-side">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="hb-tag-line"
+                            >
+                                <Sparkles size={13} />
+                                <span>{b.prize_offer || "EXCLUSIVE OFFER"}</span>
+                            </motion.div>
+
+                            <motion.h1
+                                initial={{ opacity: 0, y: 25 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.5 }}
+                                className="hb-headline"
+                            >
+                                {b.title}
+                            </motion.h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.35 }}
+                                className="hb-description"
+                            >
+                                {b.description || "Discover premium products curated just for you. Shop the finest collection with confidence."}
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                className="hb-actions"
+                            >
+                                <button className="hb-shop-btn" onClick={handleShopNow}>
+                                    <ShoppingCart size={18} />
+                                    <span>Shop Now</span>
+                                    <ArrowRight size={18} className="hb-btn-arrow" />
+                                </button>
+
+                                <div className="hb-stats-row">
+                                    <div className="hb-stat">
+                                        <TrendingUp size={14} />
+                                        <span>50K+ Orders</span>
+                                    </div>
+                                    <div className="hb-stat">
+                                        <Star size={14} fill="var(--primary-brand)" stroke="none" />
+                                        <span>4.9 Rating</span>
+                                    </div>
+                                    <div className="hb-stat">
+                                        <ShieldCheck size={14} />
+                                        <span>Genuine</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* RIGHT — PRODUCT IMAGE */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 60, rotate: 5 }}
+                            animate={{ opacity: 1, x: 0, rotate: -2 }}
+                            transition={{ duration: 0.8, delay: 0.15 }}
+                            className="hb-image-side"
+                        >
+                            <BannerProductImage url={b.resolvedImage} title={b.title} />
+                            <div className="hb-image-glow"></div>
+                        </motion.div>
+                    </div>
+                </motion.div>
+            </AnimatePresence>
+
+            {/* NAV ARROWS */}
             {banners.length > 1 && (
                 <>
-                    <button className="nav-btn prev-btn" onClick={prevSlide}>
-                        <ChevronLeft size={24} />
+                    <button className="hb-arrow left" onClick={() => goTo('prev')}>
+                        <ChevronLeft size={20} strokeWidth={3} />
                     </button>
-                    <button className="nav-btn next-btn" onClick={nextSlide}>
-                        <ChevronRight size={24} />
+                    <button className="hb-arrow right" onClick={() => goTo('next')}>
+                        <ChevronRight size={20} strokeWidth={3} />
                     </button>
-
-                    <div className="carousel-dots">
-                        {banners.map((_, index) => (
-                            <span 
-                                key={index} 
-                                className={`dot ${index === currentIndex ? 'active' : ''}`}
-                                onClick={() => goToSlide(index)}
-                            ></span>
-                        ))}
-                    </div>
                 </>
+            )}
+
+            {/* PROGRESS DOTS */}
+            {banners.length > 1 && (
+                <div className="hb-progress">
+                    {banners.map((_, idx) => (
+                        <button
+                            key={idx}
+                            className={`hb-dot ${idx === currentIndex ? 'active' : ''}`}
+                            onClick={() => setCurrentIndex(idx)}
+                        >
+                            <div className="hb-dot-fill"></div>
+                        </button>
+                    ))}
+                </div>
             )}
         </div>
     );
 };
 
-export default BannerCarousel;
+/** Blurred background backdrop */
+const BannerBackdrop = ({ url }) => {
+    const src = useSmartBannerImage(url);
+    return (
+        <div className="hb-backdrop-engine">
+            <div className="hb-backdrop-img" style={{ backgroundImage: src ? `url(${src})` : 'none' }} />
+            <div className="hb-backdrop-overlay" />
+        </div>
+    );
+};
+
+/** Main product image */
+const BannerProductImage = ({ url, title }) => {
+    const src = useSmartBannerImage(url);
+    const [hasError, setHasError] = useState(false);
+
+    // If we have a resolved source that isn't null, we show it
+    // If it's null (not even 404 URL yet), we don't render to avoid broken icons
+    if (!src && !url) return null;
+    if (hasError) return null;
+
+    return (
+        <img
+            src={src || url}
+            alt={title || "Banner"}
+            className="hb-product-img"
+            onError={() => setHasError(true)}
+        />
+    );
+};
+
+export default HeroBanner;
