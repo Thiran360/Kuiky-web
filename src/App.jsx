@@ -4,6 +4,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  useNavigate
 } from "react-router-dom";
 
 // --- Context Providers ---
@@ -12,6 +13,7 @@ import { CartProvider } from "./context/CartContext";
 import { AddressProvider } from "./context/AddressContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrderProvider } from "./context/OrderContext";
+import { useUser } from "./context/UserContext";
 
 // --- Layout ---
 import Header from "./components/layout/Header";
@@ -31,7 +33,6 @@ import EnthiranChat from "./components/common/EnthiranChat";
 // --- Global Styles ---
 import "./App.css";
 import "./styles/Global.css";
-import CelestialBackground from "./components/common/CelestialBackground";
 
 // ------------------------------
 // APP CONTENT (inside Router)
@@ -44,33 +45,44 @@ const token = localStorage.getItem("accessToken");
 if (token) {
   setAuthToken(token);
 }
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useUser();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  if (isLoading) return <div className="p-20 text-center">Elite Royale: Synchronizing Credentials...</div>;
+  return isAuthenticated ? children : null;
+};
+
 const AppContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { isAuthenticated } = useUser();
 
   return (
     <div className="min-h-screen bg-transparent font-sans text-gray-900 antialiased flex flex-col">
-      <CelestialBackground />
       {/* HEADER */}
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       {/* MAIN CONTENT */}
       <main className="flex-grow">
         <Routes>
-          <Route
-            path="/"
-            element={
-              <LandingPage
-                searchTerm={searchTerm}
-              />
-            }
-          />
           <Route path="/login" element={<CustomerAuth />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/address" element={<AddressManager />} />
-          <Route path="/orders" element={<OrderHistoryPage />} />
+          
+          {/* PUBLIC — Browse products, cart, and wishlist without login */}
+          <Route path="/" element={<LandingPage searchTerm={searchTerm} />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+
+          {/* PROTECTED — Requires login */}
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/address" element={<ProtectedRoute><AddressManager /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><OrderHistoryPage /></ProtectedRoute>} />
         </Routes>
       </main>
 

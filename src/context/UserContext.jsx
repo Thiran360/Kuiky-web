@@ -25,27 +25,27 @@ export const UserProvider = ({ children }) => {
   // INIT FROM LOCAL STORAGE
   // ====================================
   useEffect(() => {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    // 💎 LEAN-TOKEN ARCHITECTURE: Construct session from standalone markers
+    const accessToken = localStorage.getItem("accessToken") || localStorage.getItem("access_token");
+    const userId = localStorage.getItem("user_id");
+    const rawProfile = localStorage.getItem("user_profile");
 
-    if (!raw || raw === "undefined" || raw === "null") {
+    if (!accessToken || !userId) {
       setUserSession(null);
       setIsLoading(false);
       return;
     }
 
     try {
-      const parsed = JSON.parse(raw);
-
-      if (parsed && (parsed.user || parsed.id || parsed.username)) {
-        // Restore session
-        const session = parsed.user ? parsed : { access: parsed.access || null, user: parsed };
-        setUserSession(session);
-      } else {
-        throw new Error("Invalid auth shape");
+      let profile = { id: userId };
+      if (rawProfile && rawProfile !== "undefined") {
+        profile = JSON.parse(rawProfile);
       }
+      
+      const session = { access: accessToken, user: profile };
+      setUserSession(session);
     } catch (e) {
-      console.error("Corrupted auth storage. Clearing...", e);
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+      console.error("Session reconstruction failed:", e);
       setUserSession(null);
     } finally {
       setIsLoading(false);
@@ -70,7 +70,7 @@ export const UserProvider = ({ children }) => {
     const userObj = payload.user || payload.customer || payload;
     let userId = userObj?.id || userObj?.user_id || payload.user_id || payload.id || null;
 
-    // 🔥 If backend only returns tokens and hides the user_id, forcefully decrypt it from the JWT Access Token!
+    // If backend only returns tokens and hides the user_id, decrypt from JWT
     if (!userId && accessToken) {
         try {
             const base64Url = accessToken.split('.')[1];
@@ -85,16 +85,11 @@ export const UserProvider = ({ children }) => {
         }
     }
 
-    // Ensure we force save to Local Storage exactly as requested by the user
+    // Save tokens
     if (accessToken) {
         localStorage.setItem("accessToken", String(accessToken));
         localStorage.setItem("access_token", String(accessToken));
-        setAuthToken(accessToken); // Immediately update Axios defaults
-    }
-    
-    if (refreshToken) {
-        localStorage.setItem("refreshToken", String(refreshToken));
-        localStorage.setItem("refresh_token", String(refreshToken));
+        setAuthToken(accessToken);
     }
 
     if (userId) {
@@ -106,11 +101,28 @@ export const UserProvider = ({ children }) => {
     if (!finalUser && (payload.id || payload.user_id || payload.username)) finalUser = payload;
     if (!finalUser && userId) finalUser = { id: userId };
 
+    // Normalize field names — backend may use different keys
+    if (finalUser) {
+        // Mobile: backend may return as mobile, phone, phone_number
+        if (!finalUser.mobile_number) {
+            finalUser.mobile_number = finalUser.mobile || finalUser.phone || finalUser.phone_number || "";
+        }
+        // Username: backend may return as name, full_name, first_name
+        if (!finalUser.username) {
+            finalUser.username = finalUser.name || finalUser.full_name || finalUser.first_name || "";
+        }
+        // Email: backend may return as email_address
+        if (!finalUser.email) {
+            finalUser.email = finalUser.email_address || "";
+        }
+
+        localStorage.setItem("user_profile", JSON.stringify(finalUser));
+    }
+
     const session = { access: accessToken, user: finalUser };
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
     setUserSession(session);
     
-    console.log("✅ [UserContext] Session Synchronized", { userId, hasToken: !!accessToken });
+    console.log("✅ [UserContext] Session Synchronized", { userId, hasToken: !!accessToken, user: finalUser });
   };
 
   // ====================================
@@ -160,7 +172,7 @@ export const UserProvider = ({ children }) => {
       "accessToken", "access_token",
       "refreshToken", "refresh_token",
       "user_id", "user",
-      "localCart", "localWishlist",
+      // "localCart", "localWishlist", // 💎 GUEST CONTINUITY: Preserved during logout
       "latitude", "longitude"
     ];
     

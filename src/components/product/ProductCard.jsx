@@ -57,7 +57,11 @@ const ProductCard = ({ product, index = 0 }) => {
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();
-        if (!isAuthenticated) { navigate("/login"); return; }
+        // 💎 AUTH-MANDATORY: Redirect guests to Membership Portal
+        if (!isAuthenticated) { 
+            navigate("/login"); 
+            return; 
+        }
         if (isInCart) return;
         setIsAddingToCart(true);
         try {
@@ -67,6 +71,10 @@ const ProductCard = ({ product, index = 0 }) => {
 
     const handleWishlist = async (e) => {
         e.stopPropagation();
+        if (!isAuthenticated) { 
+            navigate("/login"); 
+            return; 
+        }
         if (isTogglingWishlist) return;
         setIsTogglingWishlist(true);
         try { await toggleWishlist(product.id, product); } finally { setIsTogglingWishlist(false); }
@@ -86,7 +94,7 @@ const ProductCard = ({ product, index = 0 }) => {
             
             {/* PROCUREMENT STATUS */}
             <div className="capsule-status-ecom360">
-                {discountPercent > 0 && <span className="status-pill discount"><Zap size={10} /> {discountPercent}% YIELD</span>}
+                {discountPercent > 0 && <span className="status-pill discount"><Zap size={10} /> {discountPercent}% OFF</span>}
                 <button 
                     className={`status-pill wishlist ${isWishlisted ? 'active' : ''}`}
                     onClick={handleWishlist}
@@ -145,9 +153,9 @@ const ProductCard = ({ product, index = 0 }) => {
                         onClick={handleAddToCart}
                         disabled={isAddingToCart || isInCart}
                     >
-                        {isAddingToCart ? <Loader size={16} className="spin" /> : 
-                         isInCart ? <><Check size={16} /> <span>IN CART</span></> : 
-                         <><ShoppingCart size={16} /> <span>ADD TO CART</span></>}
+                        {isAddingToCart ? <Loader size={14} className="spin" /> : 
+                         isInCart ? <><Check size={14} /> <span>IN CART</span></> : 
+                         <><ShoppingCart size={14} /> <span>ADD TO CART</span></>}
                     </button>
                 </div>
             </div>

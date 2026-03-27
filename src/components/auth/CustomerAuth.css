@@ -19,10 +19,9 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
   font-family: 'Outfit', sans-serif;
-  padding: 3rem;
+  padding: 2rem;
 }
 
 /* ============================================
@@ -71,7 +70,7 @@
 
 .premium-card-split {
   display: flex;
-  min-height: 750px;
+  min-height: 600px;
   transition: transform 0.9s cubic-bezier(0.8, 0, 0.2, 1);
 }
 
@@ -83,12 +82,12 @@
    HERO SIDE (IMAGE + BRAND)
    ============================================ */
 .auth-hero-side {
-  flex: 0 0 480px;
+  flex: 0 0 420px;
   background: #020617;
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 4.5rem;
+  padding: 3.5rem;
   color: white;
   overflow: hidden;
   transition: transform 0.9s cubic-bezier(0.8, 0, 0.2, 1);
@@ -183,7 +182,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 4.5rem 6.5rem;
+  padding: 3rem 4.5rem;
   transition: transform 0.9s cubic-bezier(0.8, 0, 0.2, 1);
   position: relative;
 }
@@ -193,7 +192,7 @@
 }
 
 .form-header-premium {
-  margin-bottom: 4rem;
+  margin-bottom: 2.5rem;
   position: relative;
 }
 
@@ -246,14 +245,14 @@
 }
 
 .form-greeting {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .form-greeting h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 950;
   color: var(--auth-text-main);
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
   margin-bottom: 0.5rem;
 }
 
@@ -286,8 +285,7 @@
 .modern-field-group.focused {
   background: #ffffff;
   border-color: var(--auth-text-main);
-  box-shadow: 0 15px 35px -10px rgba(0,0,0,0.06);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
 }
 
 .field-icon-wrap {
@@ -320,11 +318,13 @@
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   color: #94a3b8;
   pointer-events: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .modern-field-group.active .modern-label {
@@ -368,7 +368,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .premium-checkbox {
@@ -389,17 +389,17 @@
 
 .premium-btn {
   width: 100%;
-  height: 68px;
+  height: 56px;
   border-radius: 100px;
   font-weight: 900;
-  font-size: 1.15rem;
+  font-size: 1rem;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 0.75rem;
+  transition: all 0.3s ease;
   letter-spacing: -0.5px;
 }
 
@@ -416,19 +416,53 @@
 }
 
 .premium-btn:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.4);
 }
 
 .premium-btn.gold:hover {
   box-shadow: 0 30px 60px -12px rgba(250, 204, 21, 0.5);
 }
 
+/* Premium Registration Button */
+.premium-btn.register-btn {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  color: #0f172a;
+  box-shadow: 0 12px 30px -6px rgba(251, 191, 36, 0.4);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-btn.register-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left 0.6s ease;
+}
+
+.premium-btn.register-btn:hover::before {
+  left: 100%;
+}
+
+.premium-btn.register-btn:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -8px rgba(245, 158, 11, 0.5);
+}
+
 /* ============================================
    SOCIAL LOGIN
    ============================================ */
 .social-login-group {
-  margin-top: 3.5rem;
+  margin-top: 2rem;
   text-align: center;
 }
 

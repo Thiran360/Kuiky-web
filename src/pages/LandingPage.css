@@ -1,13 +1,60 @@
 .landing-container {
-    background: transparent; /* DECOUPLED FOR CELESTIAL SURFACING */
     min-height: 100vh;
     padding-bottom: 5rem;
+    position: relative;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -15%, rgba(251, 191, 36, 0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 85% 90%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 5% 50%, rgba(16, 185, 129, 0.07) 0%, transparent 50%),
+        linear-gradient(180deg, #faf8f5 0%, #f0f1f8 40%, #e8ecf4 100%);
+    overflow: hidden;
+}
+
+/* Floating ambient orbs */
+.landing-container::before {
+    content: '';
+    position: fixed;
+    top: -150px;
+    right: -150px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    animation: landingOrb1 22s ease-in-out infinite;
+    z-index: 0;
+}
+
+.landing-container::after {
+    content: '';
+    position: fixed;
+    bottom: -120px;
+    left: -120px;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    animation: landingOrb2 28s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes landingOrb1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-50px, 70px); }
+}
+
+@keyframes landingOrb2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(40px, -50px); }
 }
 
 .page-content {
-    max-width: 1900px; /* 💎 MASTER-VIEWPORT EXPANSION */
+    max-width: 1900px;
     margin: 0 auto;
     padding: 0 4rem;
+    position: relative;
+    z-index: 1;
 }
 
 /* --- ELITE SECTOR HEADER --- */
@@ -113,7 +160,7 @@
 
 .prem-loader {
     width: 80px;
-    height: 85px;
+    height: 80px;
     position: relative;
     display: flex;
     align-items: center;

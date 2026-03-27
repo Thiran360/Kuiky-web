@@ -7,6 +7,7 @@ import { useSmartImage } from "../../api/imageService";
 import { motion, AnimatePresence } from "framer-motion";
 import "./cart.css";
 
+import { useUser } from "../../context/UserContext";
 import {
   Trash2,
   ShoppingBag,
@@ -28,11 +29,45 @@ import {
   Truck,
   Navigation,
   Globe,
-  FileDown
+  FileDown,
+  Lock,
+  UserPlus
 } from "lucide-react";
 import { generateInvoice } from "../../utils/invoiceGenerator";
 
 import AddressManager from "../Profile/AddressManager";
+
+/* ─── GUEST STATE (NOT LOGGED IN) ─── */
+const GuestCartState = () => {
+    const navigate = useNavigate();
+    return (
+        <div className="checkout-page guest-luxe-state">
+            <motion.div 
+                className="empty-luxe-card"
+                initial={{ scale: 0.9, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }}
+            >
+                <div className="empty-luxe-visual">
+                    <Lock size={80} strokeWidth={1} className="text-amber-200" />
+                    <div className="empty-glow-amber"></div>
+                </div>
+                <h2 className="empty-luxe-title">Cart Synchronicity Limited</h2>
+                <p className="empty-luxe-text">
+                    Your shopping bag is waiting to be filled. Sign in to your account to sync items across your devices 
+                    and access our secure elite procurement protocol.
+                </p>
+                <div className="flex flex-col gap-4 items-center">
+                    <button className="btn-elite-deployment m-0 w-auto px-12" onClick={() => navigate("/login")}>
+                        <Zap size={18} /> SIGN IN TO YOUR ACCOUNT
+                    </button>
+                    <button className="text-slate-400 text-sm font-bold uppercase tracking-widest hover:text-white transition-colors" onClick={() => navigate("/")}>
+                        OR BROWSE AS GUEST
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
 /* ─── HELPER: get the best price for a cart item ─── */
 const getItemPrice = (item) => {
@@ -239,6 +274,7 @@ const LogisticsDrawer = ({ onClose }) => (
 const CartPage = () => {
   const { cartItems, updateItemQuantity, removeFromCart, placeOrderFromCart, clearCart } = useCart();
   const { selectedAddress, loadAddresses, addresses } = useAddress();
+  const { isAuthenticated } = useUser();
   const navigate = useNavigate();
 
   const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart' -> 'shipping' -> 'payment'
@@ -323,6 +359,11 @@ const CartPage = () => {
     e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
     e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
   };
+
+  // CHECK GUEST STATUS FIRST
+  if (!isAuthenticated) {
+      return <GuestCartState />;
+  }
 
   if (!cartItems.length && !orderSuccess) {
     return (

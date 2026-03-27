@@ -1,25 +1,49 @@
+/* ═══════════════════════════════════════════════════════════════
+   💎 ELITE ROYALE — PROFILE & SETTINGS
+   Premium Dashboard Experience
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-    --elite-slate: #0f172a;
-    --elite-blue: #2563eb;
-    --elite-blue-glow: rgba(37, 99, 235, 0.4);
-    --elite-emerald: #10b981;
-    --elite-gold: #fbbf24;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --elite-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+    --p-slate: #0f172a;
+    --p-blue: #2563eb;
+    --p-blue-glow: rgba(37, 99, 235, 0.15);
+    --p-emerald: #10b981;
+    --p-gold: #fbbf24;
 }
 
 .elite-profile-page {
     min-height: 100vh;
-    background: #f8fafc;
     padding: 0;
-    font-family: 'Inter', sans-serif;
-    color: var(--elite-slate);
+    font-family: 'Outfit', 'Inter', sans-serif;
+    color: var(--p-slate);
     position: relative;
     overflow-x: hidden;
+    background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #faf8f5 0%, #eef1f8 50%, #e8ecf4 100%);
 }
 
-/* --- CANVAS & LAYOUT --- */
+/* Ambient floating light */
+.elite-profile-page::before {
+    content: '';
+    position: fixed;
+    top: -150px;
+    right: -150px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    animation: profileOrb1 18s ease-in-out infinite;
+}
+
+@keyframes profileOrb1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-40px, 60px); }
+}
+
+/* ─── CANVAS & LAYOUT ─── */
 .elite-profile-canvas {
     width: 100%;
     max-width: 1400px;
@@ -28,20 +52,22 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
-/* --- CINEMATIC BANNER --- */
+/* ═══ CINEMATIC BANNER ═══ */
 .elite-profile-banner {
     width: 100%;
-    min-height: 380px;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    border-radius: 2.5rem;
+    min-height: 260px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+    border-radius: 2rem;
     position: relative;
     overflow: hidden;
-    padding: 4rem;
+    padding: 3rem 3.5rem;
     display: flex;
     align-items: center;
-    box-shadow: 0 30px 60px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
 }
 
 .banner-visual-overlay {
@@ -51,8 +77,20 @@
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(251, 191, 36, 0.08) 0%, transparent 40%);
+    pointer-events: none;
+}
+
+/* Grid pattern overlay */
+.banner-visual-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
     pointer-events: none;
 }
 
@@ -65,25 +103,25 @@
     z-index: 2;
 }
 
-/* --- AVATAR & IDENTITY --- */
+/* ─── AVATAR & IDENTITY ─── */
 .profile-avatar-ecom360 {
     display: flex;
     align-items: center;
-    gap: 3rem;
+    gap: 2.5rem;
 }
 
 .avatar-shield {
-    width: 160px;
-    height: 160px;
-    background: rgba(255, 255, 255, 0.05);
+    width: 110px;
+    height: 110px;
+    background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 3rem;
+    border-radius: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
     position: relative;
 }
 
@@ -91,9 +129,9 @@
     content: '';
     position: absolute;
     inset: -2px;
-    border-radius: 3.1rem;
+    border-radius: 2.1rem;
     padding: 2px;
-    background: linear-gradient(45deg, var(--elite-blue), transparent, var(--elite-emerald));
+    background: linear-gradient(135deg, var(--p-blue), transparent 50%, var(--p-gold));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -103,73 +141,74 @@
 .identity-dossier {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .protocol-badge {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: var(--elite-blue);
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: var(--p-gold);
     letter-spacing: 3px;
     text-transform: uppercase;
 }
 
 .identity-name {
-    font-size: 3.5rem;
-    font-weight: 950;
+    font-size: 2.5rem;
+    font-weight: 900;
     color: white;
     margin: 0;
-    letter-spacing: -2px;
+    letter-spacing: -1.5px;
     line-height: 1;
 }
 
 .identity-meta {
     display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
 }
 
 .meta-pill {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.05);
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 100px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    letter-spacing: 1px;
 }
 
-/* --- STATS ECOM360 --- */
+/* ─── STATS ─── */
 .profile-stats-ecom360 {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .stat-card-luxe {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 1.5rem 2rem;
-    border-radius: 2rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1rem;
     color: white;
-    min-width: 220px;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 180px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .stat-card-luxe:hover {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.07);
     border-color: rgba(37, 99, 235, 0.3);
 }
 
 .stat-card-luxe svg {
-    color: var(--elite-blue);
+    color: var(--p-gold);
 }
 
 .stat-info {
@@ -178,75 +217,79 @@
 }
 
 .stat-info .val {
-    font-size: 1.75rem;
-    font-weight: 950;
+    font-size: 1.4rem;
+    font-weight: 900;
     line-height: 1;
 }
 
 .stat-info .lbl {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.6rem;
+    font-weight: 800;
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
-    margin-top: 4px;
+    margin-top: 3px;
+    letter-spacing: 1px;
 }
 
-/* --- MAIN LAYOUT --- */
+/* ─── MAIN LAYOUT ─── */
 .elite-profile-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
+    grid-template-columns: 280px 1fr;
+    gap: 1.5rem;
     align-items: start;
 }
 
-/* --- SIDEBAR NAV --- */
+/* ─── SIDEBAR NAV ─── */
 .elite-profile-sidebar {
     background: white;
-    border-radius: 2.5rem;
-    padding: 1.5rem;
-    box-shadow: var(--elite-shadow);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    position: sticky;
+    top: 100px;
 }
 
 .sidebar-nav-ecom360 {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .nav-link-luxe {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    border-radius: 1.5rem;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
     border: none;
     background: transparent;
     cursor: pointer;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #64748b;
     transition: all 0.3s;
     position: relative;
-    overflow: hidden;
+    letter-spacing: 0.3px;
 }
 
 .nav-link-luxe:hover {
-    color: var(--elite-slate);
+    color: var(--p-slate);
     background: #f8fafc;
 }
 
 .nav-link-luxe.active {
     color: white;
-    background: var(--elite-slate);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+    background: var(--p-slate);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
 }
 
-.nav-link-luxe.active svg { color: var(--elite-blue); }
+.nav-link-luxe.active svg { color: var(--p-gold); }
 
 .nav-link-luxe.logout-danger {
     color: #f43f5e;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .nav-link-luxe.logout-danger:hover {
@@ -256,119 +299,136 @@
 .nav-divider {
     height: 1px;
     background: #f1f5f9;
-    margin: 0.5rem 0;
+    margin: 0.25rem 0;
 }
 
-/* --- CONTENT ECOM360 --- */
+/* ─── CONTENT PANEL ─── */
 .elite-profile-ecom360 {
     background: white;
-    border-radius: 2.5rem;
-    padding: 3rem;
-    box-shadow: var(--elite-shadow);
-    min-height: 600px;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    min-height: 500px;
 }
 
 .metrics-grid {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 2rem;
 }
 
 .metrics-header-ecom360 {
-    border-left: 4px solid var(--elite-blue);
-    padding-left: 1.5rem;
+    border-left: 3px solid var(--p-blue);
+    padding-left: 1.25rem;
 }
 
 .ecom360-subtitle {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 900;
     margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .ecom360-desc {
-    color: #64748b;
+    color: #94a3b8;
     font-weight: 500;
     margin-top: 4px;
+    font-size: 0.9rem;
 }
 
 .ecom360-cards-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
-/* --- INFO CARDS --- */
+/* ─── INFO CARDS ─── */
 .elite-info-card-luxe {
     background: #f8fafc;
     border: 1px solid #f1f5f9;
-    padding: 2rem;
-    border-radius: 2rem;
+    padding: 1.5rem;
+    border-radius: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     transition: all 0.3s;
 }
 
 .elite-info-card-luxe:hover {
     background: white;
-    border-color: var(--elite-blue);
-    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.08);
-    transform: translateY(-5px);
+    border-color: #e2e8f0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-3px);
 }
 
 .card-icon-halo {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     background: white;
-    border-radius: 1.5rem;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--elite-blue);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    color: var(--p-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+    border: 1px solid #f1f5f9;
 }
 
 .card-details {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .card-label {
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: 0.6rem;
+    font-weight: 900;
     color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
 }
 
 .card-value {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 800;
-    color: var(--elite-slate);
-    margin-top: 4px;
+    color: var(--p-slate);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* --- FORM & INPUTS --- */
+/* ─── FORM & INPUTS ─── */
+.auth-modify-ecom360 {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
 .lite-form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-top: 2rem;
+    gap: 1.25rem;
+    margin-top: 1rem;
 }
 
 .elite-input-field {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .elite-input-field.full { grid-column: span 2; }
 
 .field-label-luxe {
-    font-size: 0.75rem;
-    font-weight: 850;
-    color: #64748b;
-    padding-left: 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #94a3b8;
+    padding-left: 0.25rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
 .field-input-wrapper {
@@ -379,115 +439,141 @@
 
 .field-input-wrapper input {
     width: 100%;
-    padding: 1.25rem 1.5rem 1.25rem 3.5rem;
-    border-radius: 1.5rem;
-    border: 2px solid #f1f5f9;
+    padding: 1rem 1.25rem 1rem 3rem;
+    border-radius: 1rem;
+    border: 1.5px solid #e2e8f0;
     background: #f8fafc;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--elite-slate);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--p-slate);
     transition: all 0.3s;
+    font-family: inherit;
 }
 
 .field-input-wrapper input:focus {
     background: white;
-    border-color: var(--elite-blue);
-    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+    border-color: var(--p-blue);
+    box-shadow: 0 0 0 3px var(--p-blue-glow);
     outline: none;
 }
 
 .field-icon {
     position: absolute;
-    left: 1.5rem;
-    color: #94a3b8;
+    left: 1rem;
+    color: #cbd5e1;
     transition: color 0.3s;
 }
 
-.field-input-wrapper input:focus + .field-icon {
-    color: var(--elite-blue);
+.field-input-wrapper input:focus ~ .field-icon,
+.field-input-wrapper:focus-within .field-icon {
+    color: var(--p-blue);
 }
 
 .form-sub-protocol {
     grid-column: span 2;
-    padding: 1rem 0 0.5rem;
-    font-size: 0.75rem;
+    padding: 1rem 0 0.25rem;
+    font-size: 0.65rem;
     font-weight: 900;
     color: #94a3b8;
     letter-spacing: 2px;
+    border-top: 1px solid #f1f5f9;
 }
 
 .ecom360-form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 3rem;
+    gap: 0.75rem;
+    margin-top: 2rem;
 }
 
 .btn-cancel-elite {
-    padding: 1.25rem 2rem;
-    border-radius: 1.5rem;
-    border: 2px solid #f1f5f9;
+    padding: 1rem 1.75rem;
+    border-radius: 100px;
+    border: 1.5px solid #e2e8f0;
     background: transparent;
     font-weight: 800;
+    font-size: 0.8rem;
     color: #64748b;
     cursor: pointer;
     transition: all 0.3s;
 }
 
+.btn-cancel-elite:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
 .btn-save-elite {
-    padding: 1.25rem 2.5rem;
-    border-radius: 1.5rem;
+    padding: 1rem 2rem;
+    border-radius: 100px;
     border: none;
-    background: var(--elite-blue);
+    background: var(--p-blue);
     color: white;
-    font-weight: 850;
+    font-weight: 900;
+    font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 12px;
-    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.25);
-    transition: all 0.3s;
+    gap: 10px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 0.5px;
 }
 
 .btn-save-elite:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 45px rgba(37, 99, 235, 0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.35);
 }
 
-/* Success Toast */
+/* ─── SUCCESS TOAST ─── */
 .elite-success-toast {
     position: fixed;
-    top: 2rem;
+    top: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    padding: 1rem 2rem;
-    border-radius: 2rem;
+    padding: 0.85rem 1.75rem;
+    border-radius: 100px;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     z-index: 1000;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
     border: 1px solid #f1f5f9;
     font-weight: 900;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 1px;
 }
 
 .toast-glow-icon {
-    color: var(--elite-emerald);
+    color: var(--p-emerald);
 }
 
-/* RESPONSIVE */
+/* ─── RESPONSIVE ─── */
 @media (max-width: 1200px) {
-    .elite-profile-banner { padding: 3rem; }
-    .identity-name { font-size: 2.5rem; }
-    .profile-stats-ecom360 { flex-direction: column; gap: 1rem; }
+    .elite-profile-banner { padding: 2.5rem; }
+    .identity-name { font-size: 2rem; }
+    .profile-stats-ecom360 { flex-direction: column; gap: 0.75rem; }
+    .stat-card-luxe { min-width: auto; }
 }
 
 @media (max-width: 992px) {
     .elite-profile-layout { grid-template-columns: 1fr; }
+    .elite-profile-sidebar { position: relative; top: 0; }
     .ecom360-cards-container { grid-template-columns: 1fr; }
     .lite-form-grid { grid-template-columns: 1fr; }
     .elite-input-field.full { grid-column: auto; }
+    .banner-content { flex-direction: column; gap: 2rem; align-items: flex-start; }
+    .profile-stats-ecom360 { flex-direction: row; }
+}
+
+@media (max-width: 640px) {
+    .elite-profile-canvas { padding: 1rem; }
+    .elite-profile-banner { padding: 2rem; border-radius: 1.5rem; }
+    .profile-avatar-ecom360 { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    .avatar-shield { width: 80px; height: 80px; border-radius: 1.5rem; }
+    .identity-name { font-size: 1.75rem; }
+    .profile-stats-ecom360 { flex-wrap: wrap; }
+    .stat-card-luxe { min-width: 140px; padding: 1rem; }
+    .elite-profile-ecom360 { padding: 1.5rem; border-radius: 1.25rem; }
 }
