@@ -1,22 +1,60 @@
 import React, { useEffect } from "react";
+import { useUser } from "../context/UserContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 import { getImageUrl } from "../api/config";
-import { Trash2, ShoppingCart, Check, ArrowLeft, Heart, Zap } from "lucide-react";
+import { Trash2, ShoppingCart, Check, ArrowLeft, Heart, Zap, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Wishlist.css";
 
+/* ─── GUEST STATE (NOT LOGGED IN) ─── */
+const GuestWishlistState = () => {
+    const navigate = useNavigate();
+    return (
+        <div className="wishlist-page guest-luxe-state">
+            <motion.div 
+                className="wishlist-empty-luxe"
+                initial={{ scale: 0.9, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }}
+            >
+                <div className="empty-luxe-visual">
+                    <Lock size={80} strokeWidth={1} className="text-ruby-200" />
+                    <div className="empty-glow-ruby"></div>
+                </div>
+                <h2 className="empty-luxe-title">Private Curation Locked</h2>
+                <p className="empty-luxe-text">
+                    Join Elite Royale to curate your personal collection of luxury assets. 
+                    Members enjoy persistent wishlists synced across all secure terminals.
+                </p>
+                <div className="flex flex-col gap-4 items-center mt-6">
+                    <button className="btn-elite-deployment m-0 w-auto px-12" onClick={() => navigate("/login")}>
+                        <Zap size={18} /> INITIALIZE MEMBERSHIP
+                    </button>
+                    <button className="text-slate-400 text-sm font-bold uppercase tracking-widest hover:text-white transition-colors" onClick={() => navigate("/")}>
+                        RETURN TO SHOWROOM
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
 const Wishlist = () => {
   const { wishlist, loading, loadWishlist, toggleWishlist } = useWishlist();
   const { addItemToCart, refreshCart, findItemInCart } = useCart();
+  const { isAuthenticated } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loadWishlist) {
+    if (loadWishlist && isAuthenticated) {
       loadWishlist();
     }
-  }, [loadWishlist]);
+  }, [loadWishlist, isAuthenticated]);
+
+  if (!isAuthenticated) {
+      return <GuestWishlistState />;
+  }
 
   const getProduct = (item) => item.product || item;
 
@@ -180,7 +218,7 @@ const Wishlist = () => {
                   ? !!findItemInCart(product.id, variant.id) 
                   : false;
                 
-                const image = product?.image || product?.image_url || product?.product_image;
+                const image = product?.image_url || product?.image || product?.product_image;
 
                 return (
                   <motion.div 

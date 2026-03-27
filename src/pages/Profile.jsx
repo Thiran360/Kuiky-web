@@ -59,9 +59,9 @@ const Profile = () => {
       .map((p) => p.trim());
 
     setFormData({
-      username: user.username || "",
-      mobile_number: user.mobile_number || "",
-      email: user.email || "",
+      username: user.username || user.name || user.full_name || "",
+      mobile_number: user.mobile_number || user.mobile || user.phone || "",
+      email: user.email || user.email_address || "",
       address_line1: parts[0] || "",
       address_line2: parts[1] || "",
       city: parts[2] || "",
@@ -137,7 +137,7 @@ const Profile = () => {
             exit={{ opacity: 0, scale: 0.95 }}
           >
             <Shield size={18} className="toast-glow-icon" />
-            <span>IDENTITY UPDATE AUTHORIZED</span>
+            <span>Profile updated successfully!</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -152,11 +152,11 @@ const Profile = () => {
                         <User size={60} strokeWidth={1.5} />
                     </div>
                     <div className="identity-dossier">
-                        <span className="protocol-badge">PERSONNEL PROTOCOL</span>
+                        <span className="protocol-badge">MY PROFILE</span>
                         <h1 className="identity-name">{user.username}</h1>
                         <div className="identity-meta">
-                            <span className="meta-pill"><Shield size={12} /> VERIFIED ENTITY</span>
-                            <span className="meta-pill"><Activity size={12} /> ACTIVE STATUS</span>
+                            <span className="meta-pill"><Shield size={12} /> VERIFIED</span>
+                            <span className="meta-pill"><Activity size={12} /> ACTIVE</span>
                         </div>
                     </div>
                 </div>
@@ -166,21 +166,21 @@ const Profile = () => {
                         <Package size={20} />
                         <div className="stat-info">
                             <span className="val">{stats.totalOrders}</span>
-                            <span className="lbl">ACQUISITIONS</span>
+                            <span className="lbl">ORDERS</span>
                         </div>
                     </div>
                     <div className="stat-card-luxe">
                         <CreditCard size={20} />
                         <div className="stat-info">
                             <span className="val">₹{stats.totalSpent.toLocaleString()}</span>
-                            <span className="lbl">LOGISTICS VALUE</span>
+                            <span className="lbl">TOTAL SPENT</span>
                         </div>
                     </div>
                     <div className="stat-card-luxe">
                         <Star size={20} />
                         <div className="stat-info">
                             <span className="val">{stats.reviewCount}</span>
-                            <span className="lbl">FEEDBACK NODES</span>
+                            <span className="lbl">DELIVERED</span>
                         </div>
                     </div>
                 </div>
@@ -192,17 +192,17 @@ const Profile = () => {
           <aside className="elite-profile-sidebar">
              <nav className="sidebar-nav-ecom360">
                 <button className={`nav-link-luxe ${mode === 'view' ? 'active' : ''}`} onClick={() => setMode('view')}>
-                    <User size={18} /> <span>IDENTITY METRICS</span>
+                    <User size={18} /> <span>My Profile</span>
                 </button>
                 <button className={`nav-link-luxe ${mode === 'edit' ? 'active' : ''}`} onClick={() => setMode('edit')}>
-                    <Pencil size={18} /> <span>MODIFY AUTHENTICATION</span>
+                    <Pencil size={18} /> <span>Edit Profile</span>
                 </button>
                 <button className={`nav-link-luxe ${mode === 'addresses' ? 'active' : ''}`} onClick={() => setMode('addresses')}>
-                    <MapPin size={18} /> <span>LOGISTICS STATIONS</span>
+                    <MapPin size={18} /> <span>Manage Addresses</span>
                 </button>
                 <div className="nav-divider"></div>
                 <button className="nav-link-luxe logout-danger" onClick={logout}>
-                    <LogOut size={18} /> <span>TERMINATE SESSION</span>
+                    <LogOut size={18} /> <span>Logout</span>
                 </button>
              </nav>
           </aside>
@@ -219,14 +219,14 @@ const Profile = () => {
                     className="metrics-grid"
                 >
                     <div className="metrics-header-ecom360">
-                        <h2 className="ecom360-subtitle">Identity Portfolio</h2>
-                        <p className="ecom360-desc">Public-facing credentials and institutional identifiers.</p>
+                        <h2 className="ecom360-subtitle">My Profile</h2>
+                        <p className="ecom360-desc">Your personal details and contact information.</p>
                     </div>
                     <div className="ecom360-cards-container">
-                        <EliteInfoCard icon={<User />} label="LEGAL DESIGNATION" value={user.username} />
-                        <EliteInfoCard icon={<Mail />} label="COMMUNICATION NODE" value={user.email} />
-                        <EliteInfoCard icon={<Phone />} label="MOBILE HANDSHAKE" value={user.mobile_number} />
-                        <EliteInfoCard icon={<MapPin />} label="REGIONAL CENTER" value={user.user_address || "NOT SPECIFIED"} />
+                        <EliteInfoCard icon={<User />} label="FULL NAME" value={user.username} />
+                        <EliteInfoCard icon={<Mail />} label="EMAIL ADDRESS" value={user.email} />
+                        <EliteInfoCard icon={<Phone />} label="MOBILE NUMBER" value={user.mobile_number || user.mobile || user.phone} />
+                        <EliteInfoCard icon={<MapPin />} label="ADDRESS" value={user.user_address || "Not specified"} />
                     </div>
                 </motion.div>
               )}
@@ -240,24 +240,24 @@ const Profile = () => {
                     className="auth-modify-ecom360"
                 >
                     <div className="metrics-header-ecom360">
-                        <h2 className="ecom360-subtitle">Modify Authentication</h2>
-                        <p className="ecom360-desc">Update your institutional credentials for secure procurement.</p>
+                        <h2 className="ecom360-subtitle">Edit Profile</h2>
+                        <p className="ecom360-desc">Update your personal details and contact information.</p>
                     </div>
                     <div className="lite-form-grid">
-                        <EliteInput icon={<User />} label="USERNAME" value={formData.username} onChange={handleChange("username")} />
-                        <EliteInput icon={<Phone />} label="MOBILE" value={formData.mobile_number} onChange={handleChange("mobile_number")} />
-                        <EliteInput icon={<Mail />} label="EMAIL" value={formData.email} fullWidth onChange={handleChange("email")} />
+                        <EliteInput icon={<User />} label="FULL NAME" value={formData.username} onChange={handleChange("username")} />
+                        <EliteInput icon={<Phone />} label="MOBILE NUMBER" value={formData.mobile_number} onChange={handleChange("mobile_number")} />
+                        <EliteInput icon={<Mail />} label="EMAIL ADDRESS" value={formData.email} fullWidth onChange={handleChange("email")} />
                         
-                        <div className="form-sub-protocol">LOCATION PARAMETERS (SYNC)</div>
-                        <EliteInput icon={<Home />} label="FLAT/HOUSE" value={formData.address_line1} onChange={handleChange("address_line1")} />
-                        <EliteInput icon={<Building />} label="STREET/AREA" value={formData.address_line2} onChange={handleChange("address_line2")} />
+                        <div className="form-sub-protocol">ADDRESS DETAILS</div>
+                        <EliteInput icon={<Home />} label="FLAT / HOUSE" value={formData.address_line1} onChange={handleChange("address_line1")} />
+                        <EliteInput icon={<Building />} label="STREET / AREA" value={formData.address_line2} onChange={handleChange("address_line2")} />
                         <EliteInput icon={<Map />} label="CITY" value={formData.city} onChange={handleChange("city")} />
                         <EliteInput icon={<MapPin />} label="STATE" value={formData.state} onChange={handleChange("state")} />
                         <EliteInput icon={<Hash />} label="PINCODE" value={formData.pincode} onChange={handleChange("pincode")} />
                     </div>
                     <div className="ecom360-form-actions">
-                        <button className="btn-cancel-elite" onClick={() => setMode('view')}>TERMINATE EDIT</button>
-                        <button className="btn-save-elite" onClick={handleSave}><Save size={18} /> AUTHORIZE CHANGES</button>
+                        <button className="btn-cancel-elite" onClick={() => setMode('view')}>Cancel</button>
+                        <button className="btn-save-elite" onClick={handleSave}><Save size={18} /> Save Changes</button>
                     </div>
                 </motion.div>
               )}
@@ -270,8 +270,8 @@ const Profile = () => {
                     exit={{ opacity: 0, scale: 0.98 }}
                 >
                     <div className="metrics-header-ecom360">
-                        <h2 className="ecom360-subtitle">Logistics Stations</h2>
-                        <p className="ecom360-desc">Manage destination nodes for high-speed procurement distribution.</p>
+                        <h2 className="ecom360-subtitle">Manage Addresses</h2>
+                        <p className="ecom360-desc">Add, edit, or remove your delivery addresses.</p>
                     </div>
                     <AddressManager />
                 </motion.div>
@@ -289,7 +289,7 @@ const EliteInfoCard = ({ icon, label, value }) => (
         <div className="card-icon-halo">{icon}</div>
         <div className="card-details">
             <span className="card-label">{label}</span>
-            <span className="card-value">{value || "LOGS EMPTY"}</span>
+            <span className="card-value">{value || "Not available"}</span>
         </div>
     </div>
 );

@@ -56,7 +56,7 @@ export const CartProvider = ({ children }) => {
     /** Fetches current user's cart from backend and updates state. */
     const refreshCart = async () => {
         if (!isAuthenticated) {
-            setCartItems([]);
+            // Keep local items if not authenticated (Guest Mode)
             return;
         }
         try {
@@ -99,14 +99,18 @@ export const CartProvider = ({ children }) => {
         setCartItems([]);
     };
 
-    /** Adds/updates an item via the API. */
     const addItemToCart = async (productVariantId, quantity = 1, productDetails = null) => {
+        // 💎 AUTH-MANDATORY: Ensure user is logged in for procurement
         if (!isAuthenticated) {
-            throw { message: "Authentication Required", status: 401 };
+            alert("🔒 Elite Royale: Please login to your profile to procure this asset.");
+            return;
         }
 
-        if (!productVariantId) {
-            console.warn("addItemToCart: No productVariantId provided");
+        const pId = productDetails?.id;
+        const vId = productVariantId || pId; // Fallback to Product ID if no variant
+
+        if (!vId) {
+            console.warn("addItemToCart: No identifier (variant or product) provided");
             return;
         }
 
@@ -115,12 +119,12 @@ export const CartProvider = ({ children }) => {
         
         setCartItems(prev => {
             const existing = prev.find(item => 
-                (item.product_variation_id === productVariantId || item.variation_id === productVariantId)
+                (item.product_variation_id === vId || item.variation_id === vId || (item.product_id === pId && !item.variation_id))
             );
 
             if (existing) {
                 return prev.map(item =>
-                    (item.product_variation_id === productVariantId || item.variation_id === productVariantId)
+                    (item.product_variation_id === vId || item.variation_id === vId || (item.product_id === pId && !item.variation_id))
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
@@ -131,11 +135,11 @@ export const CartProvider = ({ children }) => {
                 const actualPrice = selectedV?.price || productDetails?.price || productDetails?.min_price || 0;
 
                 return [...prev, {
-                    id: 'opt_' + Date.now(),
-                    cart_item_id: 'opt_' + Date.now(),
-                    product_id: productDetails?.id,
-                    product_variation_id: productVariantId,
-                    variation_id: productVariantId,
+                    id: 'opt_' + Date.now() + '_' + vId,
+                    cart_item_id: 'opt_' + Date.now() + '_' + vId,
+                    product_id: pId,
+                    product_variation_id: vId,
+                    variation_id: vId,
                     quantity: quantity,
                     offer_price: actualOfferPrice,
                     price: actualPrice,
@@ -147,12 +151,13 @@ export const CartProvider = ({ children }) => {
         });
 
         try {
-            await cartService.addToCart(productVariantId, quantity);
-            // Refresh in background to get real IDs and server state
-            refreshCart();
+            if (isAuthenticated) {
+                await cartService.addToCart(productVariantId, quantity);
+                // Refresh in background to get real IDs and server state
+                refreshCart();
+            }
         } catch (error) {
-            console.error("Backend cart addition failed, reverting state:", error.message || error);
-            setCartItems(previousItems);
+            console.error("Backend cart addition failed, maintaining local state:", error.message || error);
         }
     };
 
@@ -291,8 +296,9 @@ export const CartProvider = ({ children }) => {
         if (!isUserLoading && isAuthenticated) {
             refreshCart();
         } else if (!isUserLoading && !isAuthenticated) {
-            setCartItems([]);
-            localStorage.removeItem("localCart");
+            // 💎 GUEST MODE: Preserve local items, do not wipe
+            // setCartItems([]);
+            // localStorage.removeItem("localCart");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, isUserLoading]);

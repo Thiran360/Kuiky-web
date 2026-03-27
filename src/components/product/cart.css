@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    ULTRA-PREMIUM ELITE CHECKOUT SYSTEM V3
    ========================================================= */
 
@@ -516,7 +516,6 @@
     color: var(--elite-slate);
     letter-spacing: -0.5px;
 }
-
 .manage-address-btn-luxe {
     display: flex;
     align-items: center;
@@ -1423,4 +1422,22 @@
 @keyframes redirectMove {
     0% { left: -100%; }
     100% { left: 0%; }
+}
+
+.empty-glow-amber {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: pulse-amber 3s infinite ease-in-out;
+}
+
+@keyframes pulse-amber {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.8; }
 }

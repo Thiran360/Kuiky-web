@@ -10,22 +10,22 @@ import { useWishlist } from "../../context/WishlistContext";
 const Header = ({ searchTerm, setSearchTerm }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, logout, isAuthenticated } = useUser();
+    const { cartItemCount } = useCart();
+    const { wishlistCount } = useWishlist();
 
-    // Auto-navigate to home if searching from another page
+    // Auto-navigate to home if searching from another page (only if authenticated)
     useEffect(() => {
-        if (searchTerm && location.pathname !== "/") {
+        if (searchTerm && location.pathname !== "/" && isAuthenticated) {
             navigate("/");
         }
-    }, [searchTerm, location.pathname, navigate]);
+    }, [searchTerm, location.pathname, navigate, isAuthenticated]);
 
     const [openUserDropdown, setOpenUserDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const userDropdownRef = useRef(null);
 
     const [isFocused, setIsFocused] = useState(false);
-    const { cartItemCount } = useCart();
-    const { user, logout, isAuthenticated } = useUser();
-    const { wishlistCount } = useWishlist();
     const [isListening, setIsListening] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
 

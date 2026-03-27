@@ -92,11 +92,8 @@ export const WishlistProvider = ({ children }) => {
     if (!isUserLoading && isAuthenticated) {
       loadWishlist();
     } else if (!isUserLoading && !isAuthenticated) {
-      // Clear local wishlist if not authenticated to prevent "automatic items"
-      if (wishlist.length > 0) {
-        setWishlist([]);
-        localStorage.removeItem("localWishlist");
-      }
+      // 💎 GUEST MODE: Preserve local wishlist items across sessions
+      // if (wishlist.length > 0) { ... }
     }
   }, [isUserLoading, isAuthenticated, loadWishlist]);
 
@@ -105,8 +102,9 @@ export const WishlistProvider = ({ children }) => {
     async (productId, productDetails = null) => {
       if (!productId) return;
 
+      // 💎 AUTH-MANDATORY: Ensure user is logged in for curation
       if (!isAuthenticated) {
-        alert("Please log in to manage your wishlist.");
+        alert("🔒 Elite Royale: Please login to manage your Private Collection.");
         return;
       }
 
@@ -130,13 +128,15 @@ export const WishlistProvider = ({ children }) => {
       }
 
       try {
-        if (already) {
-          await wishlistService.removeFromWishlist(productId);
-        } else {
-          await wishlistService.addToWishlist({
-            user_id: user?.id,
-            product_id: productId,
-          });
+        if (isAuthenticated) {
+          if (already) {
+            await wishlistService.removeFromWishlist(productId);
+          } else {
+            await wishlistService.addToWishlist({
+              user_id: user?.id,
+              product_id: productId,
+            });
+          }
         }
         // Force refresh from server to ensure IDs are correct (optional but recommended)
         // loadWishlist();

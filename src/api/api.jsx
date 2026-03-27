@@ -114,9 +114,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn("Unauthorized API call! Backend responded with 401. Awaiting explicit user logout to clear session.");
-      // ✅ Removed aggressive automatic local storage wipe to prevent premature loss of user_id and tokens.
-      // Session tear-down is now strictly handled by the UserContext logout() or authService logout() method.
+      console.warn("Unauthorized API call! Backend responded with 401. Clearing stale token for Guest Discovery.");
+      // ✅ Clear token to allow Guest Discovery (Products/Categories) to proceed
+      setAuthToken(null);
     }
     return Promise.reject(error);
   }

@@ -156,9 +156,10 @@ const ProductDetailPage = () => {
 
     const handleAddToCart = async () => {
         if (!product) return;
-        if (!isAuthenticated) {
-            setError("Please login to add items to your cart");
-            return;
+        // 💎 AUTH-MANDATORY: Redirect guests to Membership Portal
+        if (!isAuthenticated) { 
+            navigate("/login", { state: { from: `/product/${product.id}` } });
+            return; 
         }
         if (hasVariations && !selectedVariant) {
             setError("Please select a variant first");
@@ -180,17 +181,24 @@ const ProductDetailPage = () => {
     const handleWishlistClick = useCallback(async () => {
         if (isTogglingWishlist || !product) return;
 
+        // 💎 AUTH-MANDATORY: Redirect guests to Membership Portal
+        if (!isAuthenticated) { 
+            navigate("/login"); 
+            return; 
+        }
+
         setIsTogglingWishlist(true);
         setError(null);
         try {
-            await toggleWishlist(product.id);
+            // 💎 PASS FULL ASSET: Ensure guests see full product metadata in wishlist
+            await toggleWishlist(product.id, product);
         } catch (err) {
             console.error("Failed to toggle wishlist:", err);
             setError("Failed to update wishlist");
         } finally {
             setIsTogglingWishlist(false);
         }
-    }, [isTogglingWishlist, toggleWishlist, product]);
+    }, [isTogglingWishlist, toggleWishlist, product, isAuthenticated, navigate]);
 
     const handleBuyNow = async () => {
         if (!product) return;
@@ -450,33 +458,30 @@ const ProductDetailPage = () => {
 
                             <div className="action-buttons-group">
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    whileTap={{ scale: 0.95 }}
                                     className={`wishlist-toggle-btn ${isWishlistedStatus ? "active" : ""}`}
                                     onClick={handleWishlistClick}
                                     disabled={isTogglingWishlist}
                                 >
-                                    <Heart fill={isWishlistedStatus ? "currentColor" : "none"} size={22} />
+                                    <Heart fill={isWishlistedStatus ? "currentColor" : "none"} size={20} />
                                 </motion.button>
 
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    whileTap={{ scale: 0.97 }}
                                     className={`cart-primary-btn ${isInCart ? "added" : ""} ${isAddingToCart ? "loading" : ""}`}
                                     onClick={handleAddToCart}
                                     disabled={isAddingToCart}
                                 >
-                                    {isInCart ? <ShieldCheck size={20} /> : <ShoppingCart size={20} />}
+                                    {isInCart ? <ShieldCheck size={18} /> : <ShoppingCart size={18} />}
                                     <span>{isInCart ? "IN CART" : (isAddingToCart ? "Adding..." : "ADD TO CART")}</span>
                                 </motion.button>
 
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    whileTap={{ scale: 0.97 }}
                                     className="buy-now-premium-btn"
                                     onClick={handleBuyNow}
                                 >
-                                    <Zap size={20} fill="currentColor" />
+                                    <Zap size={18} fill="currentColor" />
                                     <span>Buy Now</span>
                                 </motion.button>
                             </div>

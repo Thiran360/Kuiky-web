@@ -3,8 +3,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingBag, Mail, Phone, Lock, User,
-  CheckCircle2, XCircle, Loader2, ArrowRight,
-  Truck, Gift, MapPin, Eye, EyeOff, Star, ShieldCheck, Sparkles, Navigation
+  CheckCircle2, XCircle, Loader2,
+  Eye, EyeOff, Star, ShieldCheck, Sparkles
 } from "lucide-react";
 
 import "./CustomerAuth.css";
@@ -131,7 +131,7 @@ const CustomerAuth = () => {
                                         exit={{ opacity: 0, x: -30 }}
                                         className="view-wrapper"
                                     >
-                                        <RegisterForm />
+                                        <RegisterForm onRegistered={() => setIsLogin(true)} />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -268,47 +268,43 @@ const LoginForm = () => {
     );
 };
 
-const RegisterForm = () => {
+const RegisterForm = ({ onRegistered }) => {
     const [formData, setFormData] = useState({
-        username: "", email: "", mobile_number: "", password: "",
-        latitude: "", longitude: "", user_address: ""
+        username: "", email: "", mobile_number: "", password: ""
     });
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPass, setShowPass] = useState(false);
-    const [locStatus, setLocStatus] = useState({ state: 'idle', msg: '' });
-
-    const navigate = useNavigate();
-    const { handleLoginSuccess } = useUser();
-
-    const getGeoLocation = () => {
-        if (!navigator.geolocation) {
-            setLocStatus({ state: 'error', msg: 'Geolocation not supported' });
-            return;
-        }
-
-        setLocStatus({ state: 'loading', msg: 'Fetching location...' });
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setFormData(p => ({ ...p, latitude: pos.coords.latitude.toString(), longitude: pos.coords.longitude.toString() }));
-                setLocStatus({ state: 'success', msg: 'Location Captured' });
-            },
-            (err) => setLocStatus({ state: 'error', msg: 'Permission Denied' }),
-            { timeout: 5000 }
-        );
-    };
+    const [showConfirmPass, setShowConfirmPass] = useState(false);
+    const [msg, setMsg] = useState({ type: "", text: "" });
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        if (!formData.username || !formData.email || !formData.mobile_number || !formData.password) return;
+        if (!formData.username || !formData.email || !formData.mobile_number || !formData.password) {
+            setMsg({ type: "error", text: "All fields are required" });
+            return;
+        }
+        if (formData.password !== confirmPassword) {
+            setMsg({ type: "error", text: "Passwords do not match" });
+            return;
+        }
+        if (formData.password.length < 6) {
+            setMsg({ type: "error", text: "Password must be at least 6 characters" });
+            return;
+        }
 
         setIsSubmitting(true);
+        setMsg({ type: "", text: "" });
         try {
             const payload = { ...formData, role: "customer", mobile: formData.mobile_number };
-            const res = await customerService.register(payload);
-            handleLoginSuccess(res);
-            navigate("/");
+            await customerService.register(payload);
+            // Show success and switch to login tab
+            setMsg({ type: "success", text: "Account created successfully! Please login with your credentials." });
+            setTimeout(() => {
+                if (onRegistered) onRegistered();
+            }, 2000);
         } catch (err) {
-            alert("Registration failed. Please check your data.");
+            setMsg({ type: "error", text: "Registration failed. Please check your data." });
         } finally {
             setIsSubmitting(false);
         }
@@ -347,7 +343,7 @@ const RegisterForm = () => {
 
             <ModernInput 
                 icon={Lock} 
-                label="Secure Password" 
+                label="Password" 
                 type={showPass ? "text" : "password"} 
                 value={formData.password}
                 onChange={(val) => setFormData({ ...formData, password: val })}
@@ -358,36 +354,32 @@ const RegisterForm = () => {
                 }
             />
 
-            <div className="location-control-premium">
-                <ModernInput 
-                    icon={MapPin} 
-                    label="Delivery Address" 
-                    value={formData.user_address}
-                    onChange={(val) => setFormData({ ...formData, user_address: val })}
-                    trailing={
-                        <button type="button" onClick={getGeoLocation} className={`geo-btn ${locStatus.state}`}>
-                            {locStatus.state === 'loading' ? <Loader2 className="spin" size={18} /> : 
-                             locStatus.state === 'success' ? <Navigation size={18} fill="currentColor" /> : 
-                             <MapPin size={18} />}
-                        </button>
-                    }
-                />
-                <AnimatePresence>
-                    {locStatus.msg && (
-                        <motion.span initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className={`loc-msg ${locStatus.state}`}>
-                            {locStatus.msg}
-                        </motion.span>
-                    )}
-                </AnimatePresence>
-            </div>
+            <ModernInput 
+                icon={ShieldCheck} 
+                label="Confirm Password" 
+                type={showConfirmPass ? "text" : "password"} 
+                value={confirmPassword}
+                onChange={(val) => setConfirmPassword(val)}
+                trailing={
+                    <button type="button" className="eye-toggle" onClick={() => setShowConfirmPass(!showConfirmPass)}>
+                        {showConfirmPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                }
+            />
+
+            {msg.text && (
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`form-alert ${msg.type}`}>
+                    {msg.type === 'error' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                    <span>{msg.text}</span>
+                </motion.div>
+            )}
 
             <motion.button
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`premium-btn gold ${isSubmitting ? 'loading' : ''}`}
+                whileTap={{ scale: 0.97 }}
+                className={`premium-btn register-btn ${isSubmitting ? 'loading' : ''}`}
                 disabled={isSubmitting}
             >
-                {isSubmitting ? <Loader2 className="spin" /> : "Complete Registration"}
+                {isSubmitting ? <Loader2 className="spin" /> : <><Sparkles size={18} /> Create My Account</>}
             </motion.button>
         </form>
     );
