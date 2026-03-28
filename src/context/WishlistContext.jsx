@@ -37,34 +37,45 @@ export const WishlistProvider = ({ children }) => {
   }, [wishlist]);
 
   // Normalize product ID from any possible shape
-  const extractProductId = (item) => {
+  const extractProductId = useCallback((item) => {
     if (!item) return null;
     try {
-      const product = item.product || item;
-      return (
-        product?.id ??
-        product?.product_id ??
-        item.id ??
-        item.product_id ??
-        item.product?.id ??
-        item.product?.product_id ??
-        null
-      );
+      // 💎 PRECISION ELITE ID EXTRACTION
+      // We prioritize actual product identifiers over entry record IDs (item.id)
+      const p = item.product || {};
+      const potentialIds = [
+        item.product_id, // Explicit foreign key
+        p.id,            // ID inside the nested product object
+        p.product_id,    // Fallback product key
+        item.id          // Entry ID (Last resort, common in simple local storage items)
+      ];
+
+      for (let id of potentialIds) {
+        if (id != null && id !== undefined && id !== "" && id !== "null") {
+          const num = Number(id);
+          // Only return if it's a valid ID (ignoring indices like -1 or system zeros if needed)
+          if (!isNaN(num) && num > 0) return num;
+        }
+      }
+      return null;
     } catch {
       return null;
     }
-  };
+  }, []);
 
   // Check if a given productId is already in wishlist
   const isProductWishlisted = useCallback(
-    (productId) => {
-      if (!productId) return false;
+    (targetId) => {
+      if (!targetId) return false;
+      const tId = Number(targetId);
+      if (isNaN(tId)) return false;
+
       return wishlist.some((item) => {
         const currentId = extractProductId(item);
-        return Number(currentId) === Number(productId);
+        return currentId === tId;
       });
     },
-    [wishlist]
+    [wishlist, extractProductId]
   );
 
   // Load wishlist from server

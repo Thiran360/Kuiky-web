@@ -412,33 +412,65 @@
     box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
 }
 
-/* --- RESPONSIVE --- */
+/* --- RESPONSIVE ELITE UPGRADE --- */
 @media (max-width: 1024px) {
-    .order-product-ecom360 {
-        grid-template-columns: 100px 1fr 1fr;
-    }
-    .order-actions-ecom360 {
-        grid-column: span 3;
-        justify-content: flex-start;
-        padding-top: 1.5rem;
-        border-top: 1px solid #f1f5f9;
+    .order-history-container { padding: 0 1.5rem; }
+    .order-history-luxe-header { margin-bottom: 3rem; }
+    .header-title-luxe { font-size: 2.2rem; }
+    .order-product-ecom360 { 
+        grid-template-columns: 120px 1fr 140px; 
+        gap: 1.5rem;
     }
 }
 
 @media (max-width: 768px) {
-    .order-history-luxe-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2rem;
+    .order-history-page { padding: 2rem 0; }
+    .order-history-luxe-header { padding-bottom: 2rem; }
+    .header-title-luxe { font-size: 1.8rem; letter-spacing: -1px; }
+    
+    .order-stats-ecom360 { 
+        width: 100%; 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 1.5rem; 
     }
-    .order-institutional-dossier {
-        flex-wrap: wrap;
-        gap: 1.5rem;
+    
+    .order-item-ecom360-card { padding: 1.5rem; border-radius: 1.5rem; }
+    .order-institutional-dossier { gap: 1.5rem; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+    .dossier-status-pill { margin-left: 0; width: 100%; justify-content: center; order: 10; }
+    
+    .order-product-ecom360 { grid-template-columns: 80px 1fr; gap: 1rem; }
+    .product-title-luxe { font-size: 1.1rem; }
+    
+    .order-financial-ecom360 { 
+        grid-column: span 2; 
+        background: #f8fafc; 
+        padding: 1rem; 
+        border-radius: 1rem; 
+        flex-direction: row; 
+        justify-content: space-between; 
+        align-items: center; 
     }
-    .order-product-ecom360 {
-        grid-template-columns: 80px 1fr;
+    
+    .financial-amount { font-size: 1.25rem; }
+    
+    .order-actions-ecom360 { 
+        grid-column: span 2; 
+        gap: 8px; 
+        padding-top: 1rem; 
+        border-top: 1px solid #f1f5f9; 
     }
-    .order-financial-ecom360 {
-        grid-column: span 2;
-    }
+    .btn-luxe-action { flex: 1; padding: 0.75rem; font-size: 0.65rem; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+    .order-stats-ecom360 { grid-template-columns: 1fr; }
+    .header-title-luxe { font-size: 1.5rem; }
+    .protocol-badge { font-size: 0.55rem; padding: 4px 10px; }
+    
+    .order-item-ecom360-card { border-radius: 1.25rem; }
+    .dossier-id-block, .dossier-date-block { width: 100%; }
+    
+    .order-actions-ecom360 { flex-wrap: wrap; }
+    .btn-luxe-action-icon { width: 100%; margin-top: 5px; border-radius: 10px; height: 40px; }
 }

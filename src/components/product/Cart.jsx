@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useCart } from "../../context/CartContext";
+import { useOrder } from "../../context/OrderContext";
 import { useAddress } from "../../context/AddressContext";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../api/config";
@@ -162,9 +163,12 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, index }) => {
 };
 
 /* ─── SUCCESS OVERLAY (ORDER PLACED) ─── */
-const SuccessOverlay = () => {
+const SuccessOverlay = ({ orderData }) => {
     const navigate = useNavigate();
-    const { cartItems } = useCart();
+    // Use the captured order data instead of the active (potentially empty) cart
+    const items = orderData?.items || [];
+    const address = orderData?.address || "SECURE STORE PICKUP";
+    const orderId = useMemo(() => Math.random().toString(36).substr(2, 9).toUpperCase(), []);
     return (
         <motion.div 
             className="success-ecom360-overlay"
@@ -202,14 +206,11 @@ const SuccessOverlay = () => {
                                 // Simulate generating invoice for the current order
                                 // In a real app, you'd have the order object from the backend response
                                 generateInvoice({
-                                    id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+                                    id: orderId,
                                     date: new Date(),
-                                    items: cartItems.map(i => ({
-                                        name: i.name || i.product_name,
-                                        price: i.price,
-                                        quantity: i.quantity
-                                    })),
-                                    total: cartItems.reduce((s, i) => s + (i.price * i.quantity), 0)
+                                    items: items,
+                                    address: address,
+                                    total: items.reduce((s, i) => s + (getItemPrice(i) * i.quantity), 0)
                                 });
                             }} 
                             className="btn-success-invoice"
@@ -273,6 +274,7 @@ const LogisticsDrawer = ({ onClose }) => (
 /* ─── MAIN CART PAGE ─── */
 const CartPage = () => {
   const { cartItems, updateItemQuantity, removeFromCart, placeOrderFromCart, clearCart } = useCart();
+  const { fetchOrders } = useOrder();
   const { selectedAddress, loadAddresses, addresses } = useAddress();
   const { isAuthenticated } = useUser();
   const navigate = useNavigate();
@@ -282,6 +284,7 @@ const CartPage = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState(null);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [lastOrderData, setLastOrderData] = useState(null);
   
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -300,8 +303,8 @@ const CartPage = () => {
 
   const totals = useMemo(() => {
     const subtotal = cartItems.reduce((s, i) => s + getItemPrice(i) * i.quantity, 0);
-    const shipping = subtotal > 2000 ? 0 : subtotal ? 200 : 0; 
-    const tax = Math.round(subtotal * 0.18); // 18% Luxury GST
+    const shipping = 0; // 💎 ELITE ROYALE: COMPLIMENTARY LOGISTICS
+    const tax = 0;      // 💎 ELITE ROYALE: TAX-EXEMPT PROCUREMENT
     return { subtotal, shipping, tax, total: subtotal + shipping + tax };
   }, [cartItems]);
 
@@ -337,7 +340,19 @@ const CartPage = () => {
       
       await new Promise(r => setTimeout(r, 2800));
       
+      // Capture order snapshot before clearing cart
+      setLastOrderData({
+        items: [...cartItems],
+        address: selectedAddress
+      });
+      
       await placeOrderFromCart(selectedAddress);
+      
+      // 💎 ELITE SYNC: Background refresh of Order History
+      if (typeof fetchOrders === 'function') {
+        fetchOrders();
+      }
+
       setOrderSuccess(true);
       
       // Auto-clear cart locally for supreme sync
@@ -772,8 +787,8 @@ const CartPage = () => {
             </div>
 
             <div className="price-row">
-              <span className="row-label-luxe">GST (18%)</span>
-              <span className="row-value-luxe">₹{totals.tax.toLocaleString()}</span>
+              <span className="row-label-luxe">Corporate GST (0%)</span>
+              <span className="row-value-luxe">₹0</span>
             </div>
 
             <div className="price-row total-row-premium">
@@ -794,7 +809,12 @@ const CartPage = () => {
             )}
 
             <button
-              className={`btn-elite-deployment ${(!selectedAddress || isPlacingOrder || (checkoutStep === 'payment' && !paymentMethod)) ? "btn-locked" : ""}`}
+              className={`btn-elite-deployment ${
+                (isPlacingOrder || 
+                 (checkoutStep === 'shipping' && !selectedAddress) || 
+                 (checkoutStep === 'payment' && (!selectedAddress || !paymentMethod))
+                ) ? "btn-locked" : ""
+              }`}
               onClick={() => {
                 if (checkoutStep === 'cart') setCheckoutStep('shipping');
                 else if (checkoutStep === 'shipping') setCheckoutStep('payment');
@@ -838,7 +858,7 @@ const CartPage = () => {
       </AnimatePresence>
 
       <AnimatePresence>
-        {orderSuccess && <SuccessOverlay />}
+        {orderSuccess && <SuccessOverlay orderData={lastOrderData} />}
       </AnimatePresence>
     </div>
   );

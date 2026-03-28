@@ -70,8 +70,8 @@ const CategoryRail = ({ onNavSelect }) => {
     }
     const tertEl = tertiaryScrollRef.current;
     if (tertEl) {
-        setCanTertiaryScrollLeft(tertEl.scrollLeft > 10);
-        setCanTertiaryScrollRight(tertEl.scrollLeft < tertEl.scrollWidth - tertEl.clientWidth - 10);
+      setCanTertiaryScrollLeft(tertEl.scrollLeft > 10);
+      setCanTertiaryScrollRight(tertEl.scrollLeft < tertEl.scrollWidth - tertEl.clientWidth - 10);
     }
   }, []);
 
@@ -103,7 +103,7 @@ const CategoryRail = ({ onNavSelect }) => {
     checkScrollButtons();
     tertEl.addEventListener('scroll', checkScrollButtons);
     return () => {
-        tertEl.removeEventListener('scroll', checkScrollButtons);
+      tertEl.removeEventListener('scroll', checkScrollButtons);
     };
   }, [tertiarySubCategories, checkScrollButtons]);
 
@@ -131,7 +131,7 @@ const CategoryRail = ({ onNavSelect }) => {
     setTertiarySubCategories([]);
     setActiveSub(null);
     setActiveTertiarySub(null);
-    onNavSelect(null, null);
+    onNavSelect(null, null, null, null, false);
   };
 
   const handleCategorySelect = async (cat) => {
@@ -147,7 +147,7 @@ const CategoryRail = ({ onNavSelect }) => {
     setActiveTertiarySub(null);
     setLoading(true);
 
-    onNavSelect(cat.id, null);
+    onNavSelect(cat.id, cat.name, null, null, false);
 
     try {
       const subs = await fetchSubCategories(cat.id);
@@ -162,11 +162,11 @@ const CategoryRail = ({ onNavSelect }) => {
 
   const handleSubSelect = async (sub) => {
     if (activeSub === sub.name) {
-        setActiveSub(null);
-        setTertiarySubCategories([]);
-        setActiveTertiarySub(null);
-        onNavSelect(selectedCategory.id, null);
-        return;
+      setActiveSub(null);
+      setTertiarySubCategories([]);
+      setActiveTertiarySub(null);
+      onNavSelect(selectedCategory.id, selectedCategory.name, null, null, false);
+      return;
     }
 
     setActiveSub(sub.name);
@@ -174,26 +174,26 @@ const CategoryRail = ({ onNavSelect }) => {
     setActiveTertiarySub(null);
     setTertiaryLoading(true);
 
-    onNavSelect(selectedCategory.id, sub.name);
+    onNavSelect(selectedCategory.id, selectedCategory.name, sub.name, sub.id, false);
 
     try {
-        const tertiary = await fetchSubCategories(null, sub.id);
-        setTertiarySubCategories(tertiary || []);
+      const tertiary = await fetchSubCategories(null, sub.id);
+      setTertiarySubCategories(tertiary || []);
     } catch (err) {
-        console.error("Tertiary subcategories fetch error:", err);
+      console.error("Tertiary subcategories fetch error:", err);
     } finally {
-        setTertiaryLoading(false);
+      setTertiaryLoading(false);
     }
   };
 
   const handleTertiarySelect = (tert) => {
     setActiveTertiarySub(tert.name);
-    onNavSelect(selectedCategory.id, tert.name);
+    onNavSelect(selectedCategory.id, selectedCategory.name, tert.name, tert.id, true);
   };
 
   return (
-    <div 
-      className="category-rail-container" 
+    <div
+      className="category-rail-container"
       ref={railContainerRef}
       onMouseMove={handleMouseMove}
       style={{
@@ -204,25 +204,25 @@ const CategoryRail = ({ onNavSelect }) => {
       <div className="category-radium-glow"></div>
       <div className="category-rail-content">
         <div className="category-rail-header">
-            <div className="category-rail-title">
-              <LayoutGrid className="rail-icon" size={18} />
-              <span>{selectedCategory ? `Browsing ${selectedCategory.name}` : 'Explore Categories'}</span>
-            </div>
-           {selectedCategory && (
-             <motion.button 
-               initial={{ opacity: 0, x: 20 }}
-               animate={{ opacity: 1, x: 0 }}
-               className="clear-category-btn-elite"
-               onClick={handleBackToCategories}
-             >
-               <ChevronLeft size={16} /> Back to Top Categories
-             </motion.button>
-           )}
+          <div className="category-rail-title">
+            <LayoutGrid className="rail-icon" size={18} />
+            <span>{selectedCategory ? `Browsing ${selectedCategory.name}` : 'Explore Categories'}</span>
+          </div>
+          {selectedCategory && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="clear-category-btn-elite"
+              onClick={handleBackToCategories}
+            >
+              <ChevronLeft size={16} /> Back to Top Categories
+            </motion.button>
+          )}
         </div>
 
         <AnimatePresence mode="wait">
           {!selectedCategory ? (
-            <motion.div 
+            <motion.div
               key="l0-rail"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -256,8 +256,8 @@ const CategoryRail = ({ onNavSelect }) => {
                       <CategoryItemImage src={cat.displayImage} name={cat.name} />
                       <div className="sector-glass-overlay"></div>
                       {selectedCategory?.id === cat.id && (
-                        <motion.div 
-                          layoutId="sector-active-glow" 
+                        <motion.div
+                          layoutId="sector-active-glow"
                           className="sector-active-indicator"
                         />
                       )}
@@ -289,7 +289,7 @@ const CategoryRail = ({ onNavSelect }) => {
 
         <AnimatePresence>
           {selectedCategory && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
@@ -300,66 +300,66 @@ const CategoryRail = ({ onNavSelect }) => {
                 <h3 className="sub-rail-title-premium">Popular in {selectedCategory.name}</h3>
               </div>
 
-               <div className="sub-rail-viewport-luxury">
-                  <AnimatePresence>
-                    {canSubScrollLeft && (
-                      <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury left" onClick={() => subScroll('left')}><ChevronLeft size={20} /></motion.button>
-                    )}
-                  </AnimatePresence>
+              <div className="sub-rail-viewport-luxury">
+                <AnimatePresence>
+                  {canSubScrollLeft && (
+                    <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury left" onClick={() => subScroll('left')}><ChevronLeft size={20} /></motion.button>
+                  )}
+                </AnimatePresence>
 
-                  <div className="sub-scroll-container-premium no-scrollbar" ref={subScrollRef} onScroll={checkScrollButtons}>
-                    {loading ? (
-                      <div className="loading-pulse-container"><div className="pulse-dot"></div><div className="pulse-dot"></div><div className="pulse-dot"></div></div>
-                    ) : (subCategories?.length || 0) > 0 ? (
-                        subCategories.map((sub, idx) => (
-                          <motion.div
-                            key={sub.name}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: idx * 0.04, type: "spring", damping: 15 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`subcategory-royal-card ${activeSub === sub.name ? 'active' : ''}`}
-                            onClick={() => handleSubSelect(sub)}
-                          >
-                            <div className="sector-shimmer-sweep"></div>
-                            <div className="sector-visual-wrap">
-                               <CategoryItemImage src={sub.image || sub.displayImage} name={sub.name} />
-                               <div className="sector-glass-overlay"></div>
-                               {activeSub === sub.name && (
-                                 <motion.div layoutId="royalActiveRing" className="sector-active-indicator" />
-                               )}
-                            </div>
-                            <div className="sector-info-luxe"><span className="sector-name-luxe">{sub.name}</span></div>
-                            <div className="sector-scanner-line"></div>
-                          </motion.div>
-                        ))
-                    ) : (
-                      <div className="no-sub-categories-message-premium">
-                        <div className="empty-section-icon-wrap">
-                          <Layers size={24} className="empty-section-icon" />
-                          <div className="icon-radium-glow"></div>
+                <div className="sub-scroll-container-premium no-scrollbar" ref={subScrollRef} onScroll={checkScrollButtons}>
+                  {loading ? (
+                    <div className="loading-pulse-container"><div className="pulse-dot"></div><div className="pulse-dot"></div><div className="pulse-dot"></div></div>
+                  ) : (subCategories?.length || 0) > 0 ? (
+                    subCategories.map((sub, idx) => (
+                      <motion.div
+                        key={sub.name}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.04, type: "spring", damping: 15 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`subcategory-royal-card ${activeSub === sub.name ? 'active' : ''}`}
+                        onClick={() => handleSubSelect(sub)}
+                      >
+                        <div className="sector-shimmer-sweep"></div>
+                        <div className="sector-visual-wrap">
+                          <CategoryItemImage src={sub.image || sub.displayImage} name={sub.name} />
+                          <div className="sector-glass-overlay"></div>
+                          {activeSub === sub.name && (
+                            <motion.div layoutId="royalActiveRing" className="sector-active-indicator" />
+                          )}
                         </div>
-                        <div className="empty-message-stack">
-                          <h4 className="empty-message-title">Elite Sector Discovery</h4>
-                          <p className="empty-message-subtitle">Our curators are currently assembling the premier collection for <strong>{selectedCategory.name}</strong>. Experience this curated journey soon.</p>
-                        </div>
+                        <div className="sector-info-luxe"><span className="sector-name-luxe">{sub.name}</span></div>
+                        <div className="sector-scanner-line"></div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="no-sub-categories-message-premium">
+                      <div className="empty-section-icon-wrap">
+                        <Layers size={24} className="empty-section-icon" />
+                        <div className="icon-radium-glow"></div>
                       </div>
-                    )}
-                  </div>
+                      <div className="empty-message-stack">
+                        <h4 className="empty-message-title">Elite Sector Discovery</h4>
+                        <p className="empty-message-subtitle">Our curators are currently assembling the premier collection for <strong>{selectedCategory.name}</strong>. Experience this curated journey soon.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  <AnimatePresence>
-                    {canSubScrollRight && (
-                      <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury right" onClick={() => subScroll('right')}><ChevronRight size={20} /></motion.button>
-                    )}
-                  </AnimatePresence>
-               </div>
+                <AnimatePresence>
+                  {canSubScrollRight && (
+                    <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury right" onClick={() => subScroll('right')}><ChevronRight size={20} /></motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         <AnimatePresence>
           {activeSub && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.98, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: -20 }}
@@ -370,57 +370,57 @@ const CategoryRail = ({ onNavSelect }) => {
                 <h4 className="sub-rail-title-premium">Refine within {activeSub}</h4>
               </div>
 
-               <div className="sub-rail-viewport-luxury">
-                  <AnimatePresence>
-                    {canTertiaryScrollLeft && (
-                      <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury left" onClick={() => tertiaryScroll('left')}><ChevronLeft size={20} /></motion.button>
-                    )}
-                  </AnimatePresence>
+              <div className="sub-rail-viewport-luxury">
+                <AnimatePresence>
+                  {canTertiaryScrollLeft && (
+                    <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury left" onClick={() => tertiaryScroll('left')}><ChevronLeft size={20} /></motion.button>
+                  )}
+                </AnimatePresence>
 
-                  <div className="sub-scroll-container-premium no-scrollbar" ref={tertiaryScrollRef} onScroll={checkScrollButtons}>
-                    {tertiaryLoading ? (
-                      <div className="loading-pulse-container"><div className="pulse-dot"></div><div className="pulse-dot"></div><div className="pulse-dot"></div></div>
-                    ) : (tertiarySubCategories?.length || 0) > 0 ? (
-                      tertiarySubCategories.map((tert, idx) => (
-                        <motion.div
-                          key={tert.name}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className={`subcategory-royal-card tertiary ${activeTertiarySub === tert.name ? 'active' : ''}`}
-                          onClick={() => handleTertiarySelect(tert)}
-                        >
-                          <div className="sector-shimmer-sweep"></div>
-                          <div className="sector-visual-wrap tertiary">
-                             <CategoryItemImage src={tert.image || tert.displayImage} name={tert.name} />
-                             <div className="sector-glass-overlay"></div>
-                             {activeTertiarySub === tert.name && (
-                               <motion.div layoutId="tertActive" className="sector-active-indicator" />
-                             )}
-                          </div>
-                          <div className="sector-info-luxe"><span className="sector-name-luxe tertiary">{tert.name}</span></div>
-                          <div className="sector-scanner-line tertiary"></div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="no-sub-categories-message-premium tertiary">
-                        <div className="empty-section-icon-wrap">
-                          <LayoutGrid size={24} className="empty-section-icon" />
-                          <div className="icon-radium-glow"></div>
+                <div className="sub-scroll-container-premium no-scrollbar" ref={tertiaryScrollRef} onScroll={checkScrollButtons}>
+                  {tertiaryLoading ? (
+                    <div className="loading-pulse-container"><div className="pulse-dot"></div><div className="pulse-dot"></div><div className="pulse-dot"></div></div>
+                  ) : (tertiarySubCategories?.length || 0) > 0 ? (
+                    tertiarySubCategories.map((tert, idx) => (
+                      <motion.div
+                        key={tert.name}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`subcategory-royal-card tertiary ${activeTertiarySub === tert.name ? 'active' : ''}`}
+                        onClick={() => handleTertiarySelect(tert)}
+                      >
+                        <div className="sector-shimmer-sweep"></div>
+                        <div className="sector-visual-wrap tertiary">
+                          <CategoryItemImage src={tert.image || tert.displayImage} name={tert.name} />
+                          <div className="sector-glass-overlay"></div>
+                          {activeTertiarySub === tert.name && (
+                            <motion.div layoutId="tertActive" className="sector-active-indicator" />
+                          )}
                         </div>
-                        <div className="empty-message-stack">
-                          <h4 className="empty-message-title">Refinement in Progress</h4>
-                          <p className="empty-message-subtitle">Curators are currently selecting specific refinements for <strong>{activeSub}</strong>. Check back soon for the full collection.</p>
-                        </div>
+                        <div className="sector-info-luxe"><span className="sector-name-luxe tertiary">{tert.name}</span></div>
+                        <div className="sector-scanner-line tertiary"></div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="no-sub-categories-message-premium tertiary">
+                      <div className="empty-section-icon-wrap">
+                        <LayoutGrid size={24} className="empty-section-icon" />
+                        <div className="icon-radium-glow"></div>
                       </div>
-                    )}
-                  </div>
+                      <div className="empty-message-stack">
+                        <h4 className="empty-message-title">Refinement in Progress</h4>
+                        <p className="empty-message-subtitle">Curators are currently selecting specific refinements for <strong>{activeSub}</strong>. Check back soon for the full collection.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  <AnimatePresence>
-                    {canTertiaryScrollRight && (
-                      <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury right" onClick={() => tertiaryScroll('right')}><ChevronRight size={20} /></motion.button>
-                    )}
-                  </AnimatePresence>
-               </div>
+                <AnimatePresence>
+                  {canTertiaryScrollRight && (
+                    <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="sub-scroll-arrow-luxury right" onClick={() => tertiaryScroll('right')}><ChevronRight size={20} /></motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -432,9 +432,9 @@ const CategoryRail = ({ onNavSelect }) => {
 const CategoryItemImage = ({ src: rawPath, name }) => {
   const { src } = useSmartImage(rawPath);
   return (
-    <img 
-      src={src} 
-      alt={name} 
+    <img
+      src={src}
+      alt={name}
       className="category-img-element"
       onError={(e) => {
         if (!e.target.src.includes('placehold.co')) {

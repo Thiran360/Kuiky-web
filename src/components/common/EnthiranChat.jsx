@@ -8,7 +8,8 @@ import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useOrder } from "../../context/OrderContext";
 
-const ENTHIRAN_AVATAR = "/enthiran_final_robot.jpg";
+// 🤖 USER REQUESTED CONCIERGE LOGO
+const ENTHIRAN_AVATAR = "/enthiran_concierge_master.png";
 
 const EnthiranChat = () => {
     const navigate = useNavigate();
@@ -29,7 +30,6 @@ const EnthiranChat = () => {
     const cartItemCount = cartCtx?.cartItemCount || 0;
     const wishlistItems = wishlistCtx?.wishlist || [];
     const orderItems = orderCtx?.orders || [];
-    const userName = user?.name || "Biological Entity";
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -52,7 +52,14 @@ const EnthiranChat = () => {
     const handleCommand = (commandText) => {
         if (!commandText || isThinking) return;
         const processedCommand = commandText.trim();
-        setMessages(prev => [...prev, { id: Date.now(), type: "user", text: processedCommand }]);
+        
+        // Add user message if it's not already in the stream (to avoid duplicates for input sends)
+        setMessages(prev => {
+            const lastMsg = prev[prev.length - 1];
+            if (lastMsg && lastMsg.text === processedCommand && lastMsg.type === 'user') return prev;
+            return [...prev, { id: Date.now(), type: "user", text: processedCommand }];
+        });
+
         setIsThinking(true);
         
         // --- ⚡ LIGHT-SPEED EXECUTION ---
@@ -75,25 +82,30 @@ const EnthiranChat = () => {
             } else if (lowInput.includes("home")) {
                 botResponse = "Returning to Primary Hub. Scanning arrivals.";
                 navigate("/");
+            } else if (lowInput.includes("hello") || lowInput.includes("hi")) {
+                botResponse = `Greetings. My neural processors are operating at peak efficiency. How may I serve you?`;
             } else {
-                botResponse = "Understood. I'm prioritizing your request in the luxury stream.";
+                botResponse = "Analysis complete. I've noted your inquiry and am optimizing the shopping stream accordingly.";
             }
             
             setMessages(prev => [...prev, { id: Date.now() + 1, type: "bot", text: botResponse }]);
             setIsThinking(false);
-        }, 300); // ⭐️ Reduced delay for instant feedback
+        }, 800); 
     };
 
     const handleSend = (e) => {
         if (e) e.preventDefault();
-        if (!input.trim()) return;
-        handleCommand(input);
+        if (!input.trim() || isThinking) return;
+        
+        const userInput = input.trim();
+        setMessages(prev => [...prev, { id: Date.now(), type: "user", text: userInput }]);
         setInput("");
+        handleCommand(userInput);
     };
 
     return (
         <div className="enthiran-root">
-            {/* 🤖 TRIGGER - PRECISION CENTERED */}
+            {/* 🤖 TRIGGER BUBBLE */}
             <motion.div 
                 className="enthiran-trigger-group"
                 style={{ 
@@ -123,19 +135,22 @@ const EnthiranChat = () => {
                         exit={{ opacity: 0, scale: 0.95, y: 50, filter: "blur(10px)" }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     >
-                        {/* HEADER - CYBER GLASS STYLE */}
+                        {/* HEADER - OBSIDIAN GOLD PROTOCOL */}
                         <div className="win-header-luxe">
                             <div className="flex items-center gap-4">
                                 <div className="avatar-shield-outer">
                                     <div className="avatar-shield-inner">
-                                        <Bot size={22} className="text-cyan-400" />
+                                        <div className="avatar-ai-core">
+                                            <Zap size={18} fill="currentColor" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="title-stack">
-                                    <span className="name-elite">ENTHIRAN ELITE</span>
+                                    <span className="name-elite">ENTHIRAN ELITE AI</span>
                                     <div className="status-badge-premium">
-                                        <span className="pulse-dot-cyan"></span>
-                                        SECURE PROTOCOL ACTIVE
+                                        <div className="secure-scan-line"></div>
+                                        <span className="pulse-dot-gold"></span>
+                                        PROTOCOL: SECURED ACQUISITION
                                     </div>
                                 </div>
                             </div>
@@ -167,56 +182,55 @@ const EnthiranChat = () => {
                                     </div>
                                 </motion.div>
                             ))}
-                                           <div className="command-selector-luxe">
-                                <div className="grid grid-cols-1 gap-4 mt-6">
-                                    <button onClick={() => handleCommand("Open Cart")} className="option-btn-luxe group">
-                                        <div className="btn-icon-luxe"><ShoppingBag size={20} /></div>
-                                        <div className="btn-text-content">
-                                            <span className="btn-main-text">Curated Shopping Bag</span>
-                                            <span className="btn-sub-text">{cartItemCount} boutique items preserved</span>
-                                        </div>
-                                    </button>
-                                    <button onClick={() => handleCommand("Open Wishlist")} className="option-btn-luxe group">
-                                        <div className="btn-icon-luxe text-pink-500"><Heart size={20} /></div>
-                                        <div className="btn-text-content">
-                                            <span className="btn-main-text">Desires Log</span>
-                                            <span className="btn-sub-text">{wishlistItems?.length || 0} elite candidates</span>
-                                        </div>
-                                    </button>
-                                    <button onClick={() => handleCommand("Open Orders")} className="option-btn-luxe group">
-                                        <div className="btn-icon-luxe text-blue-500"><Package size={20} /></div>
-                                        <div className="btn-text-content">
-                                            <span className="btn-main-text">Logistics Hub</span>
-                                            <span className="btn-sub-text">Tracking {orderItems?.length || 0} active transits</span>
-                                        </div>
-                                    </button>
-                                    <button onClick={() => handleCommand("Go To Profile")} className="option-btn-luxe group">
-                                        <div className="btn-icon-luxe text-cyan-500"><UserCircle size={20} /></div>
-                                        <div className="btn-text-content">
-                                            <span className="btn-main-text">Identity Module</span>
-                                            <span className="btn-sub-text">Modify bio-data & encryption</span>
-                                        </div>
-                                    </button>
-                                    <button onClick={() => handleCommand("Return Home")} className="option-btn-luxe group">
-                                        <div className="btn-icon-luxe text-green-500"><Home size={20} /></div>
-                                        <div className="btn-text-content">
-                                            <span className="btn-main-text">Primary Hub</span>
-                                            <span className="btn-sub-text">Back to arrivals & curation</span>
-                                        </div>
-                                    </button>
-                                </div>
+
+                            <div className="option-grid-compact">
+                                <button onClick={() => handleCommand("Open Cart")} className="option-pill-luxe">
+                                    <ShoppingBag size={18} /> <span>COMMERCE PORTAL</span>
+                                </button>
+                                <button onClick={() => handleCommand("Open Wishlist")} className="option-pill-luxe">
+                                    <Heart size={18} /> <span>DESIRES LOG</span>
+                                </button>
+                                <button onClick={() => handleCommand("Open Orders")} className="option-pill-luxe">
+                                    <Package size={18} /> <span>LOGISTICS HUB</span>
+                                </button>
+                                <button onClick={() => handleCommand("Go To Profile")} className="option-pill-luxe">
+                                    <UserCircle size={18} /> <span>IDENTITY MODULE</span>
+                                </button>
+                                <button onClick={() => handleCommand("Return Home")} className="option-pill-luxe">
+                                    <Home size={18} /> <span>PRIMARY HUB</span>
+                                </button>
                             </div>
 
                             {isThinking && (
-                                <div className="msg-row-luxe bot">
-                                    <div className="msg-bubble-luxe thinking-luxe shadow-glow">
-                                        <Sparkles size={14} className="animate-spin text-cyan-400" />
-                                        <span>Executing elite sequence...</span>
+                                <div className="msg-row-luxe bot mt-4">
+                                    <div className="msg-bubble-luxe thinking-luxe shadow-glow-gold">
+                                        <Loader2 size={14} className="animate-spin text-yellow-400" />
+                                        <span>OPTIMIZING BIO-STREAM...</span>
                                     </div>
                                 </div>
                             )}
                         </div>
-      
+
+                        {/* ⌨️ INTERACTIVE CONSOLE - OBSIDIAN GRADE */}
+                        <div className="win-footer-luxe">
+                            <form onSubmit={handleSend} className="chat-input-wrapper-elite">
+                                <input 
+                                    type="text" 
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder="Type your elite inquiry..." 
+                                    className="elite-input-field"
+                                    disabled={isThinking}
+                                />
+                                <button 
+                                    type="submit" 
+                                    className="elite-send-btn"
+                                    disabled={!input.trim() || isThinking}
+                                >
+                                    {isThinking ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                </button>
+                            </form>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

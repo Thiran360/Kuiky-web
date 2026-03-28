@@ -44,16 +44,57 @@
 }
 
 /* BASE LAYOUT */
+html, body, #root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+main {
+    padding-top: 135px;
+}
+
+@media (max-width: 1024px) {
+    main { padding-top: 150px; }
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .landing-container {
-  background-color: transparent; /* RADIANT SURFACING SCALING */
+  background-color: transparent;
   min-height: 100vh;
   font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .landing-container { padding-top: 0; }
 }
 
 .page-content {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 2rem 2rem 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1.5rem 1rem; /* Further reduced */
+    width: 100%;
+    overflow-x: hidden;
+  }
 }
 
 /* 🏔 PREMIUM SECTION HEADER */
@@ -139,8 +180,9 @@
 
 @media (max-width: 600px) {
   .prem-product-grid {
-    grid-template-columns: 1fr; /* Single column for high-fidelity focus */
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr); /* Dual column for Amazon-like discovery */
+    gap: 1.25rem;
+    padding: 0 0.5rem;
   }
 }
 
