@@ -192,8 +192,15 @@ const FOOTER_DATA = {
 };
 
 const Footer = () => {
-  // All sections open by default — toggling one doesn't close others
-  const [openSections, setOpenSections] = useState({ about: true, help: true, policy: true });
+  // 💎 INTELLIGENT VIEWPORT SYNC: Collapse sections on mobile to prevent "Infinite Scroll"
+  const isMobileInitial = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const [openSections, setOpenSections] = useState({ 
+    about: !isMobileInitial, 
+    help: !isMobileInitial, 
+    policy: !isMobileInitial,
+    mail: !isMobileInitial,
+    office: !isMobileInitial
+  });
   const [activeDetail, setActiveDetail] = useState(null);
 
   const toggleSection = (id) => setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
@@ -236,41 +243,71 @@ const Footer = () => {
           />
 
           {/* 4. MAIL US */}
-          <div className="footer-section-flat">
-            <h4 className="section-title static">MAIL US</h4>
-            <div className="contact-details">
-              <p>Thiran360AI Private Limited,</p>
-              <p>Kullampalayam, CFX3+8J,</p>
-              <p>Gobichettipalayam, TN 638476, India</p>
-              <div className="social-mini-row">
-                <span className="social-label">SOCIAL</span>
-                <div className="social-icons-wrap">
-                  {FOOTER_DATA.socials.map((soc, i) => (
-                    <motion.a 
-                      key={i}
-                      whileHover={{ y: -4, color: soc.color, scale: 1.1 }}
-                      href={soc.href} 
-                      className="social-icon-btn"
-                    >
-                      <soc.icon size={18} />
-                    </motion.a>
-                  ))}
-                </div>
+          <div className={`footer-section-flat ${openSections.mail ? 'is-open' : ''}`}>
+            <button className="section-title-btn" onClick={() => toggleSection('mail')}>
+              <span>MAIL US</span>
+              <div className="title-icon-wrap mobile-only">
+                {openSections.mail ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </div>
-            </div>
+            </button>
+            <AnimatePresence initial={false}>
+              {openSections.mail && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }} 
+                  animate={{ height: "auto", opacity: 1 }} 
+                  exit={{ height: 0, opacity: 0 }} 
+                  className="contact-details"
+                  style={{ overflow: "hidden" }}
+                >
+                  <p>Thiran360AI Private Limited,</p>
+                  <p>Kullampalayam, CFX3+8J,</p>
+                  <p>Gobichettipalayam, TN 638476, India</p>
+                  <div className="social-mini-row">
+                    <span className="social-label">SOCIAL</span>
+                    <div className="social-icons-wrap">
+                      {FOOTER_DATA.socials.map((soc, i) => (
+                        <motion.a 
+                          key={i}
+                          whileHover={{ y: -4, color: soc.color, scale: 1.1 }}
+                          href={soc.href} 
+                          className="social-icon-btn"
+                        >
+                          <soc.icon size={18} />
+                        </motion.a>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* 5. REGISTERED OFFICE */}
-          <div className="footer-section-flat">
-            <h4 className="section-title static">REGISTERED OFFICE</h4>
-            <div className="contact-details">
-              <p>Thiran360AI Private Limited,</p>
-              <p>Madivala, Bengaluru – 560103</p>
-              <p className="phone-line">
-                <Phone size={14} /> 
-                <span>77088-05630</span>
-              </p>
-            </div>
+          <div className={`footer-section-flat ${openSections.office ? 'is-open' : ''}`}>
+            <button className="section-title-btn" onClick={() => toggleSection('office')}>
+              <span>REGISTERED OFFICE</span>
+              <div className="title-icon-wrap mobile-only">
+                {openSections.office ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+            </button>
+            <AnimatePresence initial={false}>
+              {openSections.office && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }} 
+                  animate={{ height: "auto", opacity: 1 }} 
+                  exit={{ height: 0, opacity: 0 }} 
+                  className="contact-details"
+                  style={{ overflow: "hidden" }}
+                >
+                  <p>Thiran360AI Private Limited,</p>
+                  <p>Madivala, Bengaluru – 560103</p>
+                  <p className="phone-line">
+                    <Phone size={14} /> 
+                    <span>77088-05630</span>
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -351,7 +388,7 @@ const FooterSection = ({ section, isOpen, onToggle, onLinkClick }) => (
   <div className={`footer-section-flat ${isOpen ? 'is-open' : ''}`}>
     <button className="section-title-btn" onClick={onToggle}>
       <span>{section.title}</span>
-      <div className="title-icon-wrap">
+      <div className="title-icon-wrap mobile-only">
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </div>
     </button>

@@ -1,530 +1,203 @@
 /* src/components/home/HeroBanner.css */
-/* ✨ LUXURY ADVERTISEMENT BANNER */
+/* 🎭 LUXE VANGUARD — SUPREME DISCOVERY BANNER HUB */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&display=swap');
 
-/* ============================================
-   VIEWPORT
-   ============================================ */
-.hb-viewport {
-    position: relative;
+:root {
+    --bn-navy: #0a0e1a;
+    --bn-gold: #fbbf24;
+    --bn-gold-glow: rgba(251, 191, 36, 0.4);
+    --bn-glass: rgba(255, 255, 255, 0.03);
+    --bn-border: rgba(255, 255, 255, 0.08);
+}
+
+.hb-prime-wrapper {
     width: 100%;
-    height: 440px;
-    /* Shortened for a sleeker, tighter view */
-    background: #060a14;
+    padding: 2rem 0 6rem; /* SPACIOUS BOTTOM FOR NAV BAR */
     overflow: hidden;
-    user-select: none;
+    background: transparent;
     font-family: 'Outfit', sans-serif;
-    margin-bottom: 0.5rem;
-    /* Tighter integration */
 }
 
-.hb-slide {
-    position: absolute;
-    inset: 0;
+.hb-stage-luxe {
+    max-width: 1400px; /* INCREASED WIDTH FOR CINEMATIC FEEL */
+    margin: 0 auto;
+    height: 420px; /* REDUCED LENGTH (HEIGHT) */
+    position: relative;
+    padding: 0 80px; /* TIGHTER PADDING TO EXTEND WIDER */
 }
 
-/* ============================================
-   BLURRED BACKDROP
-   ============================================ */
-.hb-backdrop-engine {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
-.hb-backdrop-img {
-    position: absolute;
-    inset: -30px;
-    background-size: cover;
-    background-position: center;
-    filter: blur(60px) brightness(0.35) saturate(1.6);
-    transform: scale(1.15);
-}
-
-.hb-backdrop-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(135deg, rgba(6, 10, 20, 0.95) 0%, rgba(6, 10, 20, 0.5) 50%, rgba(6, 10, 20, 0.85) 100%),
-        radial-gradient(ellipse at 80% 50%, rgba(250, 204, 21, 0.06) 0%, transparent 60%);
-}
-
-/* ============================================
-   CONTENT LAYOUT
-   ============================================ */
-.hb-content {
+/* --- THE VANGUARD VAULT --- */
+.hb-active-vanguard {
+    width: 100%;
+    height: 100%;
     position: relative;
     z-index: 10;
-    max-width: 1400px;
-    margin: 0 auto;
-    height: 100%;
-    padding: 0 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4rem;
 }
 
-/* ============================================
-   TEXT SIDE
-   ============================================ */
-.hb-text-side {
-    max-width: 620px;
-    flex-shrink: 0;
-}
-
-/* OFFER TAG */
-.hb-tag-line {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(250, 204, 21, 0.03));
-    color: var(--primary-brand);
-    padding: 0.55rem 1.25rem;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 2.5px;
-    border: 1px solid rgba(250, 204, 21, 0.15);
-    margin-bottom: 1.75rem;
-    text-transform: uppercase;
-}
-
-.hb-tag-line svg {
-    animation: hb-sparkle 2.5s infinite ease-in-out;
-}
-
-@keyframes hb-sparkle {
-
-    0%,
-    100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 0.6;
-    }
-
-    50% {
-        transform: scale(1.2) rotate(10deg);
-        opacity: 1;
-    }
-}
-
-/* HEADLINE */
-.hb-headline {
-    font-size: 3.1rem;
-    /* Scaled down for compact height */
-    font-weight: 950;
-    line-height: 1.1;
-    color: #ffffff;
-    margin: 0 0 1rem;
-    letter-spacing: -1.5px;
-    text-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
-}
-
-/* DESCRIPTION */
-.hb-description {
-    font-size: 1rem;
-    color: #b8c5d6;
-    line-height: 1.6;
-    font-weight: 500;
-    margin-bottom: 2rem;
-    max-width: 440px;
-}
-
-/* ============================================
-   CTA SECTION
-   ============================================ */
-.hb-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-/* SHOP NOW BUTTON */
-.hb-shop-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.85rem;
-    background: var(--primary-brand);
-    color: #000;
-    padding: 0.9rem 2rem;
-    border-radius: 100px;
-    border: none;
-    font-size: 0.95rem;
-    font-weight: 950;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow:
-        0 15px 40px rgba(250, 204, 21, 0.2),
-        0 0 0 1px rgba(250, 204, 21, 0.1);
-    width: fit-content;
-    letter-spacing: 0.5px;
-    position: relative;
-    overflow: hidden;
-}
-
-.hb-shop-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.6s;
-}
-
-.hb-shop-btn:hover::before {
-    transform: translateX(100%);
-}
-
-.hb-shop-btn:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow:
-        0 25px 60px rgba(250, 204, 21, 0.3),
-        0 0 0 1px rgba(250, 204, 21, 0.2);
-}
-
-.hb-shop-btn span,
-.hb-shop-btn svg {
-    position: relative;
-    z-index: 2;
-}
-
-.hb-btn-arrow {
-    transition: transform 0.3s;
-}
-
-.hb-shop-btn:hover .hb-btn-arrow {
-    transform: translateX(5px);
-}
-
-/* STATS ROW */
-.hb-stats-row {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.hb-stat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #7e8ea3;
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 0.4rem 0.85rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 50px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* ============================================
-   IMAGE SIDE
-   ============================================ */
-.hb-image-side {
-    position: relative;
-    width: 420px;
-    height: 340px;
-    /* Proportional reduction */
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.hb-product-img {
+.hb-vanguard-inner {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    background: #0f172a;
     border-radius: 2.5rem;
-    border: 1.5px solid rgba(255, 255, 255, 0.08);
-    box-shadow:
-        0 30px 80px rgba(0, 0, 0, 0.7),
-        0 0 60px rgba(250, 204, 21, 0.05);
-    transform: rotate(-2deg);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 5;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--bn-border);
 }
 
-.hb-image-side:hover .hb-product-img {
-    transform: rotate(0deg) scale(1.04);
-    box-shadow:
-        0 40px 100px rgba(0, 0, 0, 0.8),
-        0 0 80px rgba(250, 204, 21, 0.08);
+.hb-vanguard-content {
+    display: flex; height: 100%; width: 100%;
+    position: relative; z-index: 10;
 }
 
-.hb-image-glow {
+/* TEXT AREA */
+.hb-text-vanguard {
+    flex: 1.25;
+    padding: 4rem 5rem;
+    display: flex; flex-direction: column; justify-content: center; gap: 1.25rem;
+}
+
+.hb-promo-pill {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    color: #000; padding: 7px 16px; border-radius: 100px;
+    width: fit-content; font-size: 0.7rem; font-weight: 1000;
+    letter-spacing: 1.5px; display: flex; align-items: center; gap: 8px;
+    text-transform: uppercase;
+}
+
+.hb-headline-vanguard {
+    font-size: 4.5rem; font-weight: 1000; color: #fff;
+    line-height: 0.9; letter-spacing: -3.5px; margin: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hb-summary-vanguard {
+    font-size: 1.15rem; color: rgba(255, 255, 255, 0.6);
+    max-width: 480px; line-height: 1.5; margin: 0;
+}
+
+.hb-vanguard-actions { display: flex; align-items: center; gap: 2.5rem; margin-top: 1.5rem; }
+
+.hb-btn-discovery {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #000; border: none; padding: 1.35rem 3rem; border-radius: 100px;
+    font-weight: 950; font-size: 1rem; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: 0.4s;
+}
+
+.hb-btn-discovery:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(251, 191, 36, 0.3); }
+
+.hb-vanguard-stats { display: flex; gap: 1.5rem; }
+.stat-node { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; font-weight: 900; color: #94a3b8; }
+
+/* VISUAL AREA */
+.hb-visual-vanguard { flex: 0.8; position: relative; display: flex; align-items: center; justify-content: center; padding-right: 4rem; }
+.hb-image-hub-luxe { width: 380px; height: 380px; position: relative; z-index: 10; }
+.hb-product-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.3)); }
+.vanguard-orb { position: absolute; width: 140%; height: 140%; background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 65%); z-index: 1; }
+
+/* --- EDGE PEEKS --- */
+.hb-edge-peek { position: absolute; top: 3.5rem; bottom: 3.5rem; width: 320px; z-index: 5; opacity: 0.2; transition: 0.5s; cursor: pointer; }
+.hb-edge-peek:hover { opacity: 0.4; }
+.hb-edge-peek.left { left: -260px; }
+.hb-edge-peek.right { right: -260px; }
+.edge-glass { width: 100%; height: 100%; border-radius: 2.5rem; overflow: hidden; background: rgba(255,255,255,0.05); border: 1px solid var(--bn-border); backdrop-filter: blur(10px); }
+
+/* --- VANGUARD CENTRAL NAV BAR (UNDER) --- */
+.hb-vanguard-pagination-bar {
     position: absolute;
-    inset: -80px;
-    background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, transparent 55%);
-    z-index: 1;
-    filter: blur(60px);
-    animation: hb-glow-breathe 5s infinite ease-in-out;
-}
-
-@keyframes hb-glow-breathe {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-
-    50% {
-        transform: scale(1.15);
-        opacity: 0.5;
-    }
-}
-
-/* ============================================
-   NAVIGATION ARROWS
-   ============================================ */
-/* 🏹 THE EXTRA-LARGE IMPERIAL NEXUS — MAXIMUM VISIBILITY */
-.hb-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 100;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-brand) 0%, #eab308 100%);
-    border: 5px solid #000;
-    /* High Contrast Architectural Rim */
-    color: #000;
+    bottom: -60px; /* POSITIONED CENTER UNDER */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--bn-border);
+    padding: 8px 15px;
+    border-radius: 100px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 0 50px rgba(250, 204, 21, 0.5),
-        0 25px 60px rgba(0, 0, 0, 0.7);
-    overflow: hidden;
+    gap: 20px;
+    z-index: 100;
 }
 
-.hb-arrow.left {
-    left: 3.5rem;
-}
-
-.hb-arrow.right {
-    right: 3.5rem;
-}
-
-/* 💎 THE GLASS LENS REFLECTION */
-.hb-arrow::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    transform: skewX(-25deg);
-    transition: left 0.6s;
-}
-
-.hb-arrow:hover::before {
-    left: 100%;
-}
-
-.hb-arrow:hover {
-    transform: translateY(-50%) scale(1.2);
-    background: #ffffff;
-    /* Total contrast switch */
-    box-shadow: 0 0 80px rgba(250, 204, 21, 0.7);
-    border-color: #000;
-}
-
-.hb-arrow svg {
-    stroke-width: 4;
-    /* Thicker Icon */
-    animation: hb-pointing-pulse 1.2s infinite ease-in-out;
-}
-
-@keyframes hb-pointing-pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    50% {
-        transform: scale(1.3);
-        opacity: 1;
-    }
-}
-
-/* 🌀 EXTRA-INTENSE CELESTIAL RADIUM HUB GLOW */
-.hb-arrow::after {
-    content: '';
-    position: absolute;
-    inset: -20px;
-    border: 5px solid var(--primary-brand);
-    border-radius: 50%;
-    animation: hb-nexus-pulse 2s infinite;
-    z-index: -1;
-    pointer-events: none;
-}
-
-@keyframes hb-nexus-pulse {
-    0% {
-        transform: scale(0.85);
-        opacity: 0.9;
-    }
-
-    100% {
-        transform: scale(1.8);
-        opacity: 0;
-    }
-}
-
-/* ============================================
-   PROGRESS DOTS
-   ============================================ */
-.hb-progress {
-    position: absolute;
-    bottom: 2.25rem;
-    left: 5rem;
-    display: flex;
-    gap: 1rem;
-    z-index: 25;
-}
-
-.hb-dot {
-    padding: 0;
+.hb-nav-arrow {
     background: transparent;
     border: none;
+    color: var(--bn-gold);
     cursor: pointer;
-    width: 48px;
-    height: 4px;
-    border-radius: 2px;
-    overflow: hidden;
+    transition: 0.3s;
+    display: flex;
+    align-items: center; justify-content: center;
 }
+.hb-nav-arrow:hover { transform: scale(1.2); filter: drop-shadow(0 0 5px var(--bn-gold)); }
 
-.hb-dot-fill {
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    position: relative;
-    overflow: hidden;
+.hb-pag-dots { display: flex; gap: 8px; }
+.hb-pag-orb {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: none; cursor: pointer; transition: 0.4s;
 }
+.hb-pag-orb.active { width: 30px; border-radius: 100px; background: var(--bn-gold); }
 
-.hb-dot.active .hb-dot-fill {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.hb-dot.active .hb-dot-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: var(--primary-brand);
-    border-radius: 2px;
-    animation: hb-progress-fill 7s linear forwards;
-}
-
-@keyframes hb-progress-fill {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
-}
-
-/* ============================================
-   SKELETON
-   ============================================ */
-.hb-skeleton {
-    width: 100%;
-    height: 580px;
-    background: #060a14;
-    position: relative;
-    overflow: hidden;
-}
-
-.hb-skeleton-shimmer {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
-    animation: hb-shimmer 2s infinite linear;
-}
-
-@keyframes hb-shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 1200px) {
-    .hb-image-side {
-        display: none;
-    }
-
-    .hb-text-side {
-        max-width: 100%;
-    }
-
-    .hb-content {
-        justify-content: flex-start;
-    }
-}
-
+/* MOBILE RESPONSIVE LUXE RESCUE */
 @media (max-width: 768px) {
-    .hb-viewport {
-        height: 500px;
+    .hb-prime-wrapper { padding: 1rem 0 3.5rem; }
+    .hb-stage-luxe { padding: 0 1rem; height: auto !important; }
+    .hb-active-vanguard { height: auto !important; min-height: 420px; }
+    .hb-vanguard-inner { border-radius: 1.5rem; }
+    .hb-vanguard-content { flex-direction: column; height: auto; }
+    
+    .hb-text-vanguard { 
+        padding: 2rem 1.25rem 3.5rem; 
+        text-align: center; 
+        align-items: center; 
+        order: 2; 
+        flex: none; 
+        gap: 1rem;
+    }
+    .hb-headline-vanguard { 
+        font-size: 2.15rem !important; 
+        letter-spacing: -1.5px; 
+        line-height: 1.15;
+    }
+    .hb-summary-vanguard { 
+        font-size: 0.95rem; 
+        opacity: 0.8; 
+        max-width: 100%; 
+    }
+    .hb-vanguard-actions {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+    .hb-btn-discovery { 
+        padding: 1rem 2rem; 
+        font-size: 0.95rem; 
+        width: 100%; 
+        max-width: 250px;
+        justify-content: center;
     }
 
-    .hb-content {
-        padding: 0 2rem;
+    .hb-visual-vanguard { 
+        order: 1; 
+        padding-right: 0; 
+        padding-top: 2rem;
+        height: auto;
+        min-height: 220px;
+        width: 100%; 
+        flex: none;
     }
-
-    .hb-headline {
-        font-size: 2.5rem;
-        letter-spacing: -1.5px;
-    }
-
-    .hb-description {
-        font-size: 1rem;
-    }
-
-    .hb-progress {
-        left: 2rem;
-    }
-
-    .hb-stats-row {
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    .hb-stat {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.6rem;
-    }
-
-    .hb-arrow {
-        width: 40px;
-        height: 40px;
-    }
-
-    .hb-arrow.left {
-        left: 0.75rem;
-    }
-
-    .hb-arrow.right {
-        right: 0.75rem;
+    .hb-image-hub-luxe { width: 190px; height: 190px; }
+    
+    .hb-vanguard-pagination-bar { 
+        bottom: -35px; 
+        padding: 6px 14px;
+        gap: 12px;
     }
 }
+
+/* BACKDROP */
+.hb-backdrop-engine { position: absolute; inset: 0; z-index: 1; }
+.hb-backdrop-img { width: 100%; height: 100%; background-size: cover; filter: blur(100px); opacity: 0.4; transform: scale(1.3); }
+.hb-backdrop-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.92) 100%); }

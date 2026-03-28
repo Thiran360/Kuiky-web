@@ -55,6 +55,14 @@
     padding: 0 4rem;
     position: relative;
     z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .page-content {
+        padding: 0 1.5rem;
+    }
 }
 
 /* --- ELITE SECTOR HEADER --- */
@@ -62,16 +70,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    /* Reduced from 4rem for tighter integration */
-    padding: 1.5rem 2.5rem;
-    /* More compact header */
-    background: white;
-    border-radius: 2rem;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    margin-bottom: 2.5rem;
+    padding: 1rem 2rem;
+    background: #ffffff;
+    border-radius: 2.5rem;
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.02),
+        0 20px 40px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     position: relative;
     overflow: hidden;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prem-section-header:hover {
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
 }
 
 .prem-section-header::before {
@@ -124,16 +138,17 @@
 }
 
 .prem-count-badge {
-    background: #f1f5f9;
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
+    background: #0f172a;
+    padding: 0.6rem 1.4rem;
+    border-radius: 1.25rem;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: 900;
-    font-size: 0.75rem;
-    color: #0f172a;
-    border: 1px solid #e2e8f0;
+    font-weight: 850;
+    font-size: 0.72rem;
+    color: var(--elite-gold);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .prem-count-badge svg {
@@ -143,9 +158,10 @@
 /* --- ASSET GRID --- */
 .prem-product-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) !important; /* 💎 ABSOLUTE QUAD-CHANNEL MASTER GRID */
-    gap: 1.25rem; /* TIGHTER FOR MAXIMUM WIDTH */
+    grid-template-columns: repeat(4, 1fr); /* 💎 QUAD-CHANNEL MASTER GRID */
+    gap: 1.25rem;
     margin-top: 3rem;
+    width: 100%;
 }
 
 /* --- LOADING PROTOCOL --- */
@@ -231,33 +247,50 @@
 }
 
 /* Responsive Grid Adjustments */
+@media (max-width: 1400px) {
+    .prem-product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 1200px) {
     .page-content {
         padding: 0 2rem;
     }
-
     .prem-product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
     }
 }
 
-@media (max-width: 768px) {
-    .prem-section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2rem;
-        padding: 2rem;
-    }
-
+@media (max-width: 992px) {
     .prem-product-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    .prem-section-title { font-size: 1.75rem; }
+    .prem-section-icon-wrap { width: 55px; height: 55px; }
+}
+
+@media (max-width: 768px) {
+    .page-content { padding: 0 1rem; } /* Tight padding */
+    .prem-section-header { 
+        padding: 1.25rem 1rem;
+        border-radius: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
         gap: 1rem;
     }
+    .prem-section-title-group { gap: 1rem; }
+    .prem-section-icon-wrap { width: 50px; height: 50px; border-radius: 1rem; }
+    .prem-section-title { font-size: 1.35rem; }
 }
 
 @media (max-width: 600px) {
     .prem-product-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
     }
+    .prem-section-header { padding: 1.25rem; }
+    .prem-section-title { font-size: 1.5rem; }
+    .prem-count-badge { padding: 0.4rem 0.75rem; font-size: 0.7rem; }
 }

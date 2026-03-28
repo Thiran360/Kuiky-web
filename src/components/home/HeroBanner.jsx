@@ -109,18 +109,16 @@ const HeroBanner = () => {
         if (banners.length > 1) {
             const timer = setInterval(() => {
                 setCurrentIndex(prev => (prev + 1) % banners.length);
-            }, 7000);
+            }, 8500);
             return () => clearInterval(timer);
         }
     }, [banners]);
 
-    const goTo = (dir) => {
-        if (dir === 'prev') setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length);
-        else setCurrentIndex(prev => (prev + 1) % banners.length);
-    };
-
     const handleShopNow = () => {
-        document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' });
+        const productsElement = document.getElementById('products-section');
+        if (productsElement) {
+            productsElement.scrollIntoView({ behavior: 'smooth' });
+        }
     };
 
     if (loading) return (
@@ -130,122 +128,110 @@ const HeroBanner = () => {
     );
 
     if (!banners.length) return null;
-    const b = banners[currentIndex % banners.length];
 
     return (
-        <div className="hb-viewport">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.7 }}
-                    className="hb-slide"
-                >
-                    {/* BLURRED BACKDROP */}
-                    <BannerBackdrop url={b.resolvedImage} />
+        <div className="hb-prime-wrapper">
+            <div className="hb-stage-luxe">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentIndex}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                        className="hb-active-vanguard"
+                    >
+                        <div className="hb-vanguard-inner">
+                            <BannerBackdrop url={banners[currentIndex].resolvedImage} />
+                            
+                            <div className="hb-vanguard-content">
+                                <div className="hb-text-vanguard">
+                                    <motion.div 
+                                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+                                        className="hb-promo-pill"
+                                    >
+                                        <Sparkles size={12} />
+                                        <span>{banners[currentIndex].prize_offer || "LIMITED EDITION"}</span>
+                                    </motion.div>
 
-                    <div className="hb-content">
-                        {/* LEFT — TEXT */}
-                        <div className="hb-text-side">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="hb-tag-line"
-                            >
-                                <Sparkles size={13} />
-                                <span>{b.prize_offer || "EXCLUSIVE OFFER"}</span>
-                            </motion.div>
+                                    <motion.h1 
+                                        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.6 }}
+                                        className="hb-headline-vanguard"
+                                    >
+                                        {banners[currentIndex].title}
+                                    </motion.h1>
 
-                            <motion.h1
-                                initial={{ opacity: 0, y: 25 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2, duration: 0.5 }}
-                                className="hb-headline"
-                            >
-                                {b.title}
-                            </motion.h1>
+                                    <motion.p 
+                                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                                        className="hb-summary-vanguard"
+                                    >
+                                        {banners[currentIndex].description || "Unlocking the next dimension of luxury retail. Experience our high-fidelity discovery sectors with institution-grade logistics."}
+                                    </motion.p>
 
-                            <motion.p
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.35 }}
-                                className="hb-description"
-                            >
-                                {b.description || "Discover premium products curated just for you. Shop the finest collection with confidence."}
-                            </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="hb-actions"
-                            >
-                                <button className="hb-shop-btn" onClick={handleShopNow}>
-                                    <ShoppingCart size={18} />
-                                    <span>Shop Now</span>
-                                    <ArrowRight size={18} className="hb-btn-arrow" />
-                                </button>
-
-                                <div className="hb-stats-row">
-                                    <div className="hb-stat">
-                                        <TrendingUp size={14} />
-                                        <span>50K+ Orders</span>
-                                    </div>
-                                    <div className="hb-stat">
-                                        <Star size={14} fill="var(--primary-brand)" stroke="none" />
-                                        <span>4.9 Rating</span>
-                                    </div>
-                                    <div className="hb-stat">
-                                        <ShieldCheck size={14} />
-                                        <span>Genuine</span>
-                                    </div>
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+                                        className="hb-vanguard-actions"
+                                    >
+                                        <button className="hb-btn-discovery" onClick={handleShopNow}>
+                                            <ShoppingCart size={18} />
+                                            <span>Shop Now</span>
+                                            <ArrowRight size={16} className="hb-arrow-discovery" />
+                                        </button>
+                                        
+                                        <div className="hb-vanguard-stats">
+                                            <div className="stat-node"><Zap size={12} /> <span>SHIPS INSTANTLY</span></div>
+                                            <div className="stat-node"><Star size={12} fill="var(--elite-gold)" stroke="none" /> <span>ELITE GRADE</span></div>
+                                        </div>
+                                    </motion.div>
                                 </div>
-                            </motion.div>
+
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.9, rotate: 2 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1.2, delay: 0.3 }}
+                                    className="hb-visual-vanguard"
+                                >
+                                    <div className="hb-image-hub-luxe">
+                                        <BannerProductImage url={banners[currentIndex].resolvedImage} title={banners[currentIndex].title} />
+                                    </div>
+                                    <div className="vanguard-orb"></div>
+                                </motion.div>
+                            </div>
                         </div>
+                    </motion.div>
+                </AnimatePresence>
 
-                        {/* RIGHT — PRODUCT IMAGE */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 60, rotate: 5 }}
-                            animate={{ opacity: 1, x: 0, rotate: -2 }}
-                            transition={{ duration: 0.8, delay: 0.15 }}
-                            className="hb-image-side"
-                        >
-                            <BannerProductImage url={b.resolvedImage} title={b.title} />
-                            <div className="hb-image-glow"></div>
-                        </motion.div>
+                {/* SIDE PEEK PROXIES — Subtle edge previews for continuity */}
+                <div className="hb-edge-peek left" onClick={() => setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length)}>
+                    <div className="edge-glass">
+                        <BannerBackdrop url={banners[(currentIndex - 1 + banners.length) % banners.length].resolvedImage} />
                     </div>
-                </motion.div>
-            </AnimatePresence>
-
-            {/* NAV ARROWS */}
-            {banners.length > 1 && (
-                <>
-                    <button className="hb-arrow left" onClick={() => goTo('prev')}>
-                        <ChevronLeft size={20} strokeWidth={3} />
-                    </button>
-                    <button className="hb-arrow right" onClick={() => goTo('next')}>
-                        <ChevronRight size={20} strokeWidth={3} />
-                    </button>
-                </>
-            )}
-
-            {/* PROGRESS DOTS */}
-            {banners.length > 1 && (
-                <div className="hb-progress">
-                    {banners.map((_, idx) => (
-                        <button
-                            key={idx}
-                            className={`hb-dot ${idx === currentIndex ? 'active' : ''}`}
-                            onClick={() => setCurrentIndex(idx)}
-                        >
-                            <div className="hb-dot-fill"></div>
-                        </button>
-                    ))}
                 </div>
-            )}
+
+                <div className="hb-edge-peek right" onClick={() => setCurrentIndex(prev => (prev + 1) % banners.length)}>
+                    <div className="edge-glass">
+                        <BannerBackdrop url={banners[(currentIndex + 1) % banners.length].resolvedImage} />
+                    </div>
+                </div>
+
+                <div className="hb-vanguard-pagination-bar">
+                    <button className="hb-nav-arrow left" onClick={() => setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length)}>
+                        <ChevronLeft size={20} />
+                    </button>
+                    
+                    <div className="hb-pag-dots">
+                        {banners.map((_, idx) => (
+                            <button 
+                                key={idx} 
+                                onClick={() => setCurrentIndex(idx)}
+                                className={`hb-pag-orb ${currentIndex === idx ? 'active' : ''}`}
+                            />
+                        ))}
+                    </div>
+
+                    <button className="hb-nav-arrow right" onClick={() => setCurrentIndex(prev => (prev + 1) % banners.length)}>
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

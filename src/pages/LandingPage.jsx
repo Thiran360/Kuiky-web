@@ -12,18 +12,22 @@ const LandingPage = ({ searchTerm }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [selectedSubId, setSelectedSubId] = useState(null);
+  const [isTertiarySelection, setIsTertiarySelection] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const productData = await fetchProducts();
-        if (Array.isArray(productData)) {
-          setProducts(productData);
-        } else {
-          setProducts([]);
-        }
+        const productData = await fetchProducts({ 
+          categoryId: selectedCategory, 
+          subcategoryId: selectedSubId, 
+          search: searchTerm 
+        });
+        setProducts(Array.isArray(productData) ? productData : []);
       } catch (err) {
         console.error("Products load error:", err);
         setError("Failed to load products");
@@ -32,12 +36,15 @@ const LandingPage = ({ searchTerm }) => {
       }
     };
     loadData();
-  }, []);
+  }, [selectedCategory, selectedSubId, searchTerm]);
 
   // Sync with CategoryRail for absolute discovery
-  const handleNavSelect = (catId, subName) => {
+  const handleNavSelect = (catId, catName, subName, subId = null, isTertiary = false) => {
     setSelectedCategory(catId);
+    setSelectedCategoryName(catName);
     setSelectedSubCategory(subName);
+    setSelectedSubId(subId);
+    setIsTertiarySelection(isTertiary);
   };
 
   const filteredProducts = useMemo(() => {
@@ -46,8 +53,8 @@ const LandingPage = ({ searchTerm }) => {
     // 1. Filter by Search Term (Global search)
     if (searchTerm) {
       const query = searchTerm.toLowerCase();
-      result = result.filter(p => 
-        p.name?.toLowerCase().includes(query) || 
+      result = result.filter(p =>
+        p.name?.toLowerCase().includes(query) ||
         p.brand?.toLowerCase().includes(query) ||
         p.description?.toLowerCase().includes(query)
       );
@@ -56,13 +63,18 @@ const LandingPage = ({ searchTerm }) => {
     // 2. Filter by Category ID (Primary Sector)
     if (selectedCategory) {
       result = result.filter(p => {
-          const pCatId = p.category?.id || p.category_id || p.category;
-          return String(pCatId) === String(selectedCategory);
+        const pCatId = p.category?.id || p.category_id || p.category;
+        return String(pCatId) === String(selectedCategory);
       });
     }
 
-    // 3. Filter by SubCategory / Sector (Granular Sector)
-    if (selectedSubCategory) {
+    // 3. Filter by SubCategory (Granular Sector)
+    if (selectedSubId) {
+      result = result.filter(p => {
+        const pSubId = p.subcategory_id || p.subcategory?.id || p.subcategory;
+        return String(pSubId) === String(selectedSubId);
+      });
+    } else if (selectedSubCategory) {
       result = result.filter(p => {
         const subName = typeof p.subcategory === 'string' ? p.subcategory : (p.subcategory?.name || p.subcategory_name);
         return subName?.toLowerCase() === selectedSubCategory.toLowerCase();
@@ -70,12 +82,14 @@ const LandingPage = ({ searchTerm }) => {
     }
 
     return result;
-  }, [products, selectedCategory, selectedSubCategory, searchTerm]);
+  }, [products, selectedCategory, selectedSubCategory, selectedSubId, searchTerm]);
 
   return (
     <div className="landing-container">
       <CategoryRail onNavSelect={handleNavSelect} />
-      <HeroBanner />
+
+      {/* 🚀 ELITE DISCOVERY GUARD: Only show HeroBanner when no active filters (Category/Sub/Search) are present */}
+      {(!selectedCategory && !selectedSubCategory && !searchTerm) && <HeroBanner />}
 
       <main className="page-content">
         <section className="products-section" id="products-section">
@@ -86,31 +100,31 @@ const LandingPage = ({ searchTerm }) => {
               </div>
               <div>
                 <h2 className="prem-section-title">
-                  {selectedSubCategory || "Curated Products"}
+                  {selectedSubCategory || selectedCategoryName || "Our Collection"}
                 </h2>
                 <p className="prem-section-subtitle">
-                  {selectedSubCategory 
-                    ? `Showing results for "${selectedSubCategory}"` 
-                    : "Handpicked selections just for you"}
+                  {selectedSubCategory || selectedCategoryName
+                    ? `Showing ${selectedSubCategory || selectedCategoryName} items`
+                    : "Handpicked items curated for you"}
                 </p>
               </div>
             </div>
-            
+
             {!loading && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="prem-count-badge"
               >
                 <Package size={14} />
-                <span>{filteredProducts.length} Items</span>
+                <span>{filteredProducts.length} Items Available</span>
               </motion.div>
             )}
           </div>
 
           <AnimatePresence mode="wait">
             {loading ? (
-              <motion.div 
+              <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -124,7 +138,7 @@ const LandingPage = ({ searchTerm }) => {
                 <p className="prem-loading-text">Discovering premium products...</p>
               </motion.div>
             ) : error ? (
-              <motion.div 
+              <motion.div
                 key="error"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -133,7 +147,7 @@ const LandingPage = ({ searchTerm }) => {
                 <p>{error}</p>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="content"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -147,16 +161,22 @@ const LandingPage = ({ searchTerm }) => {
           </AnimatePresence>
 
           {!loading && filteredProducts.length === 0 && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="prem-empty-state"
             >
               <div className="prem-empty-icon">
-                <ShoppingBag size={48} strokeWidth={1.5} />
+                <LayoutGrid size={48} strokeWidth={1.5} className="text-yellow-500 opacity-20" />
               </div>
-              <h3 className="prem-empty-title">No products found</h3>
-              <p className="prem-empty-desc">Try adjusting your filters or browse other categories to discover new items.</p>
+              <h3 className="prem-empty-title">
+                {(selectedSubCategory && !isTertiarySelection) ? "Discovery Refinement Required" : "No results in this sector"}
+              </h3>
+              <p className="prem-empty-desc">
+                {(selectedSubCategory && !isTertiarySelection)
+                  ? `Please select a specific sub-section within ${selectedSubCategory} from the options above to discover our collection.`
+                  : "Try adjusting your filters or explore our other premium categories to find what you're looking for."}
+              </p>
             </motion.div>
           )}
         </section>

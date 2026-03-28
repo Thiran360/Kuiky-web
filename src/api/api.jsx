@@ -28,7 +28,7 @@ export const setAuthToken = (token) => {
 const getUserId = () => {
   const storedId = localStorage.getItem("user_id");
   if (storedId && storedId !== "undefined" && storedId !== "null") return storedId;
-  
+
   const raw = localStorage.getItem("ecom_auth_data");
   if (raw && raw !== "undefined" && raw !== "null") {
     try {
@@ -50,13 +50,13 @@ const getToken = () => {
       if (token && token !== "undefined" && token !== "null") return token;
     } catch (e) { /* fallback */ }
   }
-  
+
   // 2. Try standalone keys (User requested explicit access_token/accessToken storage)
-  const standalone = localStorage.getItem("access_token") || 
-                     localStorage.getItem("accessToken") || 
-                     localStorage.getItem("token") ||
-                     localStorage.getItem("jwt");
-                     
+  const standalone = localStorage.getItem("access_token") ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("jwt");
+
   if (standalone && standalone !== "undefined" && standalone !== "null") return standalone;
   return null;
 };
@@ -71,8 +71,8 @@ api.interceptors.request.use(
 
     // Skip attaching for auth discovery endpoints
     const url = config.url || "";
-    const isAuthEndpoint = 
-      url.includes(API_ENDPOINTS.LOGIN) || 
+    const isAuthEndpoint =
+      url.includes(API_ENDPOINTS.LOGIN) ||
       url.includes(API_ENDPOINTS.REGISTER) ||
       url.includes(API_ENDPOINTS.BANNERS) ||
       url.includes("token/refresh/");
@@ -80,27 +80,27 @@ api.interceptors.request.use(
     if (!isAuthEndpoint && token) {
       // ✅ FORCE ATTACH LATEST TOKEN
       config.headers.Authorization = `Bearer ${token}`;
-      
+
       // ✅ PASS USER_ID AUTOMATICALLY FOR BACKEND IDENTIFICATION
       if (userId) {
-         // Some endpoints expect user_id in params (Query String)
-         config.params = { ...config.params, user_id: userId };
-         
-         // Some endpoints expect user_id in body (POST/PUT/PATCH)
-         if (['post', 'put', 'patch'].includes(config.method?.toLowerCase())) {
-            if (config.data instanceof FormData) {
-                // If FormData, append if not present
-                if (!config.data.has('user_id')) {
-                    config.data.append('user_id', userId);
-                }
-            } else if (config.data && typeof config.data === 'object') {
-                // If JSON object, merge
-                config.data = { user_id: userId, ...config.data };
-            } else if (!config.data) {
-                // If no data, provide user_id object
-                config.data = { user_id: userId };
+        // Some endpoints expect user_id in params (Query String)
+        config.params = { ...config.params, user_id: userId };
+
+        // Some endpoints expect user_id in body (POST/PUT/PATCH)
+        if (['post', 'put', 'patch'].includes(config.method?.toLowerCase())) {
+          if (config.data instanceof FormData) {
+            // If FormData, append if not present
+            if (!config.data.has('user_id')) {
+              config.data.append('user_id', userId);
             }
-         }
+          } else if (config.data && typeof config.data === 'object') {
+            // If JSON object, merge
+            config.data = { user_id: userId, ...config.data };
+          } else if (!config.data) {
+            // If no data, provide user_id object
+            config.data = { user_id: userId };
+          }
+        }
       }
     }
 
@@ -126,10 +126,11 @@ api.interceptors.response.use(
 // PRODUCTS
 // ===========================
 export const fetchProducts = async (filters = {}) => {
-  const { categoryId, search } = filters;
+  const { categoryId, subcategoryId, search } = filters;
   const params = {};
 
   if (categoryId) params.category_id = categoryId;
+  if (subcategoryId) params.subcategory_id = subcategoryId;
   if (search) params.search = search;
 
   try {

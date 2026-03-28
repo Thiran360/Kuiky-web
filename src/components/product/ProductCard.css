@@ -56,7 +56,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 20; /* 💎 SURFACE ABOVE VISUAL ORB */
+    z-index: 20;
+    /* 💎 SURFACE ABOVE VISUAL ORB */
 }
 
 .status-pill {
@@ -109,7 +110,8 @@
     justify-content: center;
     position: relative;
     z-index: 5;
-    background: radial-gradient(circle at center, rgba(251, 191, 36, 0.05) 0%, transparent 70%); /* SOLAR AURA */
+    background: radial-gradient(circle at center, rgba(251, 191, 36, 0.05) 0%, transparent 70%);
+    /* SOLAR AURA */
 }
 
 /* 💎 THE CELESTIAL ORB — EXHIBITION GRADE */
@@ -119,7 +121,8 @@
     width: 185px;
     height: 185px;
     border-radius: 50%;
-    border: 1px solid rgba(15, 23, 42, 0.05); /* OUTER HALO */
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    /* OUTER HALO */
     box-shadow: 0 0 40px rgba(15, 23, 42, 0.03);
     z-index: 1;
 }
@@ -128,10 +131,12 @@
     width: 165px !important;
     height: 165px !important;
     aspect-ratio: 1 / 1;
-    object-fit: cover; /* 💎 ABSOLUTE CIRCULAR CLIPPING */
+    object-fit: cover;
+    /* 💎 ABSOLUTE CIRCULAR CLIPPING */
     border-radius: 50%;
     z-index: 10;
-    border: 3.5px solid #0f172a; /* IMPERIAL RIM INTEGRATION */
+    border: 3.5px solid #0f172a;
+    /* IMPERIAL RIM INTEGRATION */
     background: white;
     filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.12));
     transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -147,7 +152,8 @@
 }
 
 .elite-asset-capsule:hover .asset-visual {
-    transform: scale(1.08); /* PRECISE SCALING */
+    transform: scale(1.08);
+    /* PRECISE SCALING */
     border-color: #fbbf24;
     box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
 }
@@ -166,10 +172,13 @@
 }
 
 .brand-badge {
-    font-size: 0.75rem; /* INSTITUTIONAL SCALE */
+    font-size: 0.75rem;
+    /* INSTITUTIONAL SCALE */
     font-weight: 1000;
-    color: #0f172a !important; /* ULTIMATE NAVY */
-    letter-spacing: 3.5px; /* 💎 ELITE TRACKING */
+    color: #0f172a !important;
+    /* ULTIMATE NAVY */
+    letter-spacing: 3.5px;
+    /* 💎 ELITE TRACKING */
     text-transform: uppercase;
     opacity: 0.85;
 }
@@ -335,5 +344,157 @@
 
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .elite-asset-capsule {
+        padding: 0.4rem !important;
+        border-radius: 0.85rem !important;
+        min-height: unset !important;
+        height: auto !important; /* Allow details to show without clipping */
+        gap: 0.25rem !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+        overflow: hidden !important;
+    }
+
+    .capsule-visual-ecom360 {
+        height: 100px !important; /* Slightly taller for balance */
+        padding: 0.25rem !important;
+        margin-bottom: 0 !important;
+        min-height: 100px !important;
+    }
+
+    .capsule-visual-ecom360::after {
+        display: none !important;
+    }
+
+    .asset-visual {
+        width: 75px !important;
+        height: 75px !important;
+        border-width: 1px !important;
+        filter: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Micro-Scaled Details Hubs */
+    .capsule-status-ecom360 {
+        top: 0.25rem !important;
+        left: 0.25rem !important;
+        right: 0.25rem !important;
+    }
+
+    .status-pill.discount {
+        font-size: 0.45rem !important;
+        padding: 2px 4px !important;
+    }
+
+    .status-pill.wishlist {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    .dossier-meta {
+        margin: 0 !important;
+        height: auto !important;
+    }
+
+    .brand-badge {
+        font-size: 0.45rem !important;
+        letter-spacing: 1px !important;
+        opacity: 0.8 !important;
+    }
+
+    .rating-mini {
+        font-size: 0.5rem !important;
+        gap: 2px !important;
+    }
+
+    .capsule-dossier-ecom360 {
+        gap: 0.15rem !important;
+        justify-content: flex-start !important;
+    }
+
+    .asset-title-luxe {
+        font-size: 0.75rem !important;
+        height: 1.1rem !important;
+        min-height: 1.1rem !important;
+        margin: 0 !important;
+        line-height: 1.1 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 1 !important;
+        line-clamp: 1 !important;
+        -webkit-box-orient: vertical !important;
+        white-space: normal !important;
+    }
+
+    /* Micro Specs (Logistics / Auth) */
+    .asset-specs-preview {
+        gap: 4px !important;
+        margin: 0 !important;
+    }
+
+    .spec-node {
+        font-size: 0.45rem !important;
+        padding: 2px 4px !important;
+        gap: 2px !important;
+        border-radius: 4px !important;
+    }
+
+    .spec-node svg { width: 8px !important; height: 8px !important; }
+
+    /* Micro Variants (Weights) */
+    .variant-ecom360-mini {
+        gap: 4px !important;
+        margin-top: 0.15rem !important;
+        justify-content: flex-start !important;
+    }
+
+    .v-pill-mini {
+        padding: 2px 6px !important;
+        font-size: 0.55rem !important;
+        border-radius: 4px !important;
+        border-width: 1px !important;
+    }
+
+    /* Financial Hub - Compact Row */
+    .asset-financial-ecom360 {
+        padding: 0 !important;
+        border-radius: 0 !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.25rem !important;
+        text-align: left !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        margin-top: 0.25rem !important; 
+    }
+
+    .price-block {
+        align-items: flex-start !important;
+    }
+
+    .price-current {
+        font-size: 0.95rem !important;
+    }
+
+    .price-strike {
+        font-size: 0.55rem !important;
+        display: block !important;
+    }
+
+    .btn-procure-action {
+        width: 28px !important;
+        height: 28px !important;
+        padding: 0 !important;
+        font-size: 0.6rem !important;
+        border-radius: 8px !important;
+        justify-content: center !important;
+    }
+
+    .btn-procure-action span {
+        display: none !important; /* HIDE TEXT, ICON ONLY */
     }
 }

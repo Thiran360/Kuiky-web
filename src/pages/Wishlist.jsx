@@ -60,8 +60,22 @@ const Wishlist = () => {
 
   const getProductId = (item) => {
     if (!item) return null;
-    const p = getProduct(item);
-    return item?.id || item?.product_id || p?.id || p?.product_id || null;
+    const p = item.product || {};
+    // 💎 ELITE ROYALE PRECISION: Priority mapping for product_id identification
+    const potentialIds = [
+      item.product_id, 
+      p.id, 
+      p.product_id, 
+      item.id
+    ];
+
+    for (const id of potentialIds) {
+      if (id != null && id !== "" && id !== "null") {
+        const num = Number(id);
+        if (!isNaN(num) && num > 0) return num;
+      }
+    }
+    return null;
   };
 
   const getVariantForCart = (product) => {

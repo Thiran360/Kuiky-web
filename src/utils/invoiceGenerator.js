@@ -2,99 +2,144 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export const generateInvoice = (order) => {
-    const doc = new jsPDF();
-    const primaryColor = [15, 23, 42]; // #0f172a
-    const accentColor = [79, 70, 229]; // #4f46e5
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // 💎 DESIGN SYSTEM: MATTE OBSIDIAN & LUXE GOLD
+    const colorObsidian = [15, 23, 42]; // #0f172a
+    const colorGold = [251, 191, 36];   // #fbbf24 (Lighter gold for tech feel)
+    const colorSlate = [100, 116, 139]; // #64748b
+    const colorSnow = [248, 250, 252];  // #f8fafc
 
-    // Normalize items
+    // Helper: Header Rectangle
+    doc.setFillColor(...colorObsidian);
+    doc.rect(0, 0, 210, 45, 'F');
+
+    // --- BRANDING ---
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(26);
+    doc.setFont("helvetica", "bold");
+    doc.text("ECOM 360", 15, 25);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(200, 200, 200);
+    doc.text("ELITE PROCUREMENT & GLOBAL LOGISTICS HUB", 15, 32);
+
+    // --- MANIFEST INFO ---
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("OFFICIAL INVOICE", 195, 23, { align: 'right' });
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...colorGold);
+    doc.text(`ID: #${(order.id || order.orderId || "M-0001").toUpperCase()}`, 195, 30, { align: 'right' });
+    
+    doc.setTextColor(200, 200, 200);
+    const orderDate = new Date(order.date || order.created_at || new Date()).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+    doc.text(`DATE: ${orderDate.toUpperCase()}`, 195, 35, { align: 'right' });
+
+    // --- DOSSIER SECTOR (BILLING & SHIPPING) ---
+    doc.setTextColor(...colorObsidian);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("LOGISTICS DESTINATION / BILLING", 15, 60);
+    
+    // Draw a subtle border for address
+    doc.setDrawColor(226, 232, 240);
+    doc.line(15, 63, 195, 63);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...colorSlate);
+    
+    const address = typeof order.address === 'string' 
+        ? order.address 
+        : (order.address?.full_address || order.address?.address || "SECURE STORE PICKUP");
+    const splitAddress = doc.splitTextToSize(address.toUpperCase(), 120);
+    doc.text(splitAddress, 15, 70);
+
+    // --- PROCUREMENT TABLE ---
     const items = order.items || order.products || order.order_items || [];
-
-    // Brand Header
-    doc.setFontSize(22);
-    doc.setTextColor(...primaryColor);
-    doc.setFont("helvetica", "bold");
-    doc.text("ECOM360 ELITE", 14, 22);
-
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.setFont("helvetica", "normal");
-    doc.text("Premium E-commerce Logistics Hub", 14, 28);
-
-    // Invoice Meta
-    doc.setFontSize(12);
-    doc.setTextColor(...primaryColor);
-    doc.text("INVOICE MANIFEST", 140, 22);
-    
-    doc.setFontSize(9);
-    doc.setTextColor(100);
-    doc.text(`Manifest ID: #${order.id || order.orderId}`, 140, 28);
-    doc.text(`Procurement Date: ${new Date(order.date || order.created_at || new Date()).toLocaleDateString()}`, 140, 33);
-    doc.text(`Authorized by: Customer System`, 140, 38);
-
-    // Shipping Section
-    doc.setFillColor(248, 250, 252);
-    doc.rect(14, 45, 182, 35, 'F');
-    
-    doc.setFontSize(10);
-    doc.setTextColor(...primaryColor);
-    doc.setFont("helvetica", "bold");
-    doc.text("LOGISTICS DESTINATION:", 20, 55);
-    
-    doc.setFontSize(9);
-    doc.setTextColor(100);
-    doc.setFont("helvetica", "normal");
-    const address = order.address || order.shipping_address || "Institutional Central Distribution";
-    const splitAddress = doc.splitTextToSize(address, 100);
-    doc.text(splitAddress, 20, 62);
-
-    // Items Table
     const tableData = items.map((item, index) => [
-        index + 1,
-        item.name || "Elite Material",
-        `QTY: ${item.quantity || 1}`,
+        (index + 1).toString().padStart(2, '0'),
+        (item.name || item.product_name || "ELITE ASSET").toUpperCase(),
+        item.variant_value ? `SIZE: ${item.variant_value.toUpperCase()}` : "STANDARD CONFIG",
+        (item.quantity || 1).toString(),
         `₹${(item.price || 0).toLocaleString()}`,
         `₹${((item.price || 0) * (item.quantity || 1)).toLocaleString()}`
     ]);
 
     autoTable(doc, {
         startY: 90,
-        head: [['#', 'Asset Description', 'Quantity', 'Unit Value', 'Settlement Total']],
+        head: [['SN', 'ASSET DESCRIPTION', 'SPECIFICATION', 'QTY', 'UNIT VALUE', 'NET AMOUNT']],
         body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: primaryColor, textColor: [255, 255, 255], fontStyle: 'bold' },
-        styles: { fontSize: 9, cellPadding: 5 },
+        theme: 'plain',
+        headStyles: { 
+            fillColor: colorSnow, 
+            textColor: colorObsidian, 
+            fontStyle: 'bold', 
+            fontSize: 8,
+            lineWidth: { bottom: 0.5 },
+            lineColor: [200, 200, 200]
+        },
+        styles: { 
+            fontSize: 9, 
+            cellPadding: 5,
+            textColor: colorObsidian,
+            valign: 'middle'
+        },
         columnStyles: {
-            0: { cellWidth: 10 },
-            1: { cellWidth: 80 },
-            4: { halign: 'right', fontStyle: 'bold' }
-        }
+            0: { cellWidth: 10, halign: 'center' },
+            1: { cellWidth: 60, fontStyle: 'bold' },
+            3: { halign: 'center' },
+            4: { halign: 'right' },
+            5: { halign: 'right', fontStyle: 'bold' }
+        },
+        margin: { left: 15, right: 15 }
     });
 
-    // Summary
-    const finalY = (doc.lastAutoTable?.finalY || 150) + 10;
-    const subtotal = order.total || items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+    // --- FINANCIAL SUMMARY ---
+    const finalY = (doc.lastAutoTable?.finalY || 150) + 15;
+    const subtotal = items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
     
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Procurement Subtotal:", 140, finalY);
-    doc.text(`₹${subtotal.toLocaleString()}`, 180, finalY, { align: 'right' });
+    // Background for total
+    doc.setFillColor(...colorSnow);
+    doc.rect(130, finalY - 5, 66, 35, 'F');
 
-    doc.text("Logistics Fee (Priority):", 140, finalY + 7);
-    doc.text("FREE", 180, finalY + 7, { align: 'right' });
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...colorSlate);
+    doc.text("SUBTOTAL EXEMPT:", 135, finalY + 5);
+    doc.text(`₹${subtotal.toLocaleString()}`, 190, finalY + 5, { align: 'right' });
 
-    doc.setFontSize(14);
-    doc.setTextColor(...primaryColor);
+    doc.text("LOGISTICS FEE:", 135, finalY + 12);
+    doc.setTextColor(...colorSlate);
+    doc.text("COMPLIMENTARY", 190, finalY + 12, { align: 'right' });
+
+    doc.setFontSize(11);
+    doc.setTextColor(...colorObsidian);
     doc.setFont("helvetica", "bold");
-    doc.text("TOTAL SETTLEMENT:", 140, finalY + 18);
-    doc.text(`₹${subtotal.toLocaleString()}`, 180, finalY + 18, { align: 'right' });
+    doc.text("TOTAL SETTLEMENT", 135, finalY + 23);
+    doc.setTextColor(...colorObsidian);
+    doc.text(`₹${subtotal.toLocaleString()}`, 190, finalY + 23, { align: 'right' });
 
-    // Footer Pledge
+    // --- INSTITUTIONAL FOOTER ---
+    doc.setFillColor(...colorSnow);
+    doc.rect(0, 275, 210, 22, 'F');
+    
     doc.setFontSize(8);
-    doc.setTextColor(150);
+    doc.setTextColor(...colorSlate);
     doc.setFont("helvetica", "italic");
-    doc.text("This document serves as an official proof of acquisition from Ecom360 Elite Marketplace.", 105, 280, { align: 'center' });
-    doc.text("Secure institutional handshake active. Thank you for choosing absolute excellence.", 105, 285, { align: 'center' });
+    doc.text("This manifest is a digitally authorized secure document and does not require a physical signature.", 105, 282, { align: 'center' });
+    
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...colorObsidian);
+    doc.text("THANK YOU FOR CHOOSING EXCELLENCE • ECOM360 ELITE NETWORK", 105, 288, { align: 'center' });
 
     // Output
-    doc.save(`Ecom360_Invoice_${order.id || order.orderId}.pdf`);
+    doc.save(`ECOM360_OFFICIAL_INVOICE_${(order.id || order.orderId || "TRANS").toUpperCase()}.pdf`);
 };
