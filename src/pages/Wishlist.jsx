@@ -232,7 +232,12 @@ const Wishlist = () => {
                   ? !!findItemInCart(product.id, variant.id) 
                   : false;
                 
-                const image = product?.image_url || product?.image || product?.product_image;
+                const rawImage = product?.image_url || 
+                                 product?.image || 
+                                 product?.product_image || 
+                                 product?.variation?.image || 
+                                 product?.product_variation?.image ||
+                                 product?.product_variation?.product?.image;
 
                 return (
                   <motion.div 
@@ -246,9 +251,14 @@ const Wishlist = () => {
                   >
                     <div className="wishlist-visual-luxe">
                       <img
-                        src={getImageUrl(image)}
-                        alt={product?.name}
-                        onError={(e) => { e.target.src = getImageUrl(null); }}
+                        src={getImageUrl(rawImage)}
+                        alt={product?.name || "Premium Asset"}
+                        loading="lazy"
+                        onError={(e) => { 
+                            if (!e.target.src.includes('no-image')) {
+                                e.target.src = getImageUrl(null); 
+                            }
+                        }}
                       />
                       {discount > 0 && (
                         <span className="wishlist-badge-luxe">

@@ -95,6 +95,22 @@ const Header = ({ searchTerm, setSearchTerm }) => {
                             <div className="drawer-body-luxe">
                                 <div className="drawer-nav-group">
                                     <p className="drawer-label">ACCOUNT HUB</p>
+                                    <div className="drawer-user-card-luxe">
+                                        <div className="d-user-avatar-luxe">
+                                            {isAuthenticated ? userName.charAt(0).toUpperCase() : "?"}
+                                        </div>
+                                        <div className="d-user-info-luxe">
+                                            <p className="d-welcome-luxe">{isAuthenticated ? "AUTHORIZED MEMBER" : "ELITE GUEST"}</p>
+                                            {isAuthenticated ? (
+                                                <div className="d-auth-user-profile">
+                                                    <p className="d-username-luxe">{userName}</p>
+                                                    <span className="d-user-tier">GOLD TIER ACCESS</span>
+                                                </div>
+                                            ) : (
+                                                <p className="d-username-luxe">Sign In to Proceed</p>
+                                            )}
+                                        </div>
+                                    </div>
                                     <DrawerLink icon={User} label="Profile & Settings" onClick={() => navigateTo("/profile")} />
                                     <DrawerLink icon={MapPin} label="Shipping Addresses" onClick={() => navigateTo("/address")} />
                                     <DrawerLink icon={Package} label="Order History" onClick={() => navigateTo("/orders")} />
@@ -105,6 +121,12 @@ const Header = ({ searchTerm, setSearchTerm }) => {
                                     <DrawerLink icon={Home} label="Return Home" active={isActive("/")} onClick={() => navigateTo("/")} />
                                     <DrawerLink icon={Heart} label="My Wishlist" count={wishlistCount} onClick={() => navigateTo("/wishlist")} />
                                     <DrawerLink icon={ShoppingCart} label="Basket" count={cartItemCount} onClick={() => navigateTo("/cart")} />
+                                    {!isAuthenticated && (
+                                        <div className="drawer-auth-actions-group">
+                                            <div className="divider-line-gold"></div>
+                                            <DrawerLink icon={Zap} label="Login / Sign Up" onClick={() => navigateTo("/login")} className="auth-trigger-luxe" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 {isAuthenticated && (

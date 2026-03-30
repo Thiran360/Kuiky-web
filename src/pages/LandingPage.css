@@ -294,3 +294,17 @@
     .prem-section-title { font-size: 1.5rem; }
     .prem-count-badge { padding: 0.4rem 0.75rem; font-size: 0.7rem; }
 }
+
+/* 🚀 ELITE MOBILE CLEANUP: Remove any rogue scroll buttons */
+@media (max-width: 768px) {
+    .scroll-to-top, 
+    .back-to-top, 
+    .scroll-top-btn,
+    [class*="scroll-button"],
+    [id*="scroll-button"],
+    .up-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+}

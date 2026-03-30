@@ -103,8 +103,11 @@ export const WishlistProvider = ({ children }) => {
     if (!isUserLoading && isAuthenticated) {
       loadWishlist();
     } else if (!isUserLoading && !isAuthenticated) {
-      // 💎 GUEST MODE: Preserve local wishlist items across sessions
-      // if (wishlist.length > 0) { ... }
+      // 💎 PRIVACY OVERRIDE: Clear wishlist for guests to prevent stale data visibility
+      if (wishlist.length > 0) {
+        setWishlist([]);
+        localStorage.removeItem("localWishlist");
+      }
     }
   }, [isUserLoading, isAuthenticated, loadWishlist]);
 
