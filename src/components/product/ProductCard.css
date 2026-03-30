@@ -390,8 +390,17 @@
     }
 
     .status-pill.wishlist {
-        width: 22px !important;
-        height: 22px !important;
+        width: 38px !important;
+        height: 38px !important;
+        background: white !important;
+        color: #f43f5e !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        border: 1px solid #f1f5f9 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 1 !important;
+        z-index: 30 !important;
     }
 
     .dossier-meta {
@@ -412,7 +421,8 @@
 
     .capsule-dossier-ecom360 {
         gap: 0.15rem !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 
     .asset-title-luxe {
@@ -426,12 +436,14 @@
         line-clamp: 1 !important;
         -webkit-box-orient: vertical !important;
         white-space: normal !important;
+        text-align: center !important;
     }
 
     /* Micro Specs (Logistics / Auth) */
     .asset-specs-preview {
         gap: 4px !important;
         margin: 0 !important;
+        justify-content: center !important;
     }
 
     .spec-node {
@@ -447,7 +459,7 @@
     .variant-ecom360-mini {
         gap: 4px !important;
         margin-top: 0.15rem !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
     }
 
     .v-pill-mini {
@@ -486,11 +498,11 @@
     }
 
     .btn-procure-action {
-        width: 28px !important;
-        height: 28px !important;
+        width: 40px !important;
+        height: 40px !important;
         padding: 0 !important;
         font-size: 0.6rem !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
         justify-content: center !important;
     }
 

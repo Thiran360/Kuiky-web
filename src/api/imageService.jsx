@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { getImageUrl } from "./config";
 
 /**
- * 🚀 High-Performance Image Hook
- * Bypasses ngrok splash screens using Blob fetch + headers.
- * Handles fallbacks, loading states, and prevents empty-string src warnings.
+ * 🔗 Global Singleton Cache for Blobs
+ * Prevents 1,200+ redundant network requests and ensures premium UI performance.
  */
+const imageCache = new Map();
+const pendingRequests = new Map();
+
 export const useSmartImage = (rawPath) => {
-    // Initialize with fallback to prevent React "empty string" warnings
     const [src, setSrc] = useState(getImageUrl(null));
     const [loaded, setLoaded] = useState(false);
     const [error, setError] = useState(false);
@@ -20,43 +21,65 @@ export const useSmartImage = (rawPath) => {
         }
 
         const fullUrl = getImageUrl(rawPath);
-        let blobUrl = '';
+
+        // 🚀 Hit cache first
+        if (imageCache.has(fullUrl)) {
+            setSrc(imageCache.get(fullUrl));
+            setLoaded(true);
+            return;
+        }
 
         const loadImage = async () => {
-            try {
-                // Fetch with ngrok bypass headers
-                const response = await fetch(fullUrl, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-
-                if (response.ok) {
-                    const contentType = response.headers.get('content-type') || '';
-                    if (contentType.startsWith('image/')) {
-                        const blob = await response.blob();
-                        blobUrl = URL.createObjectURL(blob);
-                        setSrc(blobUrl);
-                        setLoaded(true);
-                        return;
-                    }
+            // 🛑 Request Collapsing: Join existing request if pending
+            if (pendingRequests.has(fullUrl)) {
+                try {
+                    const sharedBlobUrl = await pendingRequests.get(fullUrl);
+                    setSrc(sharedBlobUrl);
+                    setLoaded(true);
+                } catch (err) {
+                    setSrc(fullUrl);
+                } finally {
+                    setLoaded(true);
                 }
-                
-                // Fallback to direct URL if blob fails but response was somewhat OK
-                setSrc(fullUrl);
+                return;
+            }
+
+            const fetchPromise = (async () => {
+                try {
+                    const response = await fetch(fullUrl, {
+                        headers: { 'ngrok-skip-browser-warning': 'true' }
+                    });
+
+                    if (response.ok) {
+                        const contentType = response.headers.get('content-type') || '';
+                        if (contentType.startsWith('image/')) {
+                            const blob = await response.blob();
+                            const blobUrl = URL.createObjectURL(blob);
+                            imageCache.set(fullUrl, blobUrl);
+                            return blobUrl;
+                        }
+                    }
+                    throw new Error('Not an image');
+                } catch (err) {
+                    throw err;
+                }
+            })();
+
+            pendingRequests.set(fullUrl, fetchPromise);
+
+            try {
+                const finalBlobUrl = await fetchPromise;
+                setSrc(finalBlobUrl);
             } catch (err) {
-                console.warn(`SmartImage failed for: ${fullUrl}. Using fallback.`);
                 setSrc(fullUrl);
                 setError(true);
             } finally {
+                pendingRequests.delete(fullUrl);
                 setLoaded(true);
             }
         };
 
         loadImage();
-
-        // Cleanup blob URL to prevent memory leaks
-        return () => {
-            if (blobUrl) URL.revokeObjectURL(blobUrl);
-        };
     }, [rawPath]);
 
     return { src, loaded, error };

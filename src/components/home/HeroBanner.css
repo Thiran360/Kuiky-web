@@ -191,9 +191,11 @@
     .hb-image-hub-luxe { width: 190px; height: 190px; }
     
     .hb-vanguard-pagination-bar { 
-        bottom: -35px; 
-        padding: 6px 14px;
-        gap: 12px;
+        display: none !important; /* REMOVED ON MOBILE FOR CLEAN DISCOVERY */
+    }
+
+    .hb-edge-peek {
+        display: none !important; /* REMOVED ON MOBILE TO PREVENT OVERLAP */
     }
 }
 

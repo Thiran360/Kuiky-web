@@ -144,7 +144,7 @@ export const CartProvider = ({ children }) => {
                     offer_price: actualOfferPrice,
                     price: actualPrice,
                     product_name: productDetails?.name || "Product",
-                    image: productDetails?.image || productDetails?.image_url || null,
+                    image: productDetails?.image_url || productDetails?.image || null,
                     variant_value: selectedV?.value || null
                 }];
             }

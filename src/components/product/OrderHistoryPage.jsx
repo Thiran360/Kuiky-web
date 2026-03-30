@@ -329,15 +329,31 @@ const OrderCard = ({ order, index }) => {
 
             <div className="order-product-ecom360 multi-item-view">
                 <div className="order-asset-previews">
-                    {items.slice(0, 3).map((item, idx) => (
-                        <div key={idx} className="product-visual-shield mini">
-                           <img
-                                src={getImageUrl(item.image || item.product_image || item.image_url)}
-                                alt={item.name}
-                                onError={(e) => { e.target.src = "/images/no-image.png"; }}
-                            />
-                        </div>
-                    ))}
+                    {items.slice(0, 3).map((item, idx) => {
+                        const rawImage = item.image_url || 
+                                         item.image || 
+                                         item.product_image || 
+                                         item.product?.image_url || 
+                                         item.product?.image || 
+                                         item.variation?.image || 
+                                         item.product_variation?.image ||
+                                         item.product_variation?.product?.image;
+                                         
+                        return (
+                            <div key={idx} className="product-visual-shield mini">
+                               <img
+                                    src={getImageUrl(rawImage)}
+                                    alt={item.name || item.product_name || "Asset"}
+                                    loading="lazy"
+                                    onError={(e) => { 
+                                        if (!e.target.src.includes('no-image')) {
+                                            e.target.src = getImageUrl(null); 
+                                        }
+                                    }}
+                                />
+                            </div>
+                        );
+                    })}
                     {items.length > 3 && (
                         <div className="extra-count-badge">+{items.length - 3} MORE</div>
                     )}

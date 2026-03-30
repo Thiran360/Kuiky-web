@@ -452,31 +452,59 @@
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1200px) {
-    .wishlist-container { padding: 0 2rem 4rem; }
+    .wishlist-container { padding: 0 1.5rem 4rem; }
 }
 
 @media (max-width: 768px) {
+    .wishlist-page { padding-top: 15px; }
+    .wishlist-container { padding: 0 1.25rem 3rem; }
+    
     .wishlist-header-luxe {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
     }
+    
+    .wishlist-back-btn-luxe {
+        order: -1; 
+        font-size: 0.6rem;
+        padding: 8px 16px;
+    }
+    
     .wishlist-title-container {
         position: relative;
-        left: 0;
+        left: auto;
         transform: none;
+        width: 100%;
+        align-items: center;
     }
+    
     .header-spacer-luxe { display: none; }
+    
+    .wishlist-title-luxe {
+        font-size: 1.5rem;
+    }
+    
     .wishlist-grid-luxe {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
+    
+    .wishlist-visual-luxe { height: 180px; }
+    .wishlist-name-luxe { font-size: 0.85rem; }
+    .price-current-luxe { font-size: 1.1rem; }
+    
+    .wishlist-actions-luxe { flex-direction: column; }
+    .btn-remove-luxe { width: 100%; }
 }
 
 @media (max-width: 480px) {
     .wishlist-grid-luxe {
         grid-template-columns: 1fr;
     }
+    .wishlist-visual-luxe { height: 240px; }
 }
 
 .empty-glow-ruby {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingCart, Check, Star, Eye, Zap, Package, Loader } from "lucide-react"; 
+import { Heart, ShoppingCart, Check, Star, Eye, Zap, Package, Loader } from "lucide-react";
 import { useSmartImage } from "../../api/imageService";
 import { getImageUrl } from "../../api/config";
 import "./ProductCard.css";
@@ -58,9 +58,9 @@ const ProductCard = ({ product, index = 0 }) => {
     const handleAddToCart = async (e) => {
         e.stopPropagation();
         // 💎 AUTH-MANDATORY: Redirect guests to Membership Portal
-        if (!isAuthenticated) { 
-            navigate("/login"); 
-            return; 
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
         }
         if (isInCart) return;
         setIsAddingToCart(true);
@@ -71,9 +71,9 @@ const ProductCard = ({ product, index = 0 }) => {
 
     const handleWishlist = async (e) => {
         e.stopPropagation();
-        if (!isAuthenticated) { 
-            navigate("/login"); 
-            return; 
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
         }
         if (isTogglingWishlist) return;
         setIsTogglingWishlist(true);
@@ -81,7 +81,7 @@ const ProductCard = ({ product, index = 0 }) => {
     };
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
@@ -91,11 +91,11 @@ const ProductCard = ({ product, index = 0 }) => {
             onClick={() => navigate(`/product/${product.id}`)}
         >
             <div className="capsule-hologram-shimmer"></div>
-            
+
             {/* PROCUREMENT STATUS */}
             <div className="capsule-status-ecom360">
                 {discountPercent > 0 && <span className="status-pill discount"><Zap size={10} /> {discountPercent}% OFF</span>}
-                <button 
+                <button
                     className={`status-pill wishlist ${isWishlisted ? 'active' : ''}`}
                     onClick={handleWishlist}
                 >
@@ -123,7 +123,7 @@ const ProductCard = ({ product, index = 0 }) => {
                 </div>
 
                 <h3 className="asset-title-luxe">{product.name}</h3>
-                
+
                 <div className="asset-specs-preview">
                     <div className="spec-node"><Package size={12} /> <span>LOGISTICS READY</span></div>
                     <div className="spec-node"><Check size={12} /> <span>AUTH SECURED</span></div>
@@ -132,8 +132,8 @@ const ProductCard = ({ product, index = 0 }) => {
                 {hasVariations && (
                     <div className="variant-ecom360-mini" onClick={e => e.stopPropagation()}>
                         {product.variations.slice(0, 3).map(v => (
-                            <button 
-                                key={v.id} 
+                            <button
+                                key={v.id}
                                 className={`v-pill-mini ${selectedVariant?.id === v.id ? 'active' : ''}`}
                                 onClick={() => setSelectedVariant(v)}
                             >
@@ -148,14 +148,14 @@ const ProductCard = ({ product, index = 0 }) => {
                         <span className="price-current">₹{displayPrice}</span>
                         {originalPrice > displayPrice && <span className="price-strike">₹{originalPrice}</span>}
                     </div>
-                    <button 
+                    <button
                         className={`btn-procure-action ${isInCart ? 'authorized' : ''}`}
                         onClick={handleAddToCart}
                         disabled={isAddingToCart || isInCart}
                     >
-                        {isAddingToCart ? <Loader size={14} className="spin" /> : 
-                         isInCart ? <><Check size={14} /> <span>IN CART</span></> : 
-                         <><ShoppingCart size={14} /> <span>ADD TO CART</span></>}
+                        {isAddingToCart ? <Loader size={14} className="spin" /> :
+                            isInCart ? <><Check size={14} /> <span>IN CART</span></> :
+                                <><ShoppingCart size={14} /> <span>ADD TO CART</span></>}
                     </button>
                 </div>
             </div>

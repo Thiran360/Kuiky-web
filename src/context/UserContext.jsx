@@ -172,7 +172,7 @@ export const UserProvider = ({ children }) => {
       "accessToken", "access_token",
       "refreshToken", "refresh_token",
       "user_id", "user",
-      // "localCart", "localWishlist", // 💎 GUEST CONTINUITY: Preserved during logout
+      "localCart", "localWishlist",
       "latitude", "longitude"
     ];
     

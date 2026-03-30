@@ -120,7 +120,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, index }) => {
       layout
     >
       <div className="luxe-item-visual">
-        <CartItemImage url={item.image || item.image_url} name={item.product_name || item.name} />
+        <CartItemImage item={item} name={item.product_name || item.name} />
         <div className="luxe-item-badge">PREMIUM</div>
       </div>
 
@@ -865,12 +865,25 @@ const CartPage = () => {
 };
 
 /** Helper component for cart item image */
-const CartItemImage = ({ url, name }) => {
-  const { src } = useSmartImage(url);
+const CartItemImage = ({ item, name }) => {
+  // 💎 ELITE ROYALE IMAGE DISCOVERY: Sequential fallback through all known backend schemas
+  const rawUrl = item?.image_url || 
+                 item?.image || 
+                 item?.product_image || 
+                 item?.product?.image_url || 
+                 item?.product?.image || 
+                 item?.variation?.image || 
+                 item?.product_variation?.image ||
+                 item?.product_variation?.product?.image;
+
+  const { src } = useSmartImage(rawUrl);
+
   return (
     <img
       src={src}
-      alt={name}
+      className="luxe-item-img-element"
+      alt={name || "Elite Royale Asset"}
+      loading="lazy"
       onError={(e) => { 
         if (!e.target.src.includes('no-image')) {
           e.target.src = getImageUrl(null); 

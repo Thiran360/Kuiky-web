@@ -64,57 +64,77 @@
     .checkout-page { 
         height: auto; 
         min-height: 100vh; 
-        padding: 20px 0 80px; 
+        padding-top: 20px;
+        padding-bottom: 30px; 
         overflow-y: auto; 
         overflow-x: hidden;
     }
     
     .checkout-container { padding: 0 1rem; height: auto; }
-    .checkout-content { display: flex; flex-direction: column; gap: 1.5rem; height: auto; min-height: none; }
-    .left-section { height: auto; overflow: visible; padding-right: 0; }
+    .checkout-content { display: flex !important; flex-direction: column !important; gap: 1.5rem !important; height: auto !important; min-height: none !important; }
+    .left-section { height: auto !important; overflow: visible !important; padding-right: 0 !important; margin-bottom: 2rem; }
     
     .empty-luxe-card { padding: 3rem 1.5rem; border-radius: 2.5rem; width: 100%; box-sizing: border-box; }
     .empty-luxe-visual { width: 120px; height: 120px; margin-bottom: 2rem; }
-    .empty-luxe-title { font-size: 1.5rem; }
-    .empty-luxe-text { font-size: 0.9rem; margin-bottom: 2.5rem; }
     
-    .luxe-checkout-item { flex-direction: column; gap: 1rem; align-items: flex-start; padding: 1rem; border-radius: 1.25rem; }
-    .luxe-item-visual { width: 100%; height: 180px; border-radius: 1rem; }
-    .luxe-item-info { width: 100%; }
-    .luxe-header-group { width: 100%; margin-bottom: 0.75rem; }
-    .luxe-pricing-matrix { flex-direction: column; align-items: flex-start; gap: 1rem; width: 100%; }
-    .luxe-calc-group { width: 100%; justify-content: space-between; }
+    .luxe-checkout-item { 
+      flex-direction: row; /* Horizontal better for lists */
+      gap: 1rem; 
+      align-items: center; 
+      padding: 1rem; 
+      border-radius: 1.25rem; 
+    }
     
-    .checkout-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-    .header-actions-row { width: 100%; gap: 0.5rem; }
-    .back-btn, .empty-cart-btn { flex: 1; padding: 10px; font-size: 0.7rem; justify-content: center; border-radius: 12px; }
+    .luxe-item-visual { width: 90px; height: 90px; flex-shrink: 0; }
+    .luxe-item-info { flex: 1; }
+    .luxe-item-title { font-size: 0.9rem; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .luxe-header-group { align-items: center; }
+    .luxe-pricing-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.75rem; }
+    .luxe-calc-group { gap: 10px; align-items: center; justify-content: flex-end; }
+    .luxe-qty-terminal { padding: 2px; }
+    .luxe-qty-terminal button { width: 24px; height: 24px; }
+    .qty-indicator { width: 20px; font-size: 0.75rem; }
+    .luxe-item-net { font-size: 1.1rem; }
+    
+    .checkout-header { 
+      padding: 0 0 1rem;
+      flex-direction: column !important; 
+      align-items: center !important; 
+      text-align: center;
+      gap: 1rem; 
+    }
+    .checkout-header h1 { font-size: 1.4rem !important; justify-content: center; }
+    .header-actions-row { width: 100%; gap: 10px; }
+    .back-btn, .empty-cart-btn { flex: 1; padding: 10px; font-size: 0.65rem; justify-content: center; }
     
     /* Wizard adjustment for small screens */
-    .checkout-wizard-header { padding: 0.75rem; border-radius: 1.5rem; }
-    .wizard-line { margin: 0 8px; max-width: 40px; }
-    .wizard-label { display: none; } /* Clear up space on mobile wizard */
+    .checkout-wizard-header { padding: 0.75rem; border-radius: 1.5rem; margin-bottom: 1rem; }
+    .wizard-step { gap: 4px; }
+    .wizard-icon { width: 32px; height: 32px; font-size: 0.75rem; border-radius: 8px; }
+    .wizard-line { margin: 0 5px; height: 2px; top: -14px; }
+    .wizard-label { display: none; }
      
     .payment-methods-grid { grid-template-columns: 1fr; }
-    .card-input-complex { grid-template-columns: 1fr; }
-    .luxury-card-preview { height: 170px; }
+    .luxury-card-preview { height: 160px; padding: 1rem; }
+    .luxe-checkout-item { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     
-    .btn-elite-deployment { width: 100% !important; border-radius: 14px; }
+    .checkout-form-section {
+       background: #fff;
+       border-radius: 20px;
+       padding: 1.5rem !important;
+       margin-bottom: 2rem;
+       box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+       border: 1px solid #f1f5f9;
+    }
 }
 
 @media (max-width: 480px) {
-    .checkout-header h1 { font-size: 1.35rem; }
-    .item-count-badge { padding: 6px 14px; font-size: 0.65rem; }
-    
-    .ecom360-upper { margin-bottom: 1rem; }
-    .ecom360-name { font-size: 1.1rem; }
-    .ecom360-street { font-size: 0.85rem; }
-    
-    .btn-elite-deployment { font-size: 0.8rem; padding: 1.25rem; }
-    
-    .success-luxe-card { padding: 2rem 1.5rem; border-radius: 2rem; width: 95%; }
-    .success-luxe-title { font-size: 1.5rem; }
-    
-    .popular-banks-grid { grid-template-columns: repeat(2, 1fr); }
+    .checkout-header h1 { font-size: 1.25rem !important; }
+    .item-count-badge { padding: 5px 12px; font-size: 0.6rem; }
+    .luxe-item-visual { width: 75px; height: 75px; }
+    .luxe-item-title { font-size: 0.85rem; }
+    .luxe-item-net { font-size: 1rem; }
 }
 .checkout-container { 
     position: relative;
