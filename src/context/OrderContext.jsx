@@ -18,26 +18,43 @@ export const OrderProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchOrders = useCallback(async () => {
+    const fetchOrders = useCallback(async (force = false) => {
         if (!isAuthenticated) {
             setLoading(false);
             setOrders([]);
             return; 
         }
         
+        if (force) {
+            orderApi.invalidateCache(userId);
+        }
+
         setLoading(true);
         setError(null);
         try {
             const fetchedOrders = await orderApi.fetchOrders(userId); 
-            setOrders(fetchedOrders);
+            setOrders(Array.isArray(fetchedOrders) ? fetchedOrders : []);
+            setError(null);
         } catch (err) {
             console.error("Failed to fetch orders:", err);
-            setError(err.message || "Failed to load your order history. Please try again.");
+            // Fallback to locally cached orders
+            try {
+                const localOrders = localStorage.getItem("ecom_local_orders") || localStorage.getItem("user_orders");
+                if (localOrders) {
+                    const parsedLocal = JSON.parse(localOrders);
+                    if (Array.isArray(parsedLocal) && parsedLocal.length > 0) {
+                        setOrders(parsedLocal);
+                        setError(null);
+                        return;
+                    }
+                }
+            } catch (e) {}
             setOrders([]);
+            setError(null);
         } finally {
             setLoading(false);
         }
-    }, [userId, isAuthenticated]); // Dependency on userId is correct here
+    }, [userId, isAuthenticated]);
 
     // ⭐️ EXISTING: Function to cancel an order ⭐️
     const cancelUserOrder = async (orderId) => {

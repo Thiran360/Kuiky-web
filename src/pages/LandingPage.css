@@ -272,31 +272,53 @@
 }
 
 @media (max-width: 768px) {
-    .page-content { padding: 0 1rem; } /* Tight padding */
+    .landing-container::before,
+    .landing-container::after {
+        display: none !important;
+    }
+    .page-content { padding: 0 0.75rem 4rem; width: 100%; }
     .prem-section-header { 
-        padding: 1.25rem 1rem;
-        border-radius: 1.5rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    .prem-section-title-group { gap: 1rem; }
-    .prem-section-icon-wrap { width: 50px; height: 50px; border-radius: 1rem; }
-    .prem-section-title { font-size: 1.35rem; }
-}
-
-@media (max-width: 600px) {
-    .prem-product-grid {
-        grid-template-columns: repeat(2, 1fr);
+        padding: 1rem 0.85rem;
+        border-radius: 1.25rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         gap: 0.75rem;
+        margin-bottom: 1rem;
     }
-    .prem-section-header { padding: 1.25rem; }
-    .prem-section-title { font-size: 1.5rem; }
-    .prem-count-badge { padding: 0.4rem 0.75rem; font-size: 0.7rem; }
-}
+    .prem-section-title-group { gap: 0.75rem; }
+    .prem-section-icon-wrap { width: 42px; height: 42px; border-radius: 0.85rem; }
+    .prem-section-title { font-size: 1.2rem; }
+    .prem-section-subtitle { font-size: 0.75rem; }
+    .prem-count-badge { padding: 0.4rem 0.75rem; font-size: 0.68rem; }
 
-/* 🚀 ELITE MOBILE CLEANUP: Remove any rogue scroll buttons */
-@media (max-width: 768px) {
+    .prem-product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.65rem !important;
+        margin-top: 1rem !important;
+    }
+
+    .prem-empty-state {
+        padding: 3rem 1.25rem;
+        border-radius: 2rem;
+    }
+    .prem-empty-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1.5rem;
+    }
+    .prem-empty-title {
+        font-size: 1.35rem;
+    }
+
+    .btn-collection-load-more {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 0.85rem 1.5rem;
+        font-size: 0.85rem;
+    }
+
     .scroll-to-top, 
     .back-to-top, 
     .scroll-top-btn,
@@ -307,4 +329,56 @@
         visibility: hidden !important;
         pointer-events: none !important;
     }
+}
+
+@media (max-width: 480px) {
+    .page-content { padding: 0 0.5rem 4rem; }
+    .prem-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.85rem;
+    }
+    .prem-section-title { font-size: 1.1rem; }
+    .prem-product-grid {
+        gap: 0.5rem !important;
+    }
+}
+
+/* ⚡ LOAD MORE BUTTON STYLES */
+.collection-load-more-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2.5rem 0 1.5rem 0;
+    width: 100%;
+}
+
+.btn-collection-load-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    background: #ffffff;
+    color: #0f172a;
+    border: 2px solid #e2e8f0;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-collection-load-more:hover {
+    transform: translateY(-3px);
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.2);
+}
+
+.btn-collection-load-more:active {
+    transform: translateY(-1px);
 }

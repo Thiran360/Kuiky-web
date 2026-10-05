@@ -51,7 +51,7 @@
 .footer-main-content {
     max-width: 1550px;
     margin: 0 auto;
-    padding: 4rem 3rem 3rem;
+    padding: 2rem 2.5rem 1.75rem;
     position: relative;
     z-index: 2;
 }
@@ -60,8 +60,8 @@
 .footer-grid-container-flat {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 2.5rem;
-    margin-bottom: 3.5rem;
+    gap: 1.75rem;
+    margin-bottom: 0;
     position: relative;
     z-index: 2;
 }
@@ -69,15 +69,15 @@
 .footer-section-flat {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 0.75rem;
 }
 
 /* Section titles - gold, fully visible */
 .section-title.static, .section-title-btn {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 900;
     color: #fbbf24;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -105,7 +105,7 @@
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.35rem;
 }
 
 /* Links - bright enough to read clearly */
@@ -115,10 +115,10 @@
     padding: 0;
     margin: 0;
     color: #cbd5e1;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.25s;
     text-align: left;
     display: flex;
     align-items: center;
@@ -132,7 +132,7 @@
 
 .footer-link-btn:hover::before {
     content: '→';
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #fbbf24;
 }
 
@@ -140,11 +140,11 @@
 .contact-details {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.25rem;
     color: #94a3b8;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    line-height: 1.6;
+    line-height: 1.45;
 }
 
 .phone-line {
@@ -153,14 +153,15 @@
     gap: 8px;
     color: #ffffff;
     font-weight: 800;
-    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    margin-top: 0.4rem;
 }
 
 .phone-line span { color: #fbbf24; }
 
 /* ─── SOCIAL SECTION ─── */
 .social-mini-row {
-    margin-top: 1.25rem;
+    margin-top: 0.6rem;
 }
 
 .social-label {
@@ -169,13 +170,13 @@
     font-weight: 900;
     letter-spacing: 2px;
     color: #94a3b8;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.4rem;
     text-transform: uppercase;
 }
 
 .social-icons-wrap {
     display: flex;
-    gap: 1rem;
+    gap: 0.85rem;
 }
 
 .social-icon-btn {
@@ -189,10 +190,10 @@
 .footer-features-bar {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 1.25rem;
+    gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.85rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     position: relative;
     z-index: 2;
@@ -201,18 +202,18 @@
 .feature-pill {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     color: #fbbf24;
 }
 
 .feature-text { display: flex; flex-direction: column; }
-.feature-text span { font-size: 0.9rem; font-weight: 800; color: #ffffff; }
-.feature-text p { font-size: 0.75rem; font-weight: 500; color: #94a3b8; margin-top: 2px; }
+.feature-text span { font-size: 0.82rem; font-weight: 800; color: #ffffff; }
+.feature-text p { font-size: 0.7rem; font-weight: 500; color: #94a3b8; margin-top: 1px; }
 
 /* ─── BOTTOM STRIP ─── */
 .footer-bottom-strip {
     background: rgba(0,0,0,0.25);
-    padding: 1.75rem 0;
+    padding: 0.85rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     position: relative;
     z-index: 2;
@@ -221,7 +222,7 @@
 .bottom-strip-inner {
     max-width: 1550px;
     margin: 0 auto;
-    padding: 0 3rem;
+    padding: 0 2.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -229,19 +230,19 @@
 
 .footer-utility-links {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 /* Utility buttons - clearly visible */
 .util-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     color: #94a3b8;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     background: none;
     border: none;
     cursor: pointer;
@@ -511,42 +512,49 @@
 }
 
 @media (max-width: 768px) {
-    .footer-main-content { padding: 1.5rem 1rem; }
-    .footer-grid-container-flat { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 2rem; }
+    .footer-premium {
+        padding-bottom: calc(var(--bottom-nav-height, 60px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+    }
+    .footer-main-content { padding: 1.5rem 0.85rem 1rem; width: 100%; }
+    .footer-grid-container-flat { grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1.5rem; }
     
     .footer-section-flat {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 0.65rem;
     }
 
     .section-title-btn {
-        padding: 0.5rem 0;
-        font-size: 0.7rem;
+        padding: 0.6rem 0;
+        font-size: 0.72rem;
     }
 
     .footer-list {
-        padding: 0.5rem 0 1rem;
-        gap: 0.5rem;
+        padding: 0.35rem 0 0.85rem;
+        gap: 0.45rem;
     }
 
     .footer-link-btn {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
+        padding: 3px 0;
     }
 
     .footer-features-bar { 
         grid-template-columns: 1fr; 
-        gap: 1rem; 
-        padding: 1.25rem;
-        margin-top: 1rem;
+        gap: 0.75rem; 
+        padding: 1rem; 
+        margin-top: 0.75rem; 
     }
 
-    .bottom-strip-inner { padding: 0 1rem; flex-direction: column; gap: 1.5rem; text-align: center; }
-    .footer-utility-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+    .bottom-strip-inner { padding: 0 0.85rem; flex-direction: column; gap: 1.25rem; text-align: center; }
+    .footer-utility-links { flex-wrap: wrap; justify-content: center; gap: 0.85rem; }
     .footer-credit-hub { align-items: center; }
     .thiran-badge { font-size: 0.65rem; }
 }
 
 @media (max-width: 480px) {
-    .footer-main-content { padding: 1.25rem 0.75rem; }
+    .footer-main-content { padding: 1.25rem 0.65rem; }
     .util-btn { font-size: 0.65rem; gap: 4px; }
 }

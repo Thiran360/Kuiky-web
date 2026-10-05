@@ -410,25 +410,26 @@
 .lite-form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
 }
 
 .elite-input-field {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
 }
 
 .elite-input-field.full { grid-column: span 2; }
 
 .field-label-luxe {
-    font-size: 0.65rem;
-    font-weight: 900;
-    color: #94a3b8;
-    padding-left: 0.25rem;
-    letter-spacing: 1.5px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #1e293b;
+    padding-left: 0.15rem;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
+    display: block;
 }
 
 .field-input-wrapper {
@@ -439,44 +440,64 @@
 
 .field-input-wrapper input {
     width: 100%;
-    padding: 1rem 1.25rem 1rem 3rem;
-    border-radius: 1rem;
-    border: 1.5px solid #e2e8f0;
-    background: #f8fafc;
+    padding: 0.95rem 1.25rem 0.95rem 3rem;
+    border-radius: 0.85rem;
+    border: 1.5px solid #cbd5e1;
+    background: #ffffff;
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--p-slate);
-    transition: all 0.3s;
+    color: #0f172a;
+    transition: all 0.25s ease;
     font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.field-input-wrapper input::placeholder {
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.88rem;
 }
 
 .field-input-wrapper input:focus {
-    background: white;
-    border-color: var(--p-blue);
-    box-shadow: 0 0 0 3px var(--p-blue-glow);
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18);
     outline: none;
 }
 
 .field-icon {
     position: absolute;
     left: 1rem;
-    color: #cbd5e1;
-    transition: color 0.3s;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: color 0.25s;
 }
 
 .field-input-wrapper input:focus ~ .field-icon,
 .field-input-wrapper:focus-within .field-icon {
-    color: var(--p-blue);
+    color: #2563eb;
 }
 
 .form-sub-protocol {
     grid-column: span 2;
-    padding: 1rem 0 0.25rem;
-    font-size: 0.65rem;
+    padding: 1.25rem 0 0.5rem;
+    font-size: 0.82rem;
     font-weight: 900;
-    color: #94a3b8;
-    letter-spacing: 2px;
-    border-top: 1px solid #f1f5f9;
+    color: #0f172a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-top: 1.5px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0.5rem;
+}
+
+.form-sub-protocol svg {
+    color: #2563eb;
 }
 
 .ecom360-form-actions {
@@ -558,22 +579,58 @@
 }
 
 @media (max-width: 992px) {
-    .elite-profile-layout { grid-template-columns: 1fr; }
-    .elite-profile-sidebar { position: relative; top: 0; }
+    .elite-profile-page::before { display: none !important; }
+    .elite-profile-page {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+    }
+    .elite-profile-layout { grid-template-columns: 1fr; gap: 1rem; }
+    .elite-profile-sidebar { 
+        position: static; 
+        padding: 0.5rem;
+        border-radius: 1rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .sidebar-nav-ecom360 { 
+        flex-direction: row; 
+        gap: 0.5rem;
+        width: max-content;
+        min-width: 100%;
+    }
+    .nav-link-luxe {
+        white-space: nowrap;
+        padding: 0.65rem 1rem;
+        font-size: 0.75rem;
+        border-radius: 0.75rem;
+    }
+    .nav-divider { display: none; }
+    
     .ecom360-cards-container { grid-template-columns: 1fr; }
     .lite-form-grid { grid-template-columns: 1fr; }
     .elite-input-field.full { grid-column: auto; }
-    .banner-content { flex-direction: column; gap: 2rem; align-items: flex-start; }
-    .profile-stats-ecom360 { flex-direction: row; }
+    .banner-content { flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+    .profile-stats-ecom360 { flex-direction: row; width: 100%; }
 }
 
 @media (max-width: 640px) {
-    .elite-profile-canvas { padding: 1rem; }
-    .elite-profile-banner { padding: 2rem; border-radius: 1.5rem; }
-    .profile-avatar-ecom360 { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-    .avatar-shield { width: 80px; height: 80px; border-radius: 1.5rem; }
-    .identity-name { font-size: 1.75rem; }
-    .profile-stats-ecom360 { flex-wrap: wrap; }
-    .stat-card-luxe { min-width: 140px; padding: 1rem; }
-    .elite-profile-ecom360 { padding: 1.5rem; border-radius: 1.25rem; }
+    .elite-profile-canvas { padding: 0.75rem 0.5rem 5rem; width: 100%; max-width: 100%; }
+    .elite-profile-banner { padding: 1.5rem 1rem; border-radius: 1.25rem; min-height: auto; }
+    .profile-avatar-ecom360 { flex-direction: row; align-items: center; gap: 1rem; }
+    .avatar-shield { width: 64px; height: 64px; border-radius: 1rem; }
+    .identity-name { font-size: 1.45rem; }
+    .profile-stats-ecom360 { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 0.5rem; 
+        width: 100%; 
+    }
+    .stat-card-luxe { min-width: auto; padding: 0.75rem; border-radius: 1rem; gap: 0.65rem; }
+    .stat-info .val { font-size: 1.15rem; }
+    .stat-info .lbl { font-size: 0.55rem; }
+    .elite-profile-ecom360 { padding: 1.25rem 1rem; border-radius: 1.25rem; }
+    .elite-info-card-luxe { padding: 1rem; border-radius: 1rem; gap: 0.75rem; }
+    .card-icon-halo { width: 40px; height: 40px; }
+    .card-value { font-size: 0.9rem; }
 }

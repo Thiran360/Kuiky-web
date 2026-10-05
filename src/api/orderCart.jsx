@@ -1,41 +1,131 @@
 import api from "./api";
+import axios from "axios";
+import { API_BASE_URL, FALLBACK_API_BASE_URL, ECOM_API_PATH, COMMON_HEADERS } from "./config";
 import { API_ENDPOINTS } from "./endpoints";
 
+const normalizeOrders = (data) => {
+    if (!data) return [];
+    if (data.message && typeof data.message === "string" && data.message.toLowerCase().includes("no order")) {
+        return [];
+    }
+    const possibleKeys = [
+        "orders", "order", "results", "data", "order_list",
+        "orders_list", "user_orders",
+    ];
+    for (const key of possibleKeys) {
+        if (Array.isArray(data[key])) {
+            return data[key];
+        }
+    }
+    if (Array.isArray(data)) return data;
+    return [];
+};
+
 export const orderApi = {
+    // Invalidate session cache when a new order is placed
+    invalidateCache: (userId) => {
+        try {
+            sessionStorage.removeItem(`no_remote_orders_${userId}`);
+            sessionStorage.removeItem("no_remote_orders_anon");
+        } catch (e) {}
+    },
+
     // GET: Fetch all orders for a user
     fetchOrders: async (userId) => {
+        const params = {};
+        if (userId && !isNaN(parseInt(userId))) {
+            params.user_id = parseInt(userId);
+        }
+
+        const cacheKey = `no_remote_orders_${userId || "anon"}`;
         try {
-            const params = {};
-            if (userId && !isNaN(parseInt(userId))) {
-                params.user_id = parseInt(userId);
+            if (sessionStorage.getItem(cacheKey) === "true") {
+                const localOrders = localStorage.getItem("ecom_local_orders") || localStorage.getItem("user_orders");
+                if (localOrders) {
+                    const parsedLocal = JSON.parse(localOrders);
+                    if (Array.isArray(parsedLocal)) return parsedLocal;
+                }
+                return [];
             }
-            
-            const response = await api.get(API_ENDPOINTS.USER_ORDERS, { params });
+        } catch (e) {}
 
-            const data = response.data;
+        // 1. Try Primary API (e.g. local backend on 127.0.0.1:8000)
+        try {
+            const response = await api.get(API_ENDPOINTS.USER_ORDERS, { params, timeout: 5000 });
+            const orders = normalizeOrders(response.data);
+            if (orders.length === 0) {
+                try { sessionStorage.setItem(cacheKey, "true"); } catch (e) {}
+            }
+            return orders;
+        } catch (error) {
+            // Django returns 404 with {"message": "No orders found for this user"} when the user has 0 orders
+            const isNoOrders404 =
+                error.response?.status === 404 ||
+                error.status === 404 ||
+                (typeof error.response?.data?.message === "string" &&
+                    error.response.data.message.toLowerCase().includes("no order"));
 
-            // ⭐ UNIVERSAL NORMALIZER (supports all backend variations)
-            const possibleKeys = [
-                "orders", "order", "results", "data", "order_list",
-                "orders_list", "user_orders",
-            ];
+            if (isNoOrders404) {
+                try { sessionStorage.setItem(cacheKey, "true"); } catch (e) {}
+                // Check if user has local orders placed in current session
+                try {
+                    const localOrders = localStorage.getItem("ecom_local_orders") || localStorage.getItem("user_orders");
+                    if (localOrders) {
+                        const parsedLocal = JSON.parse(localOrders);
+                        if (Array.isArray(parsedLocal) && parsedLocal.length > 0) return parsedLocal;
+                    }
+                } catch (e) {}
+                return [];
+            }
 
-            for (const key of possibleKeys) {
-                if (Array.isArray(data[key])) {
-                    return data[key];
+            console.warn("fetchOrders primary failed, checking fallback:", error.message);
+
+            // 2. Try Fallback Production API
+            if (FALLBACK_API_BASE_URL && FALLBACK_API_BASE_URL !== API_BASE_URL) {
+                try {
+                    const fallbackUrl = `${FALLBACK_API_BASE_URL}${ECOM_API_PATH}${API_ENDPOINTS.USER_ORDERS}`;
+                    const fbRes = await axios.get(fallbackUrl, {
+                        params,
+                        headers: { ...COMMON_HEADERS },
+                        timeout: 5000
+                    });
+                    return normalizeOrders(fbRes.data);
+                } catch (fbErr) {
+                    if (
+                        fbErr.response?.status === 404 ||
+                        (typeof fbErr.response?.data?.message === "string" &&
+                            fbErr.response.data.message.toLowerCase().includes("no order"))
+                    ) {
+                        try { sessionStorage.setItem(cacheKey, "true"); } catch (e) {}
+                        try {
+                            const localOrders = localStorage.getItem("ecom_local_orders") || localStorage.getItem("user_orders");
+                            if (localOrders) {
+                                const parsedLocal = JSON.parse(localOrders);
+                                if (Array.isArray(parsedLocal) && parsedLocal.length > 0) return parsedLocal;
+                            }
+                        } catch (e) {}
+                        return [];
+                    }
+                    console.warn("fetchOrders fallback failed:", fbErr.message);
                 }
             }
-
-            // If backend returns a raw array
-            if (Array.isArray(data)) return data;
-
-            console.warn("⚠ Unexpected Orders API Response:", data);
-            return [];
-        } catch (error) {
-            console.error("Failed to fetch orders:", error);
-            throw error;
         }
+
+        // 3. Check for any locally placed orders in localStorage
+        try {
+            const localOrders = localStorage.getItem("ecom_local_orders") || localStorage.getItem("user_orders");
+            if (localOrders) {
+                const parsedLocal = JSON.parse(localOrders);
+                if (Array.isArray(parsedLocal) && parsedLocal.length > 0) {
+                    return parsedLocal;
+                }
+            }
+        } catch (e) {}
+
+        // 4. Return clean empty list instead of throwing Network Error
+        return [];
     },
+
 
     // ⭐️ POST to cancel a specific order ⭐️
     cancelOrder: async (orderId) => {

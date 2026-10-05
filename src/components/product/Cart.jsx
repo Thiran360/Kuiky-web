@@ -38,31 +38,32 @@ import { generateInvoice } from "../../utils/invoiceGenerator";
 
 import AddressManager from "../Profile/AddressManager";
 
-/* ─── GUEST STATE (NOT LOGGED IN) ─── */
+/* ─── GUEST STATE (NOT LOGGED IN & EMPTY CART) ─── */
 const GuestCartState = () => {
     const navigate = useNavigate();
     return (
         <div className="checkout-page guest-luxe-state">
             <motion.div 
                 className="empty-luxe-card"
-                initial={{ scale: 0.9, opacity: 0 }} 
-                animate={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.94, opacity: 0, y: 15 }} 
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
             >
                 <div className="empty-luxe-visual">
-                    <Lock size={80} strokeWidth={1} className="text-amber-200" />
-                    <div className="empty-glow-amber"></div>
+                    <div className="empty-cart-icon-wrap">
+                        <ShoppingBag size={46} className="text-emerald-500" />
+                    </div>
                 </div>
-                <h2 className="empty-luxe-title">Cart Synchronicity Limited</h2>
+                <h2 className="empty-luxe-title">Your Basket is Empty</h2>
                 <p className="empty-luxe-text">
-                    Your shopping bag is waiting to be filled. Sign in to your account to sync items across your devices 
-                    and access our secure elite procurement protocol.
+                    Sign in to access your saved items, track your deliveries, and enjoy a faster checkout experience.
                 </p>
-                <div className="flex flex-col gap-4 items-center">
-                    <button className="btn-elite-deployment m-0 w-auto px-12" onClick={() => navigate("/login")}>
-                        <Zap size={18} /> SIGN IN TO YOUR ACCOUNT
+                <div className="cart-empty-actions-col">
+                    <button className="btn-primary-cart-action" onClick={() => navigate("/login")}>
+                        <Zap size={18} /> Sign In to Your Account
                     </button>
-                    <button className="text-slate-400 text-sm font-bold uppercase tracking-widest hover:text-white transition-colors" onClick={() => navigate("/")}>
-                        OR BROWSE AS GUEST
+                    <button className="btn-secondary-cart-action" onClick={() => navigate("/")}>
+                        <ArrowLeft size={16} /> Continue Shopping as Guest
                     </button>
                 </div>
             </motion.div>
@@ -121,24 +122,24 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, index }) => {
     >
       <div className="luxe-item-visual">
         <CartItemImage item={item} name={item.product_name || item.name} />
-        <div className="luxe-item-badge">PREMIUM</div>
       </div>
 
       <div className="luxe-item-info">
         <div className="luxe-header-group">
             <div className="luxe-title-wrapper">
-                <span className="luxe-item-serial">ITEM 0{index + 1}</span>
                 <h3 className="luxe-item-title">{item.product_name || item.name}</h3>
+                {item.variant_value && (
+                  <span className="luxe-variant-tag">{item.variant_value}</span>
+                )}
             </div>
-            <button className="luxe-remove-action" onClick={() => onRemove(item)}>
-               <Trash2 size={16} />
+            <button className="luxe-remove-action" onClick={() => onRemove(item)} title="Remove item">
+               <Trash2 size={18} />
             </button>
         </div>
         
         <div className="luxe-pricing-matrix">
             <div className="luxe-val-group">
-                <p className="luxe-item-valuation">₹{price.toFixed(0)}</p>
-                <span className="valuation-label">CERTIFIED UNIT PRICE</span>
+                <span className="luxe-item-valuation">₹{price.toLocaleString()}</span>
             </div>
 
             <div className="luxe-calc-group">
@@ -147,16 +148,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, index }) => {
                    <span className="qty-indicator">{localQty}</span>
                    <button onClick={() => setLocalQty(q => q + 1)}><Plus size={14} /></button>
                 </div>
-                <div className="luxe-item-net">₹{(price * localQty).toFixed(0)}</div>
+                <div className="luxe-item-net">₹{(price * localQty).toLocaleString()}</div>
             </div>
         </div>
-
-        {item.variant_value && (
-          <div className="luxe-variant-tag">
-            <span className="variant-dot"></span>
-            <span className="variant-label">CONFIG: {item.variant_value.toUpperCase()}</span>
-          </div>
-        )}
       </div>
     </motion.div>
   );
@@ -229,7 +223,7 @@ const SuccessOverlay = ({ orderData }) => {
     );
 };
 
-/* ─── LOGISTICS DRAWER (SLIDE-OVER) ─── */
+/* ─── LOGISTICS MODAL (CENTERED POPUP) ─── */
 const LogisticsDrawer = ({ onClose }) => (
   <motion.div 
     className="logistics-slide-overlay"
@@ -240,32 +234,32 @@ const LogisticsDrawer = ({ onClose }) => (
   >
     <motion.div 
       className="logistics-drawer-content"
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      initial={{ opacity: 0, scale: 0.94, y: 15 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.94, y: 15 }}
+      transition={{ type: 'spring', damping: 25, stiffness: 320 }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="drawer-institutional-header">
         <div className="header-meta">
-            <span className="meta-badge">COORDINATE DEPLOYMENT</span>
-            <h2>Logistics Hub</h2>
+            <span className="meta-badge">DELIVERY LOCATION</span>
+            <h2>Select Delivery Address</h2>
         </div>
-        <button onClick={onClose} className="drawer-close-btn"><X size={24} /></button>
+        <button onClick={onClose} className="drawer-close-btn" title="Close"><X size={20} /></button>
       </div>
       
       <div className="drawer-scroll-ecom360 no-scrollbar">
         <div className="drawer-info-block">
             <div className="info-icon"><Navigation size={18} /></div>
-            <p>Modify your delivery destination or deploy new logistics coordinates for this transaction.</p>
+            <p>Select your delivery address or add a new address to continue checkout.</p>
         </div>
         
         <AddressManager />
       </div>
 
       <div className="drawer-institutional-footer">
-         <ShieldCheck size={14} />
-         <span>SECURE END-TO-END DATA ENCRYPTION ACTIVE</span>
+         <ShieldCheck size={15} />
+         <span>100% SECURE & ENCRYPTED CHECKOUT</span>
       </div>
     </motion.div>
   </motion.div>
@@ -375,28 +369,33 @@ const CartPage = () => {
     e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
   };
 
-  // CHECK GUEST STATUS FIRST
-  if (!isAuthenticated) {
+  // Show guest state only if guest AND cart is empty
+  if (!isAuthenticated && (!cartItems || cartItems.length === 0)) {
       return <GuestCartState />;
   }
 
+  // Show empty state if cart has no items
   if (!cartItems.length && !orderSuccess) {
     return (
       <div className="checkout-page empty-luxe-state">
         <motion.div 
             className="empty-luxe-card"
-            initial={{ scale: 0.9, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ scale: 0.94, opacity: 0, y: 15 }} 
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
         >
           <div className="empty-luxe-visual">
-             <ShoppingBag size={80} strokeWidth={1} className="text-slate-200" />
-             <div className="empty-glow"></div>
+             <div className="empty-cart-icon-wrap">
+                <ShoppingBag size={46} className="text-slate-400" />
+             </div>
           </div>
-          <h2 className="empty-luxe-title">Your Bag is Empty</h2>
-          <p className="empty-luxe-text">It looks like you haven't added anything to your cart yet.</p>
-          <button className="btn-elite-deployment m-0 w-auto px-12" onClick={() => navigate("/")}>
-             <Zap size={18} /> START SHOPPING
-          </button>
+          <h2 className="empty-luxe-title">Your Basket is Empty</h2>
+          <p className="empty-luxe-text">Looks like you haven't added anything to your cart yet. Explore our top products and find great deals today.</p>
+          <div className="cart-empty-actions-col">
+            <button className="btn-primary-cart-action" onClick={() => navigate("/")}>
+               <ShoppingBag size={18} /> Start Shopping
+            </button>
+          </div>
         </motion.div>
       </div>
     );
@@ -417,37 +416,37 @@ const CartPage = () => {
           </h1>
           <div className="header-actions-row">
             <button className="back-btn" onClick={() => navigate("/")}>
-              <ArrowLeft size={18} /> CONTINUE SHOPPING
+              <ArrowLeft size={16} /> Continue Shopping
             </button>
             <button className="empty-cart-btn" onClick={clearCart}>
-              <Trash2 size={18} /> CLEAR BAG
+              <Trash2 size={16} /> Clear Cart
             </button>
           </div>
         </motion.div>
 
         <div className="checkout-content">
           <div className="left-section">
-            {/* PREMIUM STEP INDICATOR */}
+            {/* STEP INDICATOR */}
             <div className="checkout-wizard-header">
               <div className={`wizard-step ${checkoutStep === 'cart' ? 'active' : 'completed'}`}>
                 <div className="wizard-icon">
-                  {checkoutStep === 'cart' ? <ShoppingBag size={24} /> : <CheckCircle2 size={24} />}
+                  {checkoutStep === 'cart' ? <ShoppingBag size={20} /> : <CheckCircle2 size={20} />}
                 </div>
-                <div className="wizard-label">Curate Bag</div>
+                <div className="wizard-label">1. Cart</div>
               </div>
               <div className="wizard-line"></div>
               <div className={`wizard-step ${checkoutStep === 'shipping' ? 'active' : (checkoutStep === 'payment' ? 'completed' : 'pending')}`}>
                 <div className="wizard-icon">
-                  {checkoutStep === 'shipping' ? <MapPin size={24} /> : (checkoutStep === 'payment' ? <CheckCircle2 size={24} /> : "02")}
+                  {checkoutStep === 'shipping' ? <MapPin size={20} /> : (checkoutStep === 'payment' ? <CheckCircle2 size={20} /> : "2")}
                 </div>
-                <div className="wizard-label">Secure Shipping</div>
+                <div className="wizard-label">2. Delivery</div>
               </div>
               <div className="wizard-line"></div>
               <div className={`wizard-step ${checkoutStep === 'payment' ? 'active' : 'pending'}`}>
                 <div className="wizard-icon">
-                   <ShieldCheck size={24} />
+                   <ShieldCheck size={20} />
                 </div>
-                <div className="wizard-label">Elite Payment</div>
+                <div className="wizard-label">3. Payment</div>
               </div>
             </div>
 
@@ -476,12 +475,12 @@ const CartPage = () => {
                 <div className="address-header-row-luxe">
                   <div className="address-header-luxe">
                     <div className="logistics-icon-wrapper">
-                      <MapPin size={26} />
+                      <MapPin size={24} />
                     </div>
-                    <h2>Secure Logistics Hub</h2>
+                    <h2>Delivery Address</h2>
                   </div>
                   <button className="manage-address-btn-luxe" onClick={() => setShowAddressModal(true)}>
-                    {selectedAddress ? <><Edit2 size={16} /> CHANGE DESTINATION</> : <><Plus size={16} /> ADD ADDRESS</>}
+                    {selectedAddress ? <><Edit2 size={15} /> Change Address</> : <><Plus size={15} /> Add Address</>}
                   </button>
                 </div>
 
@@ -489,43 +488,39 @@ const CartPage = () => {
                   <div className="selected-address-ecom360">
                     <div className="ecom360-upper">
                         <div className="ecom360-status-pill">
-                            <Globe size={10} />
-                            <span>ELITE LOGISTICS PROTOCOL</span>
+                            <MapPin size={11} />
+                            <span>DELIVERY LOCATION</span>
                         </div>
                         <div className="ecom360-verification-shield">
-                            <ShieldCheck size={28} className="text-[#3b82f6]" strokeWidth={2.5} />
+                            <CheckCircle2 size={24} className="text-emerald-500" strokeWidth={2} />
                         </div>
                     </div>
 
                     <div className="ecom360-body">
                         <div className="ecom360-identity-group">
-                            <h4 className="ecom360-name">{(selectedAddress.full_name || selectedAddress.name).toUpperCase()}</h4>
-                            <p className="ecom360-location-summary">{selectedAddress.city.toUpperCase()}, {selectedAddress.state.toUpperCase()}</p>
+                            <h4 className="ecom360-name">{selectedAddress.full_name || selectedAddress.name}</h4>
+                            <p className="ecom360-location-summary">{selectedAddress.city}, {selectedAddress.state}</p>
                         </div>
                         
                         <div className="ecom360-address-details">
                             <p className="ecom360-street">{getAddressLine(selectedAddress)}</p>
-                            <p className="ecom360-pincode">Postal Zone: {getPincode(selectedAddress)}</p>
+                            <p className="ecom360-pincode">PIN: {getPincode(selectedAddress)}</p>
                         </div>
 
                         <div className="ecom360-comms-terminal">
-                            <div className="ecom360-verified-badge">
-                                <Navigation size={12} className="text-emerald-500" />
-                                <span>GPS VERIFIED COORDINATES</span>
-                            </div>
                             <div className="ecom360-phone-display">
-                                <span className="text-[10px] text-slate-400 font-black">PH</span>
-                                <span className="font-bold tracking-widest">{getPhone(selectedAddress)}</span>
+                                <span className="text-[11px] text-slate-400 font-semibold">Phone:</span>
+                                <span className="font-semibold text-slate-800">{getPhone(selectedAddress)}</span>
                             </div>
                         </div>
                     </div>
                   </div>
                 ) : (
                   <div className="no-address-warning-large" onClick={() => setShowAddressModal(true)}>
-                    <div className="icon-pulse"><MapPin size={40} /></div>
-                    <h3>Where shall we deliver?</h3>
-                    <p>Select a verified destination for your luxury items.</p>
-                    <button className="inline-add-btn">Establish First Protocol</button>
+                    <div className="icon-pulse"><MapPin size={36} /></div>
+                    <h3>Where should we deliver?</h3>
+                    <p>Select or add a delivery address to complete your order.</p>
+                    <button className="inline-add-btn">Add Delivery Address</button>
                   </div>
                 )}
               </motion.div>
@@ -538,7 +533,7 @@ const CartPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
               >
                 <div className="payment-header">
-                  <PackageCheck size={28} className="text-green-500" /> Secure Payment Hub
+                  <PackageCheck size={24} className="text-emerald-500" /> Select Payment Method
                 </div>
 
                 <div className="payment-methods-grid">
@@ -550,8 +545,8 @@ const CartPage = () => {
                        <div className="luxe-radio-ring"></div>
                     </div>
                     <div className="method-details-luxe">
-                      <h3>Cards Protocol</h3>
-                      <p>Visa, Mastercard, Platinum Amex</p>
+                      <h3>Credit / Debit Card</h3>
+                      <p>Visa, Mastercard, RuPay</p>
                     </div>
                   </div>
 
@@ -563,8 +558,8 @@ const CartPage = () => {
                        <div className="luxe-radio-ring"></div>
                     </div>
                     <div className="method-details-luxe">
-                      <h3>Instant UPI</h3>
-                      <p>Google Pay, PhonePe, Secure QR</p>
+                      <h3>UPI</h3>
+                      <p>Google Pay, PhonePe, Paytm, QR</p>
                     </div>
                   </div>
 
@@ -576,8 +571,8 @@ const CartPage = () => {
                        <div className="luxe-radio-ring"></div>
                     </div>
                     <div className="method-details-luxe">
-                      <h3>Banking Portal</h3>
-                      <p>Secure Institutional Transfer</p>
+                      <h3>Net Banking</h3>
+                      <p>All major Indian banks</p>
                     </div>
                   </div>
 
@@ -589,8 +584,8 @@ const CartPage = () => {
                        <div className="luxe-radio-ring"></div>
                     </div>
                     <div className="method-details-luxe">
-                      <h3>Pay on Arrival</h3>
-                      <p>Privilege Delivery Protocol</p>
+                      <h3>Cash on Delivery (COD)</h3>
+                      <p>Pay with cash at your doorstep</p>
                     </div>
                   </div>
                 </div>
@@ -775,20 +770,20 @@ const CartPage = () => {
             <h2>Order Summary</h2>
 
             <div className="price-row">
-              <span className="row-label-luxe">Items Subtotal ({cartItems.length})</span>
+              <span className="row-label-luxe">Items Subtotal ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})</span>
               <span className="row-value-luxe">₹{totals.subtotal.toLocaleString()}</span>
             </div>
 
             <div className="price-row">
-              <span className="row-label-luxe">Shipping Fee</span>
-              <span className={totals.shipping === 0 ? "row-value-luxe text-emerald-500" : "row-value-luxe"}>
+              <span className="row-label-luxe">Delivery Fee</span>
+              <span className={totals.shipping === 0 ? "row-value-luxe text-emerald-600 font-semibold" : "row-value-luxe"}>
                 {totals.shipping === 0 ? "FREE" : `₹${totals.shipping}`}
               </span>
             </div>
 
             <div className="price-row">
-              <span className="row-label-luxe">Corporate GST (0%)</span>
-              <span className="row-value-luxe">₹0</span>
+              <span className="row-label-luxe">Estimated Tax (GST)</span>
+              <span className="row-value-luxe text-slate-400">₹0</span>
             </div>
 
             <div className="price-row total-row-premium">
@@ -797,8 +792,8 @@ const CartPage = () => {
             </div>
 
             <div className="security-nexus-badge">
-               <ShieldCheck size={14} />
-               <span>Secure Checkout Active</span>
+               <ShieldCheck size={15} />
+               <span>100% Safe & Secure Checkout</span>
             </div>
 
             {orderError && (
@@ -811,11 +806,15 @@ const CartPage = () => {
             <button
               className={`btn-elite-deployment ${
                 (isPlacingOrder || 
-                 (checkoutStep === 'shipping' && !selectedAddress) || 
-                 (checkoutStep === 'payment' && (!selectedAddress || !paymentMethod))
+                 (isAuthenticated && checkoutStep === 'shipping' && !selectedAddress) || 
+                 (isAuthenticated && checkoutStep === 'payment' && (!selectedAddress || !paymentMethod))
                 ) ? "btn-locked" : ""
               }`}
               onClick={() => {
+                if (!isAuthenticated) {
+                  navigate("/login", { state: { from: "/cart" } });
+                  return;
+                }
                 if (checkoutStep === 'cart') setCheckoutStep('shipping');
                 else if (checkoutStep === 'shipping') setCheckoutStep('payment');
                 else handlePlaceOrder();
@@ -824,21 +823,21 @@ const CartPage = () => {
             >
               <div className="btn-glow-container">
                 {isPlacingOrder ? (
-                  <><Loader2 size={24} className="spin-icon" /> ANALYZING LOGISTICS & FUNDS...</>
+                  <><Loader2 size={20} className="spin-icon" /> Processing Order...</>
                 ) : (
                   <>
                     <span>
-                      {checkoutStep === 'cart' ? 'PROCEED TO CHECKOUT' :
-                       checkoutStep === 'shipping' ? 'CONTINUE TO PAYMENT' :
-                       'PLACE SECURE ORDER'}
+                      {!isAuthenticated ? 'Sign In to Checkout' :
+                       checkoutStep === 'cart' ? 'Proceed to Checkout' :
+                       checkoutStep === 'shipping' ? 'Continue to Payment' :
+                       'Place Order'}
                     </span>
                     <div className="btn-icon-pulse">
-                      {checkoutStep === 'payment' ? <ShieldCheck size={20} /> : <Zap size={20} />}
+                      {!isAuthenticated ? <Zap size={18} /> : checkoutStep === 'payment' ? <ShieldCheck size={18} /> : <ChevronRight size={18} />}
                     </div>
                   </>
                 )}
               </div>
-              <div className="btn-shine-overlay"></div>
             </button>
           </motion.div>
         </div>

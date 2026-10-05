@@ -1,205 +1,628 @@
 /* src/components/home/HeroBanner.css */
-/* 🎭 LUXE VANGUARD — SUPREME DISCOVERY BANNER HUB */
-
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700;800;900&display=swap');
+/* 💎 ELITE VANGUARD SLIDESHOW — KUIKY HIGH-FIDELITY SERVICES */
 
 :root {
-    --bn-navy: #0a0e1a;
     --bn-gold: #fbbf24;
-    --bn-gold-glow: rgba(251, 191, 36, 0.4);
-    --bn-glass: rgba(255, 255, 255, 0.03);
-    --bn-border: rgba(255, 255, 255, 0.08);
+    --bn-dark: #0f172a;
+    --bn-border: rgba(255, 255, 255, 0.12);
 }
 
 .hb-prime-wrapper {
+    position: relative;
     width: 100%;
-    padding: 2rem 0 6rem; /* SPACIOUS BOTTOM FOR NAV BAR */
+    padding: 1rem 0 2rem;
     overflow: hidden;
-    background: transparent;
-    font-family: 'Outfit', sans-serif;
+    background: #0a0f1e;
 }
 
 .hb-stage-luxe {
-    max-width: 1400px; /* INCREASED WIDTH FOR CINEMATIC FEEL */
+    max-width: 1580px;
     margin: 0 auto;
-    height: 420px; /* REDUCED LENGTH (HEIGHT) */
+    padding: 0 1.5rem;
     position: relative;
-    padding: 0 80px; /* TIGHTER PADDING TO EXTEND WIDER */
+    min-height: 540px;
+    display: flex;
+    align-items: center;
 }
 
-/* --- THE VANGUARD VAULT --- */
 .hb-active-vanguard {
     width: 100%;
-    height: 100%;
+    min-height: 540px;
     position: relative;
     z-index: 10;
 }
 
 .hb-vanguard-inner {
     width: 100%;
-    height: 100%;
-    background: #0f172a;
-    border-radius: 2.5rem;
-    overflow: hidden;
+    min-height: 540px;
+    border-radius: 2rem;
     position: relative;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    background: linear-gradient(145deg, #0f172a 0%, #0b1120 100%);
     border: 1px solid var(--bn-border);
+    box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.7);
 }
 
 .hb-vanguard-content {
-    display: flex; height: 100%; width: 100%;
-    position: relative; z-index: 10;
+    display: flex;
+    min-height: 540px;
+    width: 100%;
+    position: relative;
+    z-index: 10;
 }
 
 /* TEXT AREA */
 .hb-text-vanguard {
     flex: 1.25;
-    padding: 4rem 5rem;
-    display: flex; flex-direction: column; justify-content: center; gap: 1.25rem;
+    padding: 3.5rem 2.5rem 3.5rem 4.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.1rem;
 }
 
 .hb-promo-pill {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-    color: #000; padding: 7px 16px; border-radius: 100px;
-    width: fit-content; font-size: 0.7rem; font-weight: 1000;
-    letter-spacing: 1.5px; display: flex; align-items: center; gap: 8px;
+    color: #fff;
+    padding: 7px 18px;
+    border-radius: 100px;
+    width: fit-content;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     text-transform: uppercase;
 }
 
 .hb-headline-vanguard {
-    font-size: 4.5rem; font-weight: 1000; color: #fff;
-    line-height: 0.9; letter-spacing: -3.5px; margin: 0;
-    background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .hb-summary-vanguard {
-    font-size: 1.15rem; color: rgba(255, 255, 255, 0.6);
-    max-width: 480px; line-height: 1.5; margin: 0;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.78);
+    max-width: 540px;
+    line-height: 1.55;
+    margin: 0;
 }
 
-.hb-vanguard-actions { display: flex; align-items: center; gap: 2.5rem; margin-top: 1.5rem; }
-
-.hb-btn-discovery {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #000; border: none; padding: 1.35rem 3rem; border-radius: 100px;
-    font-weight: 950; font-size: 1rem; display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: 0.4s;
+/* 🌟 KUIKY SERVICE CHECKLIST */
+.hb-features-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    margin: 0.25rem 0 0.5rem;
 }
 
-.hb-btn-discovery:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(251, 191, 36, 0.3); }
-
-.hb-vanguard-stats { display: flex; gap: 1.5rem; }
-.stat-node { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; font-weight: 900; color: #94a3b8; }
-
-/* VISUAL AREA */
-.hb-visual-vanguard { flex: 0.8; position: relative; display: flex; align-items: center; justify-content: center; padding-right: 4rem; }
-.hb-image-hub-luxe { width: 380px; height: 380px; position: relative; z-index: 10; }
-.hb-product-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.3)); }
-.vanguard-orb { position: absolute; width: 140%; height: 140%; background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 65%); z-index: 1; }
-
-/* --- EDGE PEEKS --- */
-.hb-edge-peek { position: absolute; top: 3.5rem; bottom: 3.5rem; width: 320px; z-index: 5; opacity: 0.2; transition: 0.5s; cursor: pointer; }
-.hb-edge-peek:hover { opacity: 0.4; }
-.hb-edge-peek.left { left: -260px; }
-.hb-edge-peek.right { right: -260px; }
-.edge-glass { width: 100%; height: 100%; border-radius: 2.5rem; overflow: hidden; background: rgba(255,255,255,0.05); border: 1px solid var(--bn-border); backdrop-filter: blur(10px); }
-
-/* --- VANGUARD CENTRAL NAV BAR (UNDER) --- */
-.hb-vanguard-pagination-bar {
-    position: absolute;
-    bottom: -60px; /* POSITIONED CENTER UNDER */
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--bn-border);
-    padding: 8px 15px;
-    border-radius: 100px;
+.hb-check-item {
     display: flex;
     align-items: center;
-    gap: 20px;
-    z-index: 100;
+    gap: 8px;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
 }
 
-.hb-nav-arrow {
-    background: transparent;
-    border: none;
-    color: var(--bn-gold);
-    cursor: pointer;
-    transition: 0.3s;
+.hb-check-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #10b981;
     display: flex;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
-.hb-nav-arrow:hover { transform: scale(1.2); filter: drop-shadow(0 0 5px var(--bn-gold)); }
 
-.hb-pag-dots { display: flex; gap: 8px; }
-.hb-pag-orb {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: rgba(255,255,255,0.15); border: none; cursor: pointer; transition: 0.4s;
+/* ACTIONS HUB */
+.hb-vanguard-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 1.25rem; 
+    margin-top: 0.5rem; 
+    flex-wrap: wrap;
 }
-.hb-pag-orb.active { width: 30px; border-radius: 100px; background: var(--bn-gold); }
 
-/* MOBILE RESPONSIVE LUXE RESCUE */
-@media (max-width: 768px) {
-    .hb-prime-wrapper { padding: 1rem 0 3.5rem; }
-    .hb-stage-luxe { padding: 0 1rem; height: auto !important; }
-    .hb-active-vanguard { height: auto !important; min-height: 420px; }
-    .hb-vanguard-inner { border-radius: 1.5rem; }
-    .hb-vanguard-content { flex-direction: column; height: auto; }
-    
+.hb-btn-discovery {
+    color: #fff;
+    border: none;
+    padding: 0.95rem 2.2rem;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hb-btn-discovery:hover { 
+    transform: translateY(-2px) scale(1.02); 
+    filter: brightness(1.1);
+}
+
+.hb-btn-sos-call {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: #fff;
+    border: none;
+    padding: 0.95rem 2rem;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+    transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hb-btn-sos-call:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(239, 68, 68, 0.6);
+    filter: brightness(1.15);
+}
+
+.hb-vanguard-stats { 
+    display: flex; 
+    gap: 1.25rem; 
+    align-items: center;
+    margin-top: 0.25rem;
+}
+
+.stat-node { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 0.75rem; 
+    font-weight: 800; 
+    color: #94a3b8; 
+    letter-spacing: 0.5px;
+}
+
+/* VISUAL AREA */
+.hb-visual-vanguard { 
+    flex: 0.95; 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding-right: 4.5rem; 
+    padding-left: 1rem;
+}
+
+.hb-image-hub-luxe { 
+    width: 480px; 
+    height: 320px; 
+    position: relative; 
+    z-index: 10; 
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #000;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.hb-image-hub-luxe:hover {
+    transform: scale(1.03) translateY(-4px);
+}
+
+.hb-product-img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    display: block;
+}
+
+.vanguard-orb { 
+    position: absolute; 
+    width: 140%; 
+    height: 140%; 
+    z-index: 1; 
+    pointer-events: none;
+    transition: background 0.6s ease;
+}
+
+/* --- SLIDER ARROWS --- */
+.hb-slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 25;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.hb-slider-arrow:hover {
+    background: #ffffff;
+    color: #0f172a;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.hb-slider-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.hb-slider-arrow.left {
+    left: 2.25rem;
+}
+
+.hb-slider-arrow.right {
+    right: 2.25rem;
+}
+
+/* --- INTERACTIVE BOOKING / SOS MODAL --- */
+.hb-modal-overlay {
+    position: fixed; 
+    inset: 0; 
+    z-index: 100000;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.hb-modal-backdrop {
+    position: absolute; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+}
+
+.hb-booking-modal {
+    position: relative; 
+    z-index: 10; 
+    width: 100%; 
+    max-width: 480px;
+    background: #0f172a; 
+    border: 2px solid; 
+    border-radius: 24px;
+    padding: 2.25rem; 
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
+
+.hb-modal-close {
+    position: absolute; 
+    top: 1.25rem; 
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.1); 
+    border: none; 
+    color: #fff;
+    width: 32px; 
+    height: 32px; 
+    border-radius: 50%; 
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.hb-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.hb-modal-header { 
+    margin-bottom: 1.5rem; 
+}
+
+.hb-modal-badge {
+    display: inline-block; 
+    padding: 4px 12px; 
+    border-radius: 100px;
+    font-size: 0.7rem; 
+    font-weight: 900; 
+    letter-spacing: 1px; 
+    color: #fff;
+    margin-bottom: 0.75rem; 
+    text-transform: uppercase;
+}
+
+.hb-modal-header h2 { 
+    font-size: 1.75rem; 
+    font-weight: 900; 
+    margin: 0 0 0.4rem; 
+}
+
+.hb-modal-header p { 
+    font-size: 0.95rem; 
+    color: #94a3b8; 
+    margin: 0; 
+}
+
+.hb-booking-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 1.15rem; 
+}
+
+.hb-form-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+}
+
+.hb-form-group label { 
+    font-size: 0.82rem; 
+    font-weight: 800; 
+    color: #cbd5e1; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
+
+.hb-form-group input {
+    background: rgba(255, 255, 255, 0.06); 
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px; 
+    padding: 0.9rem 1.1rem; 
+    color: #fff; 
+    font-size: 1rem; 
+    outline: none;
+    transition: 0.2s;
+}
+
+.hb-form-group input:focus { 
+    border-color: var(--bn-gold); 
+    background: rgba(255, 255, 255, 0.09); 
+}
+
+.hb-modal-features { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    margin: 0.5rem 0; 
+}
+
+.hb-modal-feat-pill {
+    background: rgba(255, 255, 255, 0.05); 
+    padding: 4px 10px; 
+    border-radius: 100px;
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    color: #e2e8f0; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+}
+
+.hb-modal-submit-btn {
+    border: none; 
+    color: #fff; 
+    padding: 1.1rem; 
+    border-radius: 12px;
+    font-size: 1.05rem; 
+    font-weight: 900; 
+    cursor: pointer; 
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); 
+    margin-top: 0.5rem;
+}
+
+.hb-modal-submit-btn:hover { 
+    filter: brightness(1.15); 
+    transform: translateY(-2px); 
+}
+
+.hb-booking-success { 
+    text-align: center; 
+    padding: 2rem 1rem; 
+}
+
+.hb-success-icon {
+    width: 70px; 
+    height: 70px; 
+    border-radius: 50%; 
+    margin: 0 auto 1.25rem;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.hb-booking-success h3 { 
+    font-size: 1.6rem; 
+    font-weight: 900; 
+    margin: 0 0 0.5rem; 
+    color: #fff; 
+}
+
+.hb-booking-success p { 
+    font-size: 1rem; 
+    color: #94a3b8; 
+    margin: 0; 
+}
+
+/* BACKDROP */
+.hb-backdrop-engine { 
+    position: absolute; 
+    inset: 0; 
+    z-index: 1; 
+}
+
+.hb-backdrop-img { 
+    width: 100%; 
+    height: 100%; 
+    background-size: cover; 
+    filter: blur(90px); 
+    opacity: 0.35; 
+    transform: scale(1.3); 
+}
+
+.hb-backdrop-overlay { 
+    position: absolute; 
+    inset: 0; 
+    background: radial-gradient(circle, rgba(11, 17, 32, 0.2) 0%, rgba(11, 17, 32, 0.92) 100%); 
+}
+
+/* MOBILE RESPONSIVE LUXE */
+@media (max-width: 1024px) {
+    .hb-stage-luxe { 
+        min-height: 500px; 
+        padding: 0 1rem; 
+    }
     .hb-text-vanguard { 
-        padding: 2rem 1.25rem 3.5rem; 
+        padding: 2.5rem 1.5rem 3rem 2.5rem; 
+    }
+    .hb-headline-vanguard { 
+        font-size: 2.6rem; 
+    }
+    .hb-image-hub-luxe { 
+        width: 380px; 
+        height: 250px; 
+    }
+    .hb-slider-arrow.left { left: 1rem; }
+    .hb-slider-arrow.right { right: 1rem; }
+}
+
+@media (max-width: 768px) {
+    .hb-prime-wrapper { 
+        padding: 0.25rem 0 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    .hb-stage-luxe { 
+        padding: 0 0.5rem; 
+        min-height: auto; 
+    }
+    .hb-active-vanguard { 
+        min-height: auto; 
+    }
+    .hb-vanguard-inner { 
+        border-radius: 1.25rem; 
+        min-height: auto;
+    }
+    .hb-vanguard-content { 
+        flex-direction: column; 
+        min-height: auto; 
+    }
+    
+    .hb-visual-vanguard { 
+        order: 1; 
+        padding: 1.25rem 0.75rem 0; 
+        height: auto;
+        width: 100%; 
+        flex: none;
+    }
+    .hb-image-hub-luxe { 
+        width: 100%; 
+        max-width: 320px; 
+        height: 180px; 
+        border-radius: 14px;
+        margin: 0 auto;
+    }
+    .vanguard-orb {
+        display: none !important;
+    }
+
+    .hb-text-vanguard { 
+        padding: 1.25rem 0.85rem 1.75rem; 
         text-align: center; 
         align-items: center; 
         order: 2; 
         flex: none; 
-        gap: 1rem;
+        gap: 0.65rem;
     }
     .hb-headline-vanguard { 
-        font-size: 2.15rem !important; 
-        letter-spacing: -1.5px; 
-        line-height: 1.15;
+        font-size: 1.65rem !important; 
+        letter-spacing: -0.5px; 
+        line-height: 1.2;
     }
     .hb-summary-vanguard { 
-        font-size: 0.95rem; 
-        opacity: 0.8; 
+        font-size: 0.85rem; 
+        color: rgba(255, 255, 255, 0.8); 
         max-width: 100%; 
+        line-height: 1.45;
+    }
+    .hb-promo-pill {
+        font-size: 0.68rem;
+        padding: 4px 10px;
+    }
+    .hb-features-checklist {
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .hb-check-item {
+        font-size: 0.75rem;
+        padding: 4px 8px;
     }
     .hb-vanguard-actions {
-        margin-top: 1rem;
+        margin-top: 0.5rem;
         width: 100%;
         justify-content: center;
+        flex-direction: column;
+        gap: 0.6rem;
     }
-    .hb-btn-discovery { 
-        padding: 1rem 2rem; 
-        font-size: 0.95rem; 
+    .hb-btn-discovery, .hb-btn-sos-call { 
+        padding: 0.85rem 1.5rem; 
+        font-size: 0.9rem; 
         width: 100%; 
-        max-width: 250px;
+        max-width: 280px;
         justify-content: center;
     }
-
-    .hb-visual-vanguard { 
-        order: 1; 
-        padding-right: 0; 
-        padding-top: 2rem;
-        height: auto;
-        min-height: 220px;
-        width: 100%; 
-        flex: none;
+    .hb-vanguard-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
     }
-    .hb-image-hub-luxe { width: 190px; height: 190px; }
     
-    .hb-vanguard-pagination-bar { 
-        display: none !important; /* REMOVED ON MOBILE FOR CLEAN DISCOVERY */
+    .hb-slider-arrow {
+        width: 32px;
+        height: 32px;
+        top: 105px;
+        background: rgba(15, 23, 42, 0.85);
     }
+    .hb-slider-arrow.left { left: 0.25rem; }
+    .hb-slider-arrow.right { right: 0.25rem; }
 
-    .hb-edge-peek {
-        display: none !important; /* REMOVED ON MOBILE TO PREVENT OVERLAP */
+    .hb-booking-modal {
+        padding: 1.5rem 1.15rem;
+        border-radius: 1.25rem;
+        max-width: 95%;
     }
 }
 
-/* BACKDROP */
-.hb-backdrop-engine { position: absolute; inset: 0; z-index: 1; }
-.hb-backdrop-img { width: 100%; height: 100%; background-size: cover; filter: blur(100px); opacity: 0.4; transform: scale(1.3); }
-.hb-backdrop-overlay { position: absolute; inset: 0; background: radial-gradient(circle, rgba(15,23,42,0.1) 0%, rgba(15,23,42,0.92) 100%); }
+@media (max-width: 480px) {
+    .hb-headline-vanguard {
+        font-size: 1.45rem !important;
+    }
+    .hb-image-hub-luxe {
+        height: 160px;
+        max-width: 280px;
+    }
+    .hb-slider-arrow {
+        top: 95px;
+    }
+}

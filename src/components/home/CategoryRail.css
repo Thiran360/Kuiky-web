@@ -603,43 +603,93 @@
 }
 
 @media (max-width: 768px) {
-    .category-rail-container { padding: 1rem 0 2rem; }
-    .category-rail-content { padding: 0 1.5rem; }
+    .category-rail-container { 
+        padding: 0.75rem 0 1.5rem; 
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    .category-rail-content { padding: 0 0.85rem; }
     
     .category-sector-card-elite, .subcategory-royal-card {
-        width: 110px;
-        height: 165px;
-        border-radius: 1.5rem;
-        padding: 0.75rem;
+        width: 100px;
+        height: 148px;
+        border-radius: 1.25rem;
+        padding: 0.65rem;
+        gap: 0.35rem;
+    }
+
+    .category-sector-card-elite.active, .subcategory-royal-card.active {
+        transform: translateY(-4px) scale(1.03) !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25) !important;
     }
     
     .sector-visual-wrap, .sector-visual-wrap.tertiary {
-        width: 80px;
-        height: 80px;
-        padding: 6px;
+        width: 72px;
+        height: 72px;
+        padding: 5px;
+        border-width: 2.5px;
     }
     
-    .sector-name-luxe { font-size: 0.75rem; letter-spacing: 0.5px; }
+    .sector-name-luxe { 
+        font-size: 0.7rem; 
+        letter-spacing: 0.3px; 
+    }
     
-    .category-rail-title { font-size: 1.1rem; }
-    .clear-category-btn-elite { padding: 0.45rem 1rem; font-size: 0.65rem; }
+    .category-rail-title { font-size: 1.05rem; }
+    .clear-category-btn-elite { padding: 0.45rem 0.95rem; font-size: 0.65rem; }
     
-    .scroll-arrow-btn, .sub-scroll-arrow-luxury { display: none !important; } /* Touch-scroll native is better here */
+    .scroll-arrow-btn, .sub-scroll-arrow-luxury { display: none !important; } /* Touch-scroll native is superior */
     
     .category-scroll-viewport, .sub-category-rail-premium { margin: 0; }
-    .category-scroll-container, .sub-scroll-container-premium { padding: 0.5rem 0.75rem 1rem; gap: 1rem; }
+    .category-scroll-container, .sub-scroll-container-premium { 
+        padding: 0.5rem 0.25rem 0.75rem; 
+        gap: 0.75rem; 
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .no-sub-categories-message-premium {
+        padding: 1.75rem 1.25rem;
+        border-radius: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    .empty-section-icon {
+        min-width: 50px;
+        height: 50px;
+        padding: 12px;
+    }
+    .empty-message-stack {
+        text-align: center;
+    }
+    .empty-message-title {
+        font-size: 1.05rem;
+    }
+    .empty-message-subtitle {
+        font-size: 0.82rem;
+    }
 }
 
 @media (max-width: 480px) {
-    .category-rail-content { padding: 0 1rem; }
+    .category-rail-content { padding: 0 0.65rem; }
     .category-sector-card-elite, .subcategory-royal-card {
-        width: 95px;
-        height: 145px;
-        border-radius: 1.25rem;
+        width: 86px;
+        height: 130px;
+        border-radius: 1.15rem;
+        padding: 0.5rem;
     }
-    .sector-visual-wrap { width: 70px; height: 70px; }
-    .sector-name-luxe { font-size: 0.7rem; }
+    .sector-visual-wrap, .sector-visual-wrap.tertiary { 
+        width: 60px; 
+        height: 60px; 
+        padding: 4px;
+        border-width: 2px;
+    }
+    .sector-name-luxe { 
+        font-size: 0.62rem; 
+        letter-spacing: 0.2px;
+    }
     
-    .category-rail-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .category-rail-header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
     .clear-category-btn-elite { width: 100%; justify-content: center; }
 }

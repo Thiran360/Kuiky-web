@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAddress } from '../../context/AddressContext';
-import { Plus, MapPin, Edit, Trash2, Home, CheckCircle, Loader2, XCircle, ShieldCheck } from 'lucide-react';
+import { useUser } from '../../context/UserContext';
+import { Plus, MapPin, Edit, Trash2, Home, CheckCircle, Loader2, XCircle, ShieldCheck, Navigation } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ---------------- ADDRESS FORM ----------------
 const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
+    const { user } = useUser();
     const [formData, setFormData] = useState(initialData || {
-        full_name: "",
-        phone_number: "",
+        full_name: user?.name || user?.username || "",
+        phone_number: user?.mobile_number || user?.mobile || user?.phone || "",
         address_line_1: "",
         address_line_2: "",
         city: "",
@@ -21,6 +23,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
 
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState(null);
+    const [locationSuccess, setLocationSuccess] = useState(null);
     const isEditMode = Boolean(initialData?.id);
 
     const handleChange = (e) => {
@@ -31,37 +34,138 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
         }));
     };
 
-    const handleGetLocation = () => {
-        if (!navigator.geolocation) {
-            setLocationError("Geolocation is not supported by your browser.");
+    const handleGetLocation = async () => {
+        setLocationLoading(true);
+        setLocationError(null);
+        setLocationSuccess(null);
+
+        // Helper: retrieve coordinates from browser geolocation API
+        const getBrowserCoords = () => {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    return reject(new Error("Geolocation is not supported by your browser."));
+                }
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                    (err) => {
+                        // Retry with low accuracy (WiFi/cell tower) if high accuracy times out or fails
+                        navigator.geolocation.getCurrentPosition(
+                            (pos2) => resolve({ lat: pos2.coords.latitude, lon: pos2.coords.longitude }),
+                            () => reject(err),
+                            { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
+                        );
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            });
+        };
+
+        let coords = null;
+        try {
+            coords = await getBrowserCoords();
+        } catch (geoErr) {
+            console.warn("Browser GPS failed or denied, trying network IP geolocation fallback:", geoErr?.message);
+            // Fallback: IP-based geolocation (works on PC / desktop without GPS)
+            try {
+                const ipRes = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client");
+                if (ipRes.ok) {
+                    const ipData = await ipRes.json();
+                    if (ipData.latitude && ipData.longitude) {
+                        coords = { lat: ipData.latitude, lon: ipData.longitude };
+                    }
+                }
+            } catch (ipErr) {
+                console.warn("IP geolocation fallback failed:", ipErr);
+            }
+        }
+
+        if (!coords || !coords.lat || !coords.lon) {
+            setLocationLoading(false);
+            setLocationError("Could not retrieve GPS coordinates. Please enter your address details manually.");
             return;
         }
 
-        setLocationLoading(true);
-        setLocationError(null);
-        setFormData(prev => ({ ...prev, latitude: "", longitude: "" }));
+        const latStr = coords.lat.toString();
+        const lonStr = coords.lon.toString();
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setFormData((prev) => ({
-                    ...prev,
-                    latitude: position.coords.latitude.toString(),
-                    longitude: position.coords.longitude.toString(),
-                }));
-                setLocationLoading(false);
-            },
-            (error) => {
-                setLocationLoading(false);
-                let msg = "Failed to synchronize location.";
-                if (error.code === error.PERMISSION_DENIED) {
-                    msg = "Location access denied. Please enable it in your browser settings.";
-                } else if (error.code === error.TIMEOUT) {
-                    msg = "Timed out waiting for location.";
+        // Reverse Geocoding to automatically populate address fields
+        let reverseData = null;
+
+        // 1. Try Nominatim (OpenStreetMap)
+        try {
+            const nomRes = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lon}&addressdetails=1`,
+                { headers: { "Accept-Language": "en" } }
+            );
+            if (nomRes.ok) {
+                const nomData = await nomRes.json();
+                const a = nomData.address || {};
+                const street = [a.amenity, a.road, a.neighbourhood].filter(Boolean).join(", ") || a.suburb || a.village || "";
+                const city = a.city || a.town || a.village || a.county || a.city_district || "";
+                const state = a.state || "";
+                const postcode = a.postcode || "";
+                const country = a.country || "India";
+
+                reverseData = {
+                    address_line_1: street || (nomData.display_name ? nomData.display_name.split(",").slice(0, 2).join(",") : ""),
+                    address_line_2: a.suburb || a.county || "",
+                    city: city,
+                    state: state,
+                    postal_code: postcode,
+                    country: country,
+                };
+            }
+        } catch (e) {
+            console.warn("Nominatim reverse geocoding notice:", e);
+        }
+
+        // 2. Fallback: BigDataCloud Reverse Geocoding
+        if (!reverseData || !reverseData.city) {
+            try {
+                const bdcRes = await fetch(
+                    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lon}&localityLanguage=en`
+                );
+                if (bdcRes.ok) {
+                    const bdcData = await bdcRes.json();
+                    reverseData = {
+                        address_line_1: bdcData.locality || bdcData.localityInfo?.administrative?.[3]?.name || "",
+                        address_line_2: bdcData.localityInfo?.administrative?.[2]?.name || "",
+                        city: bdcData.city || bdcData.locality || "",
+                        state: bdcData.principalSubdivision || "",
+                        postal_code: bdcData.postcode || "",
+                        country: bdcData.countryName || "India",
+                    };
                 }
-                setLocationError(msg);
-                setFormData(prev => ({ ...prev, latitude: "", longitude: "" }));
-            },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            } catch (e2) {
+                console.warn("BigDataCloud fallback notice:", e2);
+            }
+        }
+
+        const resolvedLine1 = reverseData?.address_line_1 || `Near GPS Location (${coords.lat.toFixed(4)}, ${coords.lon.toFixed(4)})`;
+        const resolvedCity = reverseData?.city || "";
+        const resolvedState = reverseData?.state || "";
+        const resolvedPostal = reverseData?.postal_code || "";
+        const resolvedCountry = reverseData?.country || "India";
+
+        setFormData(prev => ({
+            ...prev,
+            latitude: latStr,
+            longitude: lonStr,
+            address_line_1: resolvedLine1,
+            address_line_2: reverseData?.address_line_2 || prev.address_line_2 || "",
+            city: resolvedCity || prev.city,
+            state: resolvedState || prev.state,
+            postal_code: resolvedPostal || prev.postal_code,
+            country: resolvedCountry,
+            full_name: prev.full_name || user?.name || user?.username || "",
+            phone_number: prev.phone_number || user?.mobile_number || user?.mobile || user?.phone || "",
+        }));
+
+        setLocationLoading(false);
+        setLocationSuccess(
+            resolvedCity
+                ? `📍 Location Synced: ${resolvedCity}, ${resolvedState} ${resolvedPostal ? "(" + resolvedPostal + ")" : ""}`
+                : "📍 Precise GPS Coordinates Locked & Address Filled!"
         );
     };
 
@@ -80,8 +184,8 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
         >
             <div className="form-head-elite">
                 <div className="head-text-col">
-                    <h3 className="form-title-luxe">{isEditMode ? "Update Delivery Protocol" : "Add New Destination"}</h3>
-                    <p className="form-subtitle-luxe">Ensure your luxury items arrive at the precise coordinates.</p>
+                    <h3 className="form-title-luxe">{isEditMode ? "Edit Delivery Address" : "Add New Address"}</h3>
+                    <p className="form-subtitle-luxe">Enter your delivery address details below.</p>
                 </div>
                 <button type="button" onClick={onCancel} className="close-form-luxe">
                     <XCircle size={24} />
@@ -188,18 +292,24 @@ const AddressForm = ({ initialData, onSubmit, onCancel, isSaving }) => {
                     ) : (
                         <MapPin size={18} />
                     )}
-                    <span>Sync Precise GPS Coordinates</span>
+                    <span>{locationLoading ? "Detecting Address & Coordinates..." : "Sync Precise GPS Coordinates"}</span>
                 </button>
 
-                {formData.latitude && formData.longitude && !locationLoading && (
+                {locationSuccess && !locationLoading && (
                     <div className="geo-status-elite success">
-                        <CheckCircle size={14} /> Coordinates Locked
+                        <CheckCircle size={15} /> {locationSuccess}
+                    </div>
+                )}
+
+                {formData.latitude && formData.longitude && !locationSuccess && !locationLoading && (
+                    <div className="geo-status-elite success">
+                        <CheckCircle size={15} /> Coordinates Locked ({parseFloat(formData.latitude).toFixed(3)}, {parseFloat(formData.longitude).toFixed(3)})
                     </div>
                 )}
                 
-                {locationError && (
+                {locationError && !locationLoading && (
                     <div className="geo-status-elite error">
-                        <XCircle size={14} /> {locationError}
+                        <XCircle size={15} /> {locationError}
                     </div>
                 )}
             </div>
@@ -338,10 +448,10 @@ const AddressManager = () => {
             </AnimatePresence>
 
             <div className="address-list-header">
-                <h3 className="section-title">Verified Destinations ({addresses.length})</h3>
+                <h3 className="section-title">Saved Addresses ({addresses.length})</h3>
                 {!isFormVisible && (
                     <button className="btn-add-address" onClick={() => setIsFormVisible(true)}>
-                        <Plus size={18} /> New Coordinate
+                        <Plus size={18} /> Add New Address
                     </button>
                 )}
             </div>
@@ -350,9 +460,9 @@ const AddressManager = () => {
                 {addresses.length === 0 ? (
                     <div className="empty-addresses-premium">
                         <div className="pulsing-pin"><MapPin size={48} /></div>
-                        <h3>No Destination Protocol Established</h3>
-                        <p>Begin your procurement journey by defining a delivery point.</p>
-                        <button className="btn-add-address" onClick={() => setIsFormVisible(true)}>Establish First Protocol</button>
+                        <h3>No Saved Addresses</h3>
+                        <p>Please add a delivery address to continue checkout.</p>
+                        <button className="btn-add-address" onClick={() => setIsFormVisible(true)}>Add Delivery Address</button>
                     </div>
                 ) : (
                     addresses.map(address => (
@@ -399,24 +509,23 @@ const AddressManagerStyles = `
         background: #0f172a;
         color: #ffffff;
         border: none;
-        padding: 14px 30px;
-        border-radius: 100px;
-        font-weight: 850;
+        padding: 10px 22px;
+        border-radius: 9999px;
+        font-weight: 700;
         font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
         cursor: pointer;
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 12px;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.2);
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
 
     .btn-add-address:hover {
-        background: #4f46e5;
-        transform: translateY(-5px);
-        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.3);
+        background: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
     }
 
     .address-list {
@@ -674,6 +783,28 @@ const AddressManagerStyles = `
     }
     .btn-sync-geo:hover:not(:disabled) { background: #4f46e5; transform: scale(1.05); }
 
+    .geo-status-elite {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 10px 18px;
+        border-radius: 1rem;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    .geo-status-elite.success {
+        background: #ecfdf5;
+        color: #059669;
+        border: 1px solid #a7f3d0;
+    }
+    .geo-status-elite.error {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
     .form-footer-elite {
         display: flex;
         justify-content: space-between;
@@ -735,22 +866,37 @@ const AddressManagerStyles = `
 
     .empty-addresses-premium {
         grid-column: 1 / -1;
-        padding: 6rem;
+        padding: 2.25rem 1.5rem;
         text-align: center;
         background: #f8fafc;
-        border-radius: 4rem;
-        border: 2px dashed #e2e8f0;
+        border-radius: 1.25rem;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.65rem;
+    }
+
+    .empty-addresses-premium h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .empty-addresses-premium p {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin: 0 0 0.5rem;
     }
 
     .pulsing-pin {
-        color: var(--elite-blue, #2563eb);
-        margin-bottom: 2rem;
-        animation: pinFloat 3s infinite ease-in-out;
-    }
-
-    @keyframes pinFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
+        color: #4f46e5;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .spin { animation: spin 2s linear infinite; }

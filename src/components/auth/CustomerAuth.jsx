@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-    Mail, Lock, Phone, User, ShoppingBag, Eye, EyeOff, 
-    ChevronRight, ShieldCheck, Star, Loader2, ArrowLeft,
-    CheckCircle2, XCircle, Sparkles
+    Phone, ShieldCheck, Zap, Clock, Loader2,
+    CheckCircle2, XCircle, Edit3, ArrowRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { authService } from "../../api/authService";
 import "./CustomerAuth.css";
 
 const CustomerAuth = () => {
-    const [isLogin, setIsLogin] = useState(true);
-    const { login, register, isAuthenticated } = useUser();
+    const { isAuthenticated } = useUser();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -22,48 +22,54 @@ const CustomerAuth = () => {
 
     return (
         <div className="elite-auth-portal">
-            {/* Ambient Background Elements */}
+            {/* Ambient Background Glows */}
             <div className="portal-glow pg-1"></div>
             <div className="portal-glow pg-2"></div>
             
             <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
                 className="premium-auth-container-luxe"
             >
-                {/* Left Side: Visual Hero (Desktop Only) */}
+                {/* Left Side: Kuiky Visual Hero (Desktop Only) */}
                 <div className="auth-visual-sector">
                     <div className="visual-overlay-luxe">
                         <div className="brand-elite-auth">
-                            <ShoppingBag size={24} />
-                            <span>Ecom360 Royale</span>
+                            <img 
+                                src="/kuiky-logo-dark.png" 
+                                alt="Kuiky - Quick Help, Anytime" 
+                                style={{ height: "46px", objectFit: "contain" }} 
+                            />
                         </div>
                         
                         <div className="visual-content-luxe">
-                            <motion.div
-                                key={isLogin ? 'l-v' : 's-v'}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                            >
+                            <div>
+                                <div className="kuiky-badge-pill">
+                                    <span className="pulse-dot"></span>
+                                    <span>24/7 ON-DEMAND PLATFORM</span>
+                                </div>
                                 <h1 className="hero-title-luxe">
-                                    {isLogin ? "Experience the Zenith." : "Unlock Elite Privileges."}
+                                    Quick Help, <br />
+                                    <span className="hero-title-accent">Anytime.</span>
                                 </h1>
                                 <p className="hero-desc-luxe">
-                                    {isLogin 
-                                        ? "Welcome back to your personalized sanctuary of luxury assets and seamless procurement." 
-                                        : "Join the most exclusive shopping circle. Advanced logistics, priority access, and absolute security."}
+                                    Your instant access to emergency care, auto rides, roadside assistance, and seamless doorstep deliveries.
                                 </p>
-                            </motion.div>
+                            </div>
                             
                             <div className="hero-stats-luxe">
                                 <div className="stat-item-luxe">
-                                    <Star size={16} fill="#fbbf24" />
-                                    <span>Premium Collections</span>
+                                    <Zap size={16} className="stat-icon-green" />
+                                    <span>Instant Dispatch</span>
                                 </div>
                                 <div className="stat-item-luxe">
-                                    <ShieldCheck size={16} />
-                                    <span>Secured Tier</span>
+                                    <ShieldCheck size={16} className="stat-icon-green" />
+                                    <span>100% Verified</span>
+                                </div>
+                                <div className="stat-item-luxe">
+                                    <Clock size={16} className="stat-icon-green" />
+                                    <span>24/7 Priority</span>
                                 </div>
                             </div>
                         </div>
@@ -73,49 +79,32 @@ const CustomerAuth = () => {
 
                 {/* Right Side: Interactive Forms */}
                 <div className="auth-form-sector">
+                    {/* Mobile Only Brand Header */}
+                    <div className="mobile-brand-header">
+                        <img 
+                            src="/kuiky-logo-dark.png" 
+                            alt="Kuiky" 
+                            style={{ height: "36px", objectFit: "contain" }} 
+                        />
+                    </div>
+
                     <div className="form-header-luxe">
                         <div className="tabs-luxe-nav">
-                            <button 
-                                className={`tab-luxe-btn ${isLogin ? 'active' : ''}`}
-                                onClick={() => setIsLogin(true)}
-                            >
+                            <button className="tab-luxe-btn active">
                                 SIGN IN
-                                {isLogin && <motion.div layoutId="tabUnderline" className="tab-underline-luxe" />}
-                            </button>
-                            <button 
-                                className={`tab-luxe-btn ${!isLogin ? 'active' : ''}`}
-                                onClick={() => setIsLogin(false)}
-                            >
-                                JOIN NOW
-                                {!isLogin && <motion.div layoutId="tabUnderline" className="tab-underline-luxe" />}
+                                <div className="tab-underline-luxe" />
                             </button>
                         </div>
                     </div>
 
                     <div className="form-viewport-luxe">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={isLogin ? 'login' : 'register'}
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -15 }}
-                                transition={{ duration: 0.3 }}
-                                className="view-wrapper-luxe"
-                            >
-                                {isLogin ? (
-                                    <LoginForm onSwitch={() => setIsLogin(false)} />
-                                ) : (
-                                    <RegisterForm onSwitch={() => setIsLogin(true)} />
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
+                        <div className="view-wrapper-luxe">
+                            <LoginForm />
+                        </div>
                     </div>
 
                     <div className="form-footer-luxe">
-                        <button onClick={() => navigate("/")} className="guest-link-luxe">
-                           Continue as Guest <ChevronRight size={14} />
-                        </button>
-                        <p className="copyright-luxe">© 2026 Ecom360 Royale. All Assets Encrypted.</p>
+                        <p className="copyright-luxe">© 2026 Kuiky • All Transactions Encrypted</p>
                     </div>
                 </div>
             </motion.div>
@@ -123,197 +112,318 @@ const CustomerAuth = () => {
     );
 };
 
-const LoginForm = ({ onSwitch }) => {
-    const { login } = useUser();
-    const [formData, setFormData] = useState({ mobile_number: "", password: "" });
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPass, setShowPass] = useState(false);
-    const [msg, setMsg] = useState({ type: "", text: "" });
+const LoginForm = () => {
+    const { loginWithOtp, handleLoginSuccess } = useUser();
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!formData.mobile_number || !formData.password) {
-            setMsg({ type: "error", text: "Please enter your credentials" });
+    // Step state: "phone" or "otp"
+    const [step, setStep] = useState("phone");
+    const [mobileNumber, setMobileNumber] = useState("");
+    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [msg, setMsg] = useState({ type: "", text: "" });
+    const [resendTimer, setResendTimer] = useState(30);
+
+    const otpInputsRef = useRef([]);
+
+    // Countdown timer for Resend OTP
+    useEffect(() => {
+        let interval = null;
+        if (step === "otp" && resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [step, resendTimer]);
+
+    // Auto-focus first box when switching to OTP step
+    useEffect(() => {
+        if (step === "otp" && otpInputsRef.current[0]) {
+            setTimeout(() => {
+                otpInputsRef.current[0]?.focus();
+            }, 150);
+        }
+    }, [step]);
+
+    // Handle sending OTP via backend API /ecomapp/send-otp/
+    const handleSendOtp = async (e) => {
+        if (e) e.preventDefault();
+        const cleanNumber = mobileNumber.replace(/\D/g, "");
+
+        if (cleanNumber.length !== 10) {
+            setMsg({ type: "error", text: "Please enter a valid 10-digit mobile number" });
             return;
         }
+
         setIsLoading(true);
         setMsg({ type: "", text: "" });
+
         try {
-            await login(formData.mobile_number, formData.password);
+            await authService.sendOtp(cleanNumber);
+            setStep("otp");
+            setOtp(["", "", "", "", "", ""]);
+            setResendTimer(30);
+            setMsg({ 
+                type: "success", 
+                text: `OTP sent successfully to +91 ${cleanNumber}!` 
+            });
         } catch (err) {
-            setMsg({ type: "error", text: "Access Restricted. Check your credentials." });
+            setMsg({ 
+                type: "error", 
+                text: err.message || "Failed to send OTP. Please try again." 
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
-    return (
-        <form onSubmit={handleSubmit} className="premium-form-luxe">
-            <div className="greet-block-luxe">
-                <h2 className="greet-title">Member Access</h2>
-                <p className="greet-text">Enter your secure credentials to proceed.</p>
-            </div>
+    // Handle Resend OTP via backend API
+    const handleResendOtp = async () => {
+        if (resendTimer > 0) return;
+        const cleanNumber = mobileNumber.replace(/\D/g, "");
+        setIsLoading(true);
+        setMsg({ type: "", text: "" });
 
-            <div className="inputs-stack-luxe">
-                <ModernInput 
-                    icon={Phone} 
-                    label="Mobile Number" 
-                    type="tel" 
-                    placeholder="Enter registered mobile"
-                    value={formData.mobile_number}
-                    onChange={(val) => setFormData({ ...formData, mobile_number: val })}
-                />
-                <ModernInput 
-                    icon={Lock} 
-                    label="Secret Password" 
-                    type={showPass ? "text" : "password"} 
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(val) => setFormData({ ...formData, password: val })}
-                    trailing={
-                        <button type="button" className="eye-btn-luxe" onClick={() => setShowPass(!showPass)}>
-                            {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                    }
-                />
-            </div>
+        try {
+            await authService.sendOtp(cleanNumber);
+            setOtp(["", "", "", "", "", ""]);
+            setResendTimer(30);
+            setMsg({ 
+                type: "success", 
+                text: `New OTP sent to +91 ${cleanNumber}!` 
+            });
+            if (otpInputsRef.current[0]) {
+                otpInputsRef.current[0].focus();
+            }
+        } catch (err) {
+            setMsg({ 
+                type: "error", 
+                text: err.message || "Failed to resend OTP. Please try again." 
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-            <div className="form-utils-luxe">
-                <label className="checkbox-luxe">
-                    <input type="checkbox" />
-                    <span>Secure Session Persistent</span>
-                </label>
-                <button type="button" className="forgot-btn-luxe">Reset Credentials?</button>
-            </div>
+    // Handle OTP Box digit input (6 digits)
+    const handleOtpChange = (val, index) => {
+        const digit = val.replace(/\D/g, "").slice(-1);
+        const newOtp = [...otp];
+        newOtp[index] = digit;
+        setOtp(newOtp);
 
-            {msg.text && (
-                <div className={`form-alert-luxe ${msg.type}`}>
-                    {msg.type === 'error' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
-                    <span>{msg.text}</span>
-                </div>
-            )}
+        if (digit && index < 5) {
+            otpInputsRef.current[index + 1]?.focus();
+        }
 
-            <button
-                type="submit"
-                className={`btn-auth-submit-luxe ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
-            >
-                {isLoading ? <Loader2 className="spin" size={20} /> : "SIGN IN TO PORTAL"}
-            </button>
+        // Auto verify once 6 digits entered
+        if (digit && index === 5) {
+            const fullOtp = newOtp.join("");
+            if (fullOtp.length === 6) {
+                executeLogin(fullOtp);
+            }
+        }
+    };
 
-            <div className="social-auth-sector">
-                <div className="divider-luxe"><span>QUICK ACCESS</span></div>
-                <div className="social-grid-luxe">
-                    <button type="button" className="social-pill"><Mail size={18} /></button>
-                    <button type="button" className="social-pill middle"><Sparkles size={18} /></button>
-                    <button type="button" className="social-pill last">G</button>
-                </div>
-            </div>
-        </form>
-    );
-};
+    // Handle KeyDown (Backspace & Arrow Navigation)
+    const handleOtpKeyDown = (e, index) => {
+        if (e.key === "Backspace") {
+            if (!otp[index] && index > 0) {
+                otpInputsRef.current[index - 1]?.focus();
+            }
+        } else if (e.key === "ArrowLeft" && index > 0) {
+            otpInputsRef.current[index - 1]?.focus();
+        } else if (e.key === "ArrowRight" && index < 5) {
+            otpInputsRef.current[index + 1]?.focus();
+        }
+    };
 
-const RegisterForm = ({ onSwitch }) => {
-    const { register } = useUser();
-    const [formData, setFormData] = useState({
-        username: "", email: "", mobile_number: "", password: ""
-    });
-    const [confirmPass, setConfirmPass] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [msg, setMsg] = useState({ type: "", text: "" });
-
-    const handleSignup = async (e) => {
+    // Handle Paste into OTP box
+    const handleOtpPaste = (e) => {
         e.preventDefault();
-        if (formData.password !== confirmPass) {
-            setMsg({ type: "error", text: "Password integrity mismatch" });
+        const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+        if (!pastedData) return;
+
+        const newOtp = ["", "", "", "", "", ""];
+        for (let i = 0; i < pastedData.length; i++) {
+            newOtp[i] = pastedData[i];
+        }
+        setOtp(newOtp);
+
+        const nextFocus = Math.min(pastedData.length, 5);
+        otpInputsRef.current[nextFocus]?.focus();
+
+        if (pastedData.length === 6) {
+            executeLogin(pastedData);
+        }
+    };
+
+    // Verify & Login via backend API /ecomapp/verify-otp/
+    const executeLogin = async (otpCode) => {
+        const code = otpCode || otp.join("");
+        if (code.length < 6) {
+            setMsg({ type: "error", text: "Please enter the full 6-digit OTP" });
             return;
         }
+
         setIsLoading(true);
+        setMsg({ type: "", text: "" });
+
         try {
-            const payload = { ...formData, mobile: formData.mobile_number, role: "customer" };
-            await register(payload);
-            setMsg({ type: "success", text: "Identity Verified. Membership Initialized." });
-            setTimeout(() => onSwitch(), 2000);
+            await loginWithOtp(mobileNumber, code);
+            navigate("/", { replace: true });
         } catch (err) {
-            setMsg({ type: "error", text: "Registration Denied. Connection failed." });
-        } finally {
+            setMsg({ 
+                type: "error", 
+                text: err.message || "Invalid verification code. Please try again." 
+            });
             setIsLoading(false);
         }
     };
 
+    const handleOtpSubmit = (e) => {
+        e.preventDefault();
+        executeLogin();
+    };
+
     return (
-        <form onSubmit={handleSignup} className="premium-form-luxe">
-            <div className="greet-block-luxe">
-                <h2 className="greet-title">Join the Elite</h2>
-                <p className="greet-text">Initialize your premium membership certificate.</p>
-            </div>
+        <div className="premium-form-luxe">
+            <AnimatePresence mode="wait">
+                {step === "phone" ? (
+                    <motion.form 
+                        key="phone-step"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        onSubmit={handleSendOtp}
+                    >
+                        <div className="greet-block-luxe">
+                            <h2 className="greet-title">Member Access</h2>
+                            <p className="greet-text">Enter your mobile number to receive an instant OTP.</p>
+                        </div>
 
-            <div className="inputs-grid-luxe">
-                <ModernInput 
-                    icon={User} label="Full Name" placeholder="Asset Holder Name"
-                    value={formData.username}
-                    onChange={(val) => setFormData({ ...formData, username: val })}
-                />
-                <ModernInput 
-                    icon={Mail} label="Secure Email" placeholder="Private Mail Channel"
-                    value={formData.email}
-                    onChange={(val) => setFormData({ ...formData, email: val })}
-                />
-            </div>
+                        <div className="inputs-stack-luxe">
+                            <div className="modern-field-luxe">
+                                <span className="field-label-luxe">MOBILE NUMBER</span>
+                                <div className="field-body-luxe">
+                                    <Phone size={18} className="field-icon-luxe" />
+                                    <div className="phone-prefix-tag">+91</div>
+                                    <input 
+                                        type="tel" 
+                                        value={mobileNumber} 
+                                        onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                                        placeholder="Enter 10-digit number"
+                                        className="field-input-luxe"
+                                        autoComplete="tel"
+                                        autoFocus
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-            <ModernInput 
-                icon={Phone} label="Contact Terminal" placeholder="+91 XXXXX XXXXX"
-                value={formData.mobile_number}
-                onChange={(val) => setFormData({ ...formData, mobile_number: val })}
-            />
+                        {msg.text && (
+                            <div className={`form-alert-luxe ${msg.type}`}>
+                                {msg.type === 'error' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
+                                <span>{msg.text}</span>
+                            </div>
+                        )}
 
-            <div className="inputs-grid-luxe">
-                <ModernInput 
-                    icon={Lock} label="Access Key" type="password" placeholder="Min 8 Chars"
-                    value={formData.password}
-                    onChange={(val) => setFormData({ ...formData, password: val })}
-                />
-                <ModernInput 
-                    icon={ShieldCheck} label="Verify Key" type="password" placeholder="Repeat Key"
-                    value={confirmPass}
-                    onChange={(val) => setConfirmPass(val)}
-                />
-            </div>
+                        <button
+                            type="submit"
+                            className={`btn-auth-submit-luxe ${isLoading ? 'loading' : ''}`}
+                            disabled={isLoading || mobileNumber.replace(/\D/g, "").length !== 10}
+                        >
+                            {isLoading ? (
+                                <Loader2 className="spin" size={20} />
+                            ) : (
+                                <>
+                                    <span>GET OTP</span>
+                                    <ArrowRight size={18} />
+                                </>
+                            )}
+                        </button>
+                    </motion.form>
+                ) : (
+                    <motion.form 
+                        key="otp-step"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                        onSubmit={handleOtpSubmit}
+                    >
+                        <div className="greet-block-luxe">
+                            <h2 className="greet-title">Verify OTP</h2>
+                            <p className="greet-text">Enter the 6-digit code sent to your mobile.</p>
+                        </div>
 
-            {msg.text && (
-                <div className={`form-alert-luxe ${msg.type}`}>
-                    {msg.type === 'error' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
-                    <span>{msg.text}</span>
-                </div>
-            )}
+                        {/* Verified Mobile Number Card */}
+                        <div className="otp-phone-card">
+                            <div className="otp-phone-details">
+                                <Phone size={15} className="otp-card-icon" />
+                                <span className="otp-card-number">+91 {mobileNumber}</span>
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => { setStep("phone"); setMsg({ type: "", text: "" }); }}
+                                className="otp-card-edit"
+                            >
+                                <Edit3 size={13} /> Change
+                            </button>
+                        </div>
 
-            <button
-                type="submit"
-                className={`btn-auth-submit-luxe register ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
-            >
-                {isLoading ? <Loader2 className="spin" size={20} /> : "INITIALIZE MEMBERSHIP"}
-            </button>
-        </form>
-    );
-};
+                        {/* Box Shape OTP Inputs (6 boxes) */}
+                        <div className="otp-boxes-grid">
+                            {otp.map((digit, index) => (
+                                <input
+                                    key={index}
+                                    ref={(el) => (otpInputsRef.current[index] = el)}
+                                    type="text"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    maxLength={1}
+                                    value={digit}
+                                    onChange={(e) => handleOtpChange(e.target.value, index)}
+                                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                                    onPaste={handleOtpPaste}
+                                    className={`otp-digit-box ${digit ? "filled" : ""}`}
+                                    autoComplete="one-time-code"
+                                />
+                            ))}
+                        </div>
 
-const ModernInput = ({ icon: Icon, label, value, onChange, type="text", placeholder, trailing }) => {
-    return (
-        <div className="modern-field-luxe">
-            <span className="field-label-luxe">{label}</span>
-            <div className="field-body-luxe">
-                <Icon size={18} className="field-icon-luxe" />
-                <input 
-                    type={type} 
-                    value={value} 
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder={placeholder}
-                    className="field-input-luxe"
-                    autoComplete="off"
-                />
-                {trailing && <div className="field-trailing-luxe">{trailing}</div>}
-            </div>
+                        <div className="otp-resend-row">
+                            <span>Didn't receive the OTP? </span>
+                            {resendTimer > 0 ? (
+                                <span className="otp-timer-text">Resend in <strong>{resendTimer}s</strong></span>
+                            ) : (
+                                <button type="button" onClick={handleResendOtp} className="otp-resend-action">
+                                    Resend OTP
+                                </button>
+                            )}
+                        </div>
+
+                        {msg.text && (
+                            <div className={`form-alert-luxe ${msg.type}`}>
+                                {msg.type === 'error' ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
+                                <span>{msg.text}</span>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className={`btn-auth-submit-luxe ${isLoading ? 'loading' : ''}`}
+                            disabled={isLoading || otp.join("").length !== 6}
+                        >
+                            {isLoading ? <Loader2 className="spin" size={20} /> : "SIGN IN TO KUIKY"}
+                        </button>
+                    </motion.form>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

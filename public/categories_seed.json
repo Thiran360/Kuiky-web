@@ -1,0 +1,56 @@
+[
+  {
+    "id": 15,
+    "name": "Supermarket / Grocery",
+    "image": "/media/category_images/Supermarket.jpg",
+    "is_active": true
+  },
+  {
+    "id": 18,
+    "name": "Pharmacy / Medical",
+    "image": "/media/category_images/medicaal.avif",
+    "is_active": true
+  },
+  {
+    "id": 19,
+    "name": "Fashion / Clothing",
+    "image": "/media/category_images/fashion.jpg.jpeg",
+    "is_active": true
+  },
+  {
+    "id": 20,
+    "name": "Electronics & Gadgets",
+    "image": "/media/category_images/mobile.jpg.jpeg",
+    "is_active": true
+  },
+  {
+    "id": 21,
+    "name": "Restaurants / Food",
+    "image": "/media/category_images/restaurent.webp",
+    "is_active": true
+  },
+  {
+    "id": 23,
+    "name": "Paint",
+    "image": "/images/categories/electrical.png",
+    "is_active": true
+  },
+  {
+    "id": 26,
+    "name": "Rental  Spaces / Hostels",
+    "image": "/images/categories/home.png",
+    "is_active": true
+  },
+  {
+    "id": 27,
+    "name": "Safety / Security",
+    "image": "/images/categories/community-services.png",
+    "is_active": true
+  },
+  {
+    "id": 28,
+    "name": "Vehicle Accessories / Services",
+    "image": "/vehicle_auto.png",
+    "is_active": true
+  }
+]

@@ -3,8 +3,17 @@
 // 🌐 API CONFIGURATION
 // ===========================
 
-// ✅ Base URL ONLY (no /ecomapp here)
-export const API_BASE_URL = "https://api.codingboss.in";
+// ✅ Base URL ONLY (Django backend via Ngrok)
+export const API_BASE_URL = "https://affecting-tingling-duke.ngrok-free.dev";
+
+// ✅ Production Fallback API Base (When local ngrok backend is offline/unreachable)
+export const FALLBACK_API_BASE_URL = "https://api.codingboss.in";
+
+// ✅ Primary Media Base: Active backend (local Django uploads via Ngrok)
+export const MEDIA_BASE_URL = API_BASE_URL;
+
+// ✅ Production Media Fallback CDN (For seed assets if missing locally)
+export const FALLBACK_MEDIA_BASE_URL = "https://api.codingboss.in";
 
 // ✅ E-commerce API base path
 export const ECOM_API_PATH = "/ecomapp/";
@@ -24,34 +33,76 @@ export const getImageUrl = (path) => {
         return "/images/no-image.png";
     }
 
-    let finalPath = path;
+    let finalPath = String(path).trim();
 
-    // 2️⃣ Handle Absolute URLs from Backend (Fixing Localhost & Mixed Content)
+    // 2️⃣ Handle Absolute URLs from Backend
     if (finalPath.startsWith("http://") || finalPath.startsWith("https://")) {
         // Force HTTPS to avoid Mixed Content blocker in modern browsers
         if (finalPath.startsWith("http://")) {
             finalPath = finalPath.replace("http://", "https://");
         }
 
-        // If the backend returns a localhost/127.0.0.1 URL, redirect to production API base
-        if (finalPath.includes("localhost") || finalPath.includes("127.0.0.1")) {
-            const pathParts = finalPath.split("/");
-            // Find where 'media' or the first real path segment starts
-            const mediaIndex = pathParts.findIndex(p => p === "media" || p === "static");
-            const startIdx = mediaIndex !== -1 ? mediaIndex : 3;
-            const relativePath = pathParts.slice(startIdx).join("/");
-            finalPath = relativePath;
-        } else {
-            return finalPath; // Already correct external URL
+        // If it was mistakenly pointed to codingboss for local public assets (like /images/categories/...)
+        if (finalPath.includes("api.codingboss.in/images/") || finalPath.includes("api.codingboss.in/categories/")) {
+            const localRel = finalPath.replace(/https?:\/\/api\.codingboss\.in\//, "");
+            return `/${localRel}`;
         }
+
+        // If backend returns a localhost or 127.0.0.1 URL for media,
+        // redirect to active MEDIA_BASE_URL so images load reliably across devices
+        if (
+            finalPath.includes("localhost") ||
+            finalPath.includes("127.0.0.1")
+        ) {
+            const pathParts = finalPath.split("/");
+            const mediaIndex = pathParts.findIndex(p => p === "media" || p === "static");
+            if (mediaIndex !== -1) {
+                const relativePath = pathParts.slice(mediaIndex).join("/");
+                const baseMedia = MEDIA_BASE_URL.endsWith("/") ? MEDIA_BASE_URL.slice(0, -1) : MEDIA_BASE_URL;
+                return `${baseMedia}/${relativePath}`;
+            }
+        }
+
+        return finalPath; // Already valid absolute URL (e.g. ngrok, Cloudinary, S3, or codingboss)
     }
 
-    // 3️⃣ Construct Production URL from relative path
-    // Clean potential double slashes if path starts with /
-    const cleanPath = finalPath.startsWith("/") ? finalPath.substring(1) : finalPath;
-    const baseUrl = API_BASE_URL.endsWith("/") ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+    // Check for known local seed images or missing subcategory files
+    const lowerPath = finalPath.toLowerCase();
+    if (lowerPath.includes("pvr.jpg")) {
+        return "/images/categories/grocery.png";
+    }
+    if (lowerPath.includes("coffee.jpg") || lowerPath.includes("tea.jpg") || lowerPath.includes("snacks.jpg")) {
+        return "/images/subcategories/snacks-beverages.png";
+    }
+    if (lowerPath.includes("oil.jpg")) {
+        return "/images/subcategories/edible-oils.png";
+    }
+    if (lowerPath.includes("rice.jpg")) {
+        return "/images/subcategories/grains-pulses.png";
+    }
+    if (lowerPath.includes("cooking_essential.jpg")) {
+        return "/images/subcategories/organic-staples.png";
+    }
 
-    // Check if the path already contains 'media' or needs to be routed through ecomapp
-    // Most shop APIs host media as API_BASE/media/ or API_BASE/ecomapp/media/
-    return `${baseUrl}/${cleanPath}`;
+    // 3️⃣ Local Static / Public Assets (Frontend Vite assets in public/)
+    const cleanPath = finalPath.startsWith("/") ? finalPath.substring(1) : finalPath;
+    if (
+        cleanPath.startsWith("images/") ||
+        cleanPath.startsWith("categories/") ||
+        cleanPath.startsWith("banners/") ||
+        cleanPath.startsWith("enthiran_") ||
+        cleanPath.startsWith("card_") ||
+        cleanPath.startsWith("vehicle_") ||
+        cleanPath.startsWith("kuiky-") ||
+        cleanPath.startsWith("vite.") ||
+        cleanPath.startsWith("media/subcategory_images/Pvr.jpg")
+    ) {
+        return `/${cleanPath}`;
+    }
+
+    // 4️⃣ Construct Media CDN URL from relative path for Django uploaded media (e.g. /media/product_images/NAAN.jpg)
+    const baseMedia = MEDIA_BASE_URL.endsWith("/") ? MEDIA_BASE_URL.slice(0, -1) : MEDIA_BASE_URL;
+
+    return `${baseMedia}/${cleanPath}`;
 };
+

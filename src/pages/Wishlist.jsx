@@ -8,31 +8,32 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Wishlist.css";
 
-/* ─── GUEST STATE (NOT LOGGED IN) ─── */
+/* ─── GUEST STATE (NOT LOGGED IN & EMPTY WISHLIST) ─── */
 const GuestWishlistState = () => {
     const navigate = useNavigate();
     return (
         <div className="wishlist-page guest-luxe-state">
             <motion.div 
                 className="wishlist-empty-luxe"
-                initial={{ scale: 0.9, opacity: 0 }} 
-                animate={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.94, opacity: 0, y: 15 }} 
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
             >
                 <div className="empty-luxe-visual">
-                    <Lock size={80} strokeWidth={1} className="text-ruby-200" />
-                    <div className="empty-glow-ruby"></div>
+                    <div className="empty-cart-icon-wrap">
+                        <Heart size={46} className="text-rose-500 fill-rose-500/20" />
+                    </div>
                 </div>
-                <h2 className="empty-luxe-title">Private Curation Locked</h2>
+                <h2 className="empty-luxe-title">Your Wishlist is Empty</h2>
                 <p className="empty-luxe-text">
-                    Join Elite Royale to curate your personal collection of luxury assets. 
-                    Members enjoy persistent wishlists synced across all secure terminals.
+                    Sign in to your account to save products you love and sync them across all your devices.
                 </p>
-                <div className="flex flex-col gap-4 items-center mt-6">
-                    <button className="btn-elite-deployment m-0 w-auto px-12" onClick={() => navigate("/login")}>
-                        <Zap size={18} /> INITIALIZE MEMBERSHIP
+                <div className="cart-empty-actions-col">
+                    <button className="btn-primary-cart-action" onClick={() => navigate("/login")}>
+                        <Zap size={18} /> Sign In to Your Account
                     </button>
-                    <button className="text-slate-400 text-sm font-bold uppercase tracking-widest hover:text-white transition-colors" onClick={() => navigate("/")}>
-                        RETURN TO SHOWROOM
+                    <button className="btn-secondary-cart-action" onClick={() => navigate("/")}>
+                        <ArrowLeft size={16} /> Explore Products
                     </button>
                 </div>
             </motion.div>
@@ -52,7 +53,7 @@ const Wishlist = () => {
     }
   }, [loadWishlist, isAuthenticated]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && (!wishlist || wishlist.length === 0)) {
       return <GuestWishlistState />;
   }
 

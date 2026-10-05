@@ -1,7 +1,6 @@
 // src/context/WishlistContext.jsx
 
-import React,
-{
+import React, {
   createContext,
   useContext,
   useState,
@@ -19,7 +18,7 @@ export const useWishlist = () => useContext(WishlistContext);
 export const WishlistProvider = ({ children }) => {
   const { user, isAuthenticated, isLoading: isUserLoading } = useUser();
 
-  // Initialize from local storage for persistence and fallback
+  // Initialize from local storage for persistence and immediate access
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem("localWishlist");
@@ -33,27 +32,28 @@ export const WishlistProvider = ({ children }) => {
 
   // Sync to local storage whenever wishlist changes
   useEffect(() => {
-    localStorage.setItem("localWishlist", JSON.stringify(wishlist));
+    try {
+      localStorage.setItem("localWishlist", JSON.stringify(wishlist));
+    } catch (e) {
+      console.warn("Could not save to localWishlist:", e);
+    }
   }, [wishlist]);
 
   // Normalize product ID from any possible shape
   const extractProductId = useCallback((item) => {
     if (!item) return null;
     try {
-      // 💎 PRECISION ELITE ID EXTRACTION
-      // We prioritize actual product identifiers over entry record IDs (item.id)
       const p = item.product || {};
       const potentialIds = [
         item.product_id, // Explicit foreign key
+        item.id,         // Direct ID
         p.id,            // ID inside the nested product object
         p.product_id,    // Fallback product key
-        item.id          // Entry ID (Last resort, common in simple local storage items)
       ];
 
       for (let id of potentialIds) {
         if (id != null && id !== undefined && id !== "" && id !== "null") {
           const num = Number(id);
-          // Only return if it's a valid ID (ignoring indices like -1 or system zeros if needed)
           if (!isNaN(num) && num > 0) return num;
         }
       }
@@ -78,104 +78,104 @@ export const WishlistProvider = ({ children }) => {
     [wishlist, extractProductId]
   );
 
-  // Load wishlist from server
+  // Load wishlist from server and merge with local items
   const loadWishlist = useCallback(async () => {
     if (!isAuthenticated || !user?.id) {
-      // Don't clear local wishlist on logout, but maybe we should?
-      // For now, keep it local.
       return;
     }
 
     setLoading(true);
     try {
       const data = await wishlistService.fetchWishlist(user.id);
-      if (Array.isArray(data)) {
-        setWishlist(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setWishlist((prev) => {
+          const serverIds = new Set(data.map((d) => extractProductId(d)));
+          const uniqueLocals = prev.filter((p) => !serverIds.has(extractProductId(p)));
+          return [...data, ...uniqueLocals];
+        });
       }
     } catch (error) {
-      console.warn("Failed to load wishlist from server. Using local instead.", error);
+      console.warn("Failed to load wishlist from server. Using local storage copy.", error);
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, extractProductId]);
 
   useEffect(() => {
     if (!isUserLoading && isAuthenticated) {
       loadWishlist();
-    } else if (!isUserLoading && !isAuthenticated) {
-      // 💎 PRIVACY OVERRIDE: Clear wishlist for guests to prevent stale data visibility
-      if (wishlist.length > 0) {
-        setWishlist([]);
-        localStorage.removeItem("localWishlist");
-      }
     }
   }, [isUserLoading, isAuthenticated, loadWishlist]);
 
-  // Single source of truth for add/remove
+  // Single source of truth for add/remove (Reliable & Fail-Safe)
   const toggleWishlist = useCallback(
     async (productId, productDetails = null) => {
       if (!productId) return;
+      const pIdNum = Number(productId);
+      const already = isProductWishlisted(pIdNum);
 
-      // 💎 AUTH-MANDATORY: Ensure user is logged in for curation
-      if (!isAuthenticated) {
-        alert("🔒 Elite Royale: Please login to manage your Private Collection.");
-        return;
-      }
-
-      const already = isProductWishlisted(productId);
-      const previousWishlist = [...wishlist];
-
-      // Optimistic update
+      let updatedWishlist;
       if (already) {
-        setWishlist(prev => prev.filter(item => Number(extractProductId(item)) !== Number(productId)));
+        updatedWishlist = wishlist.filter(
+          (item) => Number(extractProductId(item)) !== pIdNum
+        );
       } else {
-        const newItem = productDetails ? {
-          id: productId,
-          product: productDetails,
-          product_id: productId,
-          ...productDetails
-        } : {
-          id: productId,
-          product_id: productId
-        };
-        setWishlist(prev => [...prev, newItem]);
+        const newItem = productDetails
+          ? {
+              id: pIdNum,
+              product_id: pIdNum,
+              product: productDetails,
+              ...productDetails,
+            }
+          : {
+              id: pIdNum,
+              product_id: pIdNum,
+            };
+        updatedWishlist = [...wishlist, newItem];
       }
 
+      // 1. Instantly update local state & localStorage
+      setWishlist(updatedWishlist);
       try {
-        if (isAuthenticated) {
+        localStorage.setItem("localWishlist", JSON.stringify(updatedWishlist));
+      } catch (e) {}
+
+      // 2. Best-effort server sync (never revert if server rejects or fails)
+      if (isAuthenticated && user?.id) {
+        try {
           if (already) {
-            await wishlistService.removeFromWishlist(productId);
+            await wishlistService.removeFromWishlist(pIdNum);
           } else {
             await wishlistService.addToWishlist({
-              user_id: user?.id,
-              product_id: productId,
+              user_id: user.id,
+              product_id: pIdNum,
             });
           }
+        } catch (serverErr) {
+          console.warn("Wishlist server sync skipped, persisted locally:", serverErr?.message || serverErr);
         }
-        // Force refresh from server to ensure IDs are correct (optional but recommended)
-        // loadWishlist();
-      } catch (error) {
-        console.warn("Wishlist API failed, reverting state:", error);
-        setWishlist(previousWishlist);
       }
     },
-    [isAuthenticated, user, isProductWishlisted, loadWishlist]
+    [isAuthenticated, user, wishlist, isProductWishlisted, extractProductId]
   );
 
-  // Local-only remove used by Wishlist page (after a successful API delete)
-  const removeItemLocally = useCallback((productId) => {
-    setWishlist((prevList) =>
-      prevList.filter((item) => {
-        const currentId = extractProductId(item);
-        return Number(currentId) !== Number(productId);
-      })
-    );
-  }, []);
+  // Local-only remove used by Wishlist page
+  const removeItemLocally = useCallback(
+    (productId) => {
+      setWishlist((prevList) =>
+        prevList.filter((item) => {
+          const currentId = extractProductId(item);
+          return Number(currentId) !== Number(productId);
+        })
+      );
+    },
+    [extractProductId]
+  );
 
   const contextValue = useMemo(
     () => ({
       wishlist: Array.isArray(wishlist) ? wishlist : [],
-      wishlistCount: (Array.isArray(wishlist) ? wishlist.length : 0),
+      wishlistCount: Array.isArray(wishlist) ? wishlist.length : 0,
       loading,
       loadWishlist,
       toggleWishlist,
@@ -198,4 +198,3 @@ export const WishlistProvider = ({ children }) => {
     </WishlistContext.Provider>
   );
 };
-

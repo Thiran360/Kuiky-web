@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingCart, Check, Star, Eye, Zap, Package, Loader } from "lucide-react";
+import { Heart, ShoppingBag, Check, Star, Zap, CheckCircle2, Store, Loader2 } from "lucide-react";
 import { useSmartImage } from "../../api/imageService";
 import { getImageUrl } from "../../api/config";
 import "./ProductCard.css";
@@ -9,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useUser } from "../../context/UserContext";
 
-/** Safe price parser — returns '0' instead of NaN */
 const safePrice = (val) => {
     const n = parseFloat(val);
     return isNaN(n) ? 0 : n;
@@ -29,7 +29,6 @@ const ProductCard = ({ product, index = 0 }) => {
     const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    // 🛡️ Data Priority: Browser testing confirms 'image_url' is more reliable than 'image' on this backend
     const { src: imageSrc, loaded: imgLoaded } = useSmartImage(
         product.image_url || product.image
     );
@@ -57,84 +56,124 @@ const ProductCard = ({ product, index = 0 }) => {
 
     const handleAddToCart = async (e) => {
         e.stopPropagation();
-        // 💎 AUTH-MANDATORY: Redirect guests to Membership Portal
-        if (!isAuthenticated) {
-            navigate("/login");
-            return;
-        }
         if (isInCart) return;
         setIsAddingToCart(true);
         try {
             await addItemToCart(selectedVariant?.id || null, 1, product);
-        } catch (err) { console.error(err); } finally { setIsAddingToCart(false); }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsAddingToCart(false);
+        }
     };
 
     const handleWishlist = async (e) => {
         e.stopPropagation();
-        if (!isAuthenticated) {
-            navigate("/login");
-            return;
-        }
         if (isTogglingWishlist) return;
         setIsTogglingWishlist(true);
-        try { await toggleWishlist(product.id, product); } finally { setIsTogglingWishlist(false); }
+        try { 
+            await toggleWishlist(product.id, product); 
+        } catch (err) { 
+            console.error("Wishlist toggle error:", err); 
+        } finally { 
+            setIsTogglingWishlist(false); 
+        }
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className={`elite-asset-capsule ${isHovered ? 'capsule-active' : ''}`}
+            transition={{ duration: 0.25, delay: Math.min(index * 0.02, 0.15) }}
+            className={`pro-product-card ${isHovered ? 'card-hovered' : ''}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={() => navigate(`/product/${product.id}`)}
         >
-            <div className="capsule-hologram-shimmer"></div>
+            {/* TOP IMAGE CONTAINER */}
+            <div className="pro-image-box">
+                {/* Floating Discount Badge */}
+                {discountPercent > 0 ? (
+                    <span className="pro-discount-badge">
+                        <Zap size={11} /> {discountPercent}% OFF
+                    </span>
+                ) : (
+                    <span className="pro-fresh-badge">
+                        <Zap size={11} /> Fast Delivery
+                    </span>
+                )}
 
-            {/* PROCUREMENT STATUS */}
-            <div className="capsule-status-ecom360">
-                {discountPercent > 0 && <span className="status-pill discount"><Zap size={10} /> {discountPercent}% OFF</span>}
+                {/* Floating Wishlist Heart */}
                 <button
-                    className={`status-pill wishlist ${isWishlisted ? 'active' : ''}`}
+                    className={`pro-wishlist-btn ${isWishlisted ? 'active' : ''}`}
                     onClick={handleWishlist}
+                    aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                    title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                 >
-                    <Heart size={14} fill={isWishlisted ? "currentColor" : "none"} />
+                    <Heart size={18} strokeWidth={2.2} fill={isWishlisted ? "#e11d48" : "none"} />
                 </button>
-            </div>
 
-            {/* ASSET VISUAL */}
-            <div className="capsule-visual-ecom360">
-                {!imgLoaded && <div className="visual-skeleton"><div className="shimmer"></div></div>}
+                {/* Main Product Image */}
+                {!imgLoaded && <div className="pro-image-skeleton"></div>}
                 <motion.img
-                    animate={{ scale: isHovered ? 1.08 : 1 }}
+                    animate={{ scale: isHovered ? 1.05 : 1 }}
+                    transition={{ duration: 0.3 }}
                     src={imageSrc}
                     alt={product.name}
-                    className="asset-visual"
-                    onError={(e) => { e.target.src = "/images/no-image.png"; }}
+                    className="pro-product-img"
+                    onError={(e) => {
+                        const raw = product.image_url || product.image;
+                        if (raw && !e.target.src.includes('api.codingboss.in')) {
+                            const clean = raw.startsWith('/') ? raw.slice(1) : raw;
+                            e.target.src = `https://api.codingboss.in/${clean}`;
+                        } else if (!e.target.src.includes('no-image.png')) {
+                            e.target.src = "/images/no-image.png";
+                        }
+                    }}
                 />
             </div>
 
-            {/* ASSET DOSSIER */}
-            <div className="capsule-dossier-ecom360">
-                <div className="dossier-meta">
-                    <span className="brand-badge">{product.brand || "ELITE ASSET"}</span>
-                    <div className="rating-mini"><Star size={10} fill="currentColor" /> <span>{product.rating || "5.0"}</span></div>
+            {/* CARD BODY CONTENT */}
+            <div className="pro-card-body">
+                {/* Brand / Category & Rating */}
+                <div className="pro-meta-row">
+                    <span className="pro-brand-tag">
+                        {product.brand || product.category || "KUIKY VERIFIED"}
+                    </span>
+                    <div className="pro-rating-pill">
+                        <Star size={12} fill="#f59e0b" color="#f59e0b" />
+                        <span>{product.rating || "4.8"}</span>
+                    </div>
                 </div>
 
-                <h3 className="asset-title-luxe">{product.name}</h3>
+                {/* Product Title */}
+                <h3 className="pro-product-title" title={product.name}>
+                    {product.name}
+                </h3>
 
-                <div className="asset-specs-preview">
-                    <div className="spec-node"><Package size={12} /> <span>LOGISTICS READY</span></div>
-                    <div className="spec-node"><Check size={12} /> <span>AUTH SECURED</span></div>
+                {/* Quick Trust Badges */}
+                <div className="pro-badges-row">
+                    {product.shop_name ? (
+                        <span className="pro-badge-pill">
+                            <Store size={12} /> {product.shop_name}
+                        </span>
+                    ) : (
+                        <span className="pro-badge-pill">
+                            <CheckCircle2 size={12} /> 100% Genuine
+                        </span>
+                    )}
+                    <span className="pro-badge-pill">
+                        <Zap size={12} /> Quick Dispatch
+                    </span>
                 </div>
 
+                {/* Variant Options Pills (If Any) */}
                 {hasVariations && (
-                    <div className="variant-ecom360-mini" onClick={e => e.stopPropagation()}>
-                        {product.variations.slice(0, 3).map(v => (
+                    <div className="pro-variants-row" onClick={(e) => e.stopPropagation()}>
+                        {product.variations.slice(0, 3).map((v) => (
                             <button
                                 key={v.id}
-                                className={`v-pill-mini ${selectedVariant?.id === v.id ? 'active' : ''}`}
+                                className={`pro-variant-pill ${selectedVariant?.id === v.id ? 'active' : ''}`}
                                 onClick={() => setSelectedVariant(v)}
                             >
                                 {v.weight || v.value}
@@ -143,19 +182,33 @@ const ProductCard = ({ product, index = 0 }) => {
                     </div>
                 )}
 
-                <div className="asset-financial-ecom360">
-                    <div className="price-block">
-                        <span className="price-current">₹{displayPrice}</span>
-                        {originalPrice > displayPrice && <span className="price-strike">₹{originalPrice}</span>}
+                {/* Price & Add to Cart Footer */}
+                <div className="pro-card-footer">
+                    <div className="pro-price-group">
+                        <span className="pro-price-current">₹{displayPrice}</span>
+                        {Number(originalPrice) > Number(displayPrice) && (
+                            <span className="pro-price-original">₹{originalPrice}</span>
+                        )}
                     </div>
+
                     <button
-                        className={`btn-procure-action ${isInCart ? 'authorized' : ''}`}
+                        className={`pro-add-cart-btn ${isInCart ? 'in-cart' : ''}`}
                         onClick={handleAddToCart}
-                        disabled={isAddingToCart || isInCart}
+                        disabled={isAddingToCart}
                     >
-                        {isAddingToCart ? <Loader size={14} className="spin" /> :
-                            isInCart ? <><Check size={14} /> <span>IN CART</span></> :
-                                <><ShoppingCart size={14} /> <span>ADD TO CART</span></>}
+                        {isAddingToCart ? (
+                            <Loader2 size={15} className="spin" />
+                        ) : isInCart ? (
+                            <>
+                                <Check size={15} strokeWidth={2.5} />
+                                <span>IN CART</span>
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingBag size={15} />
+                                <span>ADD TO CART</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

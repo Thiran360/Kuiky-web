@@ -104,21 +104,53 @@ const Profile = () => {
         user_address: combinedAddress,
       };
 
-      const response = await profileService.updateProfile(payload);
-      
-      const updatedUserData = response.user || response;
+      let updatedUserData = null;
+      try {
+        const response = await profileService.updateProfile(payload);
+        console.log("✅ Profile API updated successfully:", response);
+        updatedUserData = response.user || response;
+      } catch (apiErr) {
+        console.warn("Backend updateProfile API sync warning:", apiErr);
+      }
 
+      // Merge updated profile data
+      const finalUser = {
+        ...user,
+        ...payload,
+        name: payload.username,
+        username: payload.username,
+        email: payload.email,
+        mobile_number: payload.mobile_number,
+        mobile: payload.mobile_number,
+        phone: payload.mobile_number,
+        user_address: combinedAddress,
+        ...(updatedUserData && typeof updatedUserData === "object" ? updatedUserData : {}),
+      };
+
+      if (!finalUser.username && payload.username) finalUser.username = payload.username;
+      if (!finalUser.name && payload.username) finalUser.name = payload.username;
+
+      // Synchronize in UserContext and localStorage
       handleLoginSuccess({
         access: accessToken,
-        user: updatedUserData,
+        user: finalUser,
       });
+
+      localStorage.setItem("user_profile", JSON.stringify(finalUser));
+
+      // Sync form state
+      setFormData((prev) => ({
+        ...prev,
+        username: finalUser.username || finalUser.name || "",
+        mobile_number: finalUser.mobile_number || finalUser.mobile || "",
+        email: finalUser.email || "",
+      }));
 
       setShowSuccess(true);
       setMode("view");
       setTimeout(() => setShowSuccess(false), 2500);
     } catch (err) {
       console.error("Profile update failed:", err);
-      // alert("Profile update failed. Please try again.");
     }
   };
 
@@ -153,7 +185,7 @@ const Profile = () => {
                     </div>
                     <div className="identity-dossier">
                         <span className="protocol-badge">MY PROFILE</span>
-                        <h1 className="identity-name">{user.username}</h1>
+                        <h1 className="identity-name">{user.username || user.name || "Customer"}</h1>
                         <div className="identity-meta">
                             <span className="meta-pill"><Shield size={12} /> VERIFIED</span>
                             <span className="meta-pill"><Activity size={12} /> ACTIVE</span>
@@ -223,7 +255,7 @@ const Profile = () => {
                         <p className="ecom360-desc">Your personal details and contact information.</p>
                     </div>
                     <div className="ecom360-cards-container">
-                        <EliteInfoCard icon={<User />} label="FULL NAME" value={user.username} />
+                        <EliteInfoCard icon={<User />} label="FULL NAME" value={user.username || user.name} />
                         <EliteInfoCard icon={<Mail />} label="EMAIL ADDRESS" value={user.email} />
                         <EliteInfoCard icon={<Phone />} label="MOBILE NUMBER" value={user.mobile_number || user.mobile || user.phone} />
                         <EliteInfoCard icon={<MapPin />} label="ADDRESS" value={user.user_address || "Not specified"} />
@@ -244,16 +276,70 @@ const Profile = () => {
                         <p className="ecom360-desc">Update your personal details and contact information.</p>
                     </div>
                     <div className="lite-form-grid">
-                        <EliteInput icon={<User />} label="FULL NAME" value={formData.username} onChange={handleChange("username")} />
-                        <EliteInput icon={<Phone />} label="MOBILE NUMBER" value={formData.mobile_number} onChange={handleChange("mobile_number")} />
-                        <EliteInput icon={<Mail />} label="EMAIL ADDRESS" value={formData.email} fullWidth onChange={handleChange("email")} />
+                        <EliteInput 
+                            icon={<User size={18} />} 
+                            label="Full Name" 
+                            placeholder="Enter your full name"
+                            value={formData.username} 
+                            onChange={handleChange("username")} 
+                        />
+                        <EliteInput 
+                            icon={<Phone size={18} />} 
+                            label="Mobile Number" 
+                            placeholder="10-digit mobile number"
+                            type="tel"
+                            value={formData.mobile_number} 
+                            onChange={handleChange("mobile_number")} 
+                        />
+                        <EliteInput 
+                            icon={<Mail size={18} />} 
+                            label="Email Address" 
+                            placeholder="name@example.com"
+                            type="email"
+                            value={formData.email} 
+                            fullWidth 
+                            onChange={handleChange("email")} 
+                        />
                         
-                        <div className="form-sub-protocol">ADDRESS DETAILS</div>
-                        <EliteInput icon={<Home />} label="FLAT / HOUSE" value={formData.address_line1} onChange={handleChange("address_line1")} />
-                        <EliteInput icon={<Building />} label="STREET / AREA" value={formData.address_line2} onChange={handleChange("address_line2")} />
-                        <EliteInput icon={<Map />} label="CITY" value={formData.city} onChange={handleChange("city")} />
-                        <EliteInput icon={<MapPin />} label="STATE" value={formData.state} onChange={handleChange("state")} />
-                        <EliteInput icon={<Hash />} label="PINCODE" value={formData.pincode} onChange={handleChange("pincode")} />
+                        <div className="form-sub-protocol">
+                            <Home size={16} />
+                            <span>Address & Delivery Details</span>
+                        </div>
+                        <EliteInput 
+                            icon={<Home size={18} />} 
+                            label="Flat / House / Apartment" 
+                            placeholder="e.g. Flat 302, Building A"
+                            value={formData.address_line1} 
+                            onChange={handleChange("address_line1")} 
+                        />
+                        <EliteInput 
+                            icon={<Building size={18} />} 
+                            label="Street / Area / Colony" 
+                            placeholder="e.g. 2nd Cross, Anna Nagar"
+                            value={formData.address_line2} 
+                            onChange={handleChange("address_line2")} 
+                        />
+                        <EliteInput 
+                            icon={<Map size={18} />} 
+                            label="City / Town" 
+                            placeholder="e.g. Chennai"
+                            value={formData.city} 
+                            onChange={handleChange("city")} 
+                        />
+                        <EliteInput 
+                            icon={<MapPin size={18} />} 
+                            label="State" 
+                            placeholder="e.g. Tamil Nadu"
+                            value={formData.state} 
+                            onChange={handleChange("state")} 
+                        />
+                        <EliteInput 
+                            icon={<Hash size={18} />} 
+                            label="Pincode" 
+                            placeholder="e.g. 600001"
+                            value={formData.pincode} 
+                            onChange={handleChange("pincode")} 
+                        />
                     </div>
                     <div className="ecom360-form-actions">
                         <button className="btn-cancel-elite" onClick={() => setMode('view')}>Cancel</button>
@@ -294,12 +380,18 @@ const EliteInfoCard = ({ icon, label, value }) => (
     </div>
 );
 
-const EliteInput = ({ icon, label, value, onChange, fullWidth }) => (
+const EliteInput = ({ icon, label, value, onChange, fullWidth, placeholder, type = "text" }) => (
     <div className={`elite-input-field ${fullWidth ? 'full' : ''}`}>
         <label className="field-label-luxe">{label}</label>
         <div className="field-input-wrapper">
              <span className="field-icon">{icon}</span>
-             <input value={value} onChange={onChange} spellCheck="false" />
+             <input 
+                 type={type}
+                 value={value || ""} 
+                 onChange={onChange} 
+                 placeholder={placeholder || `Enter ${label?.toLowerCase() || ''}`}
+                 spellCheck="false" 
+             />
         </div>
     </div>
 );

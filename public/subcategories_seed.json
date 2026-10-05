@@ -1,0 +1,1232 @@
+[
+  {
+    "id": 215,
+    "name": "SRI BANNARI AMMAN MESS",
+    "image": "/media/subcategory_images/BANNARI_AMMAN_MESS.jpeg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 216,
+    "name": "TANDOORI ITEMS",
+    "image": "/media/subcategory_images/tandoori_item.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 217,
+    "name": "TANDOORI STARTERS",
+    "image": "/media/subcategory_images/TANDOORI_STARTERS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 218,
+    "name": "VEG NOODLES",
+    "image": "/media/subcategory_images/VEG_NOODELS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 219,
+    "name": "VEG GRAVY",
+    "image": "/media/subcategory_images/VEG_GRAVY.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 220,
+    "name": "NON VEG GRAVY",
+    "image": "/media/subcategory_images/NON_VEG_GRAVY.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 221,
+    "name": "VEG DRY ITEMS",
+    "image": "/media/subcategory_images/VEG_DRY_ITEMS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 222,
+    "name": "NON VEG DRY ITEMS",
+    "image": "/media/subcategory_images/NON_VEG_DRY_ITEMS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 223,
+    "name": "NON VEG RICE ITEMS",
+    "image": "/media/subcategory_images/NON_VEG_RICE_ITEMS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 224,
+    "name": "VEG RICE ITEMS",
+    "image": "/media/subcategory_images/VEG_RICE_ITEM.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 225,
+    "name": "NON VEG NOODLES",
+    "image": "/media/subcategory_images/NON_VEG_NOODLES.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 226,
+    "name": "OTHERS",
+    "image": "/media/subcategory_images/OTHERS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 215,
+    "parent_subcategory": 215
+  },
+  {
+    "id": 227,
+    "name": "Parasathi Hotel and AC Hall",
+    "image": "/media/subcategory_images/hotel1.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 228,
+    "name": "Soups",
+    "image": "/media/subcategory_images/Soups.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 229,
+    "name": "Non Veg Starters",
+    "image": "/media/subcategory_images/Non_Veg_Starters.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 230,
+    "name": "Veg Starters",
+    "image": "/media/subcategory_images/Veg_Starters.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 231,
+    "name": "Sea Food",
+    "image": "/media/subcategory_images/Sea_Food.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 232,
+    "name": "Tandoori",
+    "image": "/media/subcategory_images/tandoori_items.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 233,
+    "name": "Grill Chicken",
+    "image": "/media/subcategory_images/grill.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 234,
+    "name": "Briyani",
+    "image": "/media/subcategory_images/Briyani.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 235,
+    "name": "Rice/Noodles",
+    "image": "/media/subcategory_images/chicken_noodles.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 236,
+    "name": "Non-Veg Gravy",
+    "image": "/media/subcategory_images/NON_VEG_GRAVY.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 237,
+    "name": "Breads",
+    "image": "/media/subcategory_images/NAAN.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 239,
+    "name": "Veg Gravy",
+    "image": "/media/subcategory_images/VEG_GRAVY_ypOYze2.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 240,
+    "name": "Beverages",
+    "image": "/media/subcategory_images/Beverages.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 241,
+    "name": "Tawa Items",
+    "image": "/media/subcategory_images/tawa_H2snHYc.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 227,
+    "parent_subcategory": 227
+  },
+  {
+    "id": 244,
+    "name": "PVR Super Market",
+    "image": "/images/categories/grocery.png",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 245,
+    "name": "Coffee Items",
+    "image": "/media/subcategory_images/Coffee.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 246,
+    "name": "Tea Items",
+    "image": "/media/subcategory_images/Tea.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 247,
+    "name": "Oil Products",
+    "image": "/media/subcategory_images/oil.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 248,
+    "name": "Snacks ",
+    "image": "/media/subcategory_images/Snacks.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 249,
+    "name": "Rice Items",
+    "image": "/media/subcategory_images/rice.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 250,
+    "name": "Cooking Essentials",
+    "image": "/media/subcategory_images/cooking_essential.jpg",
+    "is_active": true,
+    "category_id": 15,
+    "category": "Supermarket / Grocery",
+    "parent_subcategory_id": 244,
+    "parent_subcategory": 244
+  },
+  {
+    "id": 251,
+    "name": "SRM Sweets and Cakes",
+    "image": "/media/subcategory_images/srm.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 252,
+    "name": "Sweet",
+    "image": "/media/subcategory_images/sweet.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 251,
+    "parent_subcategory": 251
+  },
+  {
+    "id": 253,
+    "name": "Kaaram",
+    "image": "/media/subcategory_images/kaaram.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 251,
+    "parent_subcategory": 251
+  },
+  {
+    "id": 254,
+    "name": "Cakes & Bakery",
+    "image": "/media/subcategory_images/CAKES.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 251,
+    "parent_subcategory": 251
+  },
+  {
+    "id": 255,
+    "name": "CHOCOLATES & ICE CREAM",
+    "image": "/media/subcategory_images/CHOCOLATES.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 251,
+    "parent_subcategory": 251
+  },
+  {
+    "id": 256,
+    "name": "OTHERS",
+    "image": "/media/subcategory_images/srm_others.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 251,
+    "parent_subcategory": 251
+  },
+  {
+    "id": 257,
+    "name": "SAI & CO PLYWOODS & HARDWARES",
+    "image": "/images/categories/electrical.png",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 258,
+    "name": "MICA / LAMINATES",
+    "image": "/media/subcategory_images/MICALAMINATES.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 259,
+    "name": "Plywood",
+    "image": "/media/subcategory_images/plywood.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 260,
+    "name": "WOODEN DOORS",
+    "image": "/media/subcategory_images/WOODEN_DOORS.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 261,
+    "name": "PVC/WPC",
+    "image": "/media/subcategory_images/PVC_and_WPC.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 262,
+    "name": "Main Door Locks",
+    "image": "/media/subcategory_images/Main_door_locks.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 263,
+    "name": "Cupboard Interior Work",
+    "image": "/media/subcategory_images/CUPBOARD_INTERIOR_WORK.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 264,
+    "name": "CEILING",
+    "image": "/media/subcategory_images/CEILING.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 265,
+    "name": "Glass",
+    "image": "/media/subcategory_images/glass.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 266,
+    "name": "HARDWARES",
+    "image": "/media/subcategory_images/HARDWARES.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 267,
+    "name": "Telescopic Channels",
+    "image": "/media/subcategory_images/telescopic_channels.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 268,
+    "name": "KITCHEN ACCESSORIES",
+    "image": "/media/subcategory_images/KITCHEN_ACCESSORIES.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 269,
+    "name": "Wood Cutter Blades",
+    "image": "/media/subcategory_images/WOOD_CUTTER_BLADES.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 270,
+    "name": "ADHESIVES",
+    "image": "/media/subcategory_images/ADHESIVES.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 271,
+    "name": "Silicone",
+    "image": "/media/subcategory_images/SILICONE.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 257,
+    "parent_subcategory": 257
+  },
+  {
+    "id": 272,
+    "name": "NARPAVI LADIES HOSTEL",
+    "image": "/media/subcategory_images/NARPAVII_LADIES_HOSTEL.jpg",
+    "is_active": true,
+    "category_id": 26,
+    "category": "Rental  Spaces / Hostels",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 273,
+    "name": "Single Room",
+    "image": "/media/subcategory_images/single_room.jpg",
+    "is_active": true,
+    "category_id": 26,
+    "category": "Rental  Spaces / Hostels",
+    "parent_subcategory_id": 272,
+    "parent_subcategory": 272
+  },
+  {
+    "id": 274,
+    "name": "Combined rooms",
+    "image": "/media/subcategory_images/Combined_rooms.jpg",
+    "is_active": true,
+    "category_id": 26,
+    "category": "Rental  Spaces / Hostels",
+    "parent_subcategory_id": 272,
+    "parent_subcategory": 272
+  },
+  {
+    "id": 275,
+    "name": "Anseena Electronics",
+    "image": "/media/subcategory_images/unnamed.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 276,
+    "name": "INFINITY Women's Salon&Bridal",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 277,
+    "name": "Makeup Services",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 278,
+    "name": "Threading Services",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 279,
+    "name": "Waxing Services",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 281,
+    "name": "Manicure & Pedicure Services",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 282,
+    "name": "HAIR CARE TREATMENT SERVICE",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 285,
+    "name": "HAIR CARE SERVICES",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 286,
+    "name": "SKIN CARE SERVICES",
+    "image": "/images/categories/beauty.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 287,
+    "name": "Saree Services",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 276,
+    "parent_subcategory": 276
+  },
+  {
+    "id": 288,
+    "name": "Freeze Fire",
+    "image": "/media/subcategory_images/images.png",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 289,
+    "name": "Fire Extinguishers",
+    "image": "/media/subcategory_images/Fire_Extinguishers.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 290,
+    "name": "Detection Devices",
+    "image": "/media/subcategory_images/Detection_Devices.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 291,
+    "name": "Services",
+    "image": "/media/subcategory_images/services.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 275,
+    "parent_subcategory": 275
+  },
+  {
+    "id": 292,
+    "name": "Fire Alarm Panels",
+    "image": "/media/subcategory_images/Fire_Alarm_Panels.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 293,
+    "name": "Manual Alarm Systems",
+    "image": "/media/subcategory_images/Manual_Alarm_Systems.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 294,
+    "name": "Sirens ",
+    "image": "/media/subcategory_images/Sirens.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 295,
+    "name": "Indicators & Lighting",
+    "image": "/media/subcategory_images/Indicators__Lighting.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 296,
+    "name": "Hydrant System Components ",
+    "image": "/media/subcategory_images/Hydrant_System_Components.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 297,
+    "name": "Sprinklers System ",
+    "image": "/media/subcategory_images/Sprinklers_System.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 298,
+    "name": "Personal Protective Equipment(PPE)",
+    "image": "/media/subcategory_images/Personal_Protective_EquipmentPPE.jpg",
+    "is_active": true,
+    "category_id": 27,
+    "category": "Safety / Security",
+    "parent_subcategory_id": 288,
+    "parent_subcategory": 288
+  },
+  {
+    "id": 299,
+    "name": "Neha Shri Food Cout",
+    "image": "/media/subcategory_images/neha.jpeg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 300,
+    "name": "Egg Variety",
+    "image": "/media/subcategory_images/Egg_Variety.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 301,
+    "name": "NON VEG FRIED RICE & NOODLES",
+    "image": "/media/subcategory_images/NON_VEG_FRIED_RICE__NOODLES.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 302,
+    "name": "ROTI & NAAN",
+    "image": "/media/subcategory_images/ROTI__NAAN.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 303,
+    "name": "TANDOORI",
+    "image": "/media/subcategory_images/TANDOORI.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 304,
+    "name": "SOUPS",
+    "image": "/media/subcategory_images/SOUPS_JtX5hhg.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 305,
+    "name": "VEG STARTERS",
+    "image": "/media/subcategory_images/VEG_STARTERS_ryd383x.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 306,
+    "name": "VEG GRAVY",
+    "image": "/media/subcategory_images/VEG_GRAVY_V6P8iGm.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 307,
+    "name": "VARIETY RICE",
+    "image": "/media/subcategory_images/VARIETY_RICE.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 308,
+    "name": "PULAV",
+    "image": "/media/subcategory_images/PULAV.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 309,
+    "name": "VEG FRIED RICE & NOODLES",
+    "image": "/media/subcategory_images/VEG_FRIED_RICE__NOODLES.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 310,
+    "name": "BIRIYANI",
+    "image": "/media/subcategory_images/BIRIYANI.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 311,
+    "name": "NON VEG STARTERS",
+    "image": "/media/subcategory_images/NON_VEG_STARTERS_6rBEUeQ.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 312,
+    "name": "NON VEG GRAVY",
+    "image": "/media/subcategory_images/NON_VEG_GRAVY_lGCUUNS.jpg",
+    "is_active": true,
+    "category_id": 21,
+    "category": "Restaurants / Food",
+    "parent_subcategory_id": 299,
+    "parent_subcategory": 299
+  },
+  {
+    "id": 313,
+    "name": "Yazhini Collections",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 314,
+    "name": "All type of Sarees",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 313,
+    "parent_subcategory": 313
+  },
+  {
+    "id": 315,
+    "name": "SS Car Care",
+    "image": "/vehicle_auto.png",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 316,
+    "name": "Car Wash & Cleaning",
+    "image": "/media/subcategory_images/Car_Wash.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 317,
+    "name": "Battery Services",
+    "image": "/media/subcategory_images/Battery_Services.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 318,
+    "name": "Wheel & Body Works",
+    "image": "/media/subcategory_images/Wheel_Body.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 319,
+    "name": "Painting Works",
+    "image": "/media/subcategory_images/Painting_Works.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 320,
+    "name": "Mechanical Works",
+    "image": "/media/subcategory_images/mechanical_works.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 321,
+    "name": "Electrical & AC Works",
+    "image": "/media/subcategory_images/Electrical_Works.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 322,
+    "name": "Suspension & Brake Works",
+    "image": "/media/subcategory_images/Suspension__Brake_Works.jpg",
+    "is_active": true,
+    "category_id": 28,
+    "category": "Vehicle Accessories / Services",
+    "parent_subcategory_id": 315,
+    "parent_subcategory": 315
+  },
+  {
+    "id": 323,
+    "name": "Paint Shop",
+    "image": "/media/subcategory_images/Paint_Shop.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 324,
+    "name": "Exterior Paint",
+    "image": "/media/subcategory_images/Exterior_Paint.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": 323,
+    "parent_subcategory": 323
+  },
+  {
+    "id": 325,
+    "name": "Interior Paint",
+    "image": "/media/subcategory_images/Interior_Paint.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": 323,
+    "parent_subcategory": 323
+  },
+  {
+    "id": 326,
+    "name": "Floor Paint",
+    "image": "/media/subcategory_images/Floor_Paint.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": 323,
+    "parent_subcategory": 323
+  },
+  {
+    "id": 327,
+    "name": "Emulsion Paint",
+    "image": "/media/subcategory_images/Emulsion_Paint.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": 323,
+    "parent_subcategory": 323
+  },
+  {
+    "id": 328,
+    "name": "Paint",
+    "image": "/media/subcategory_images/Paint.jpg",
+    "is_active": true,
+    "category_id": 23,
+    "category": "Paint",
+    "parent_subcategory_id": 323,
+    "parent_subcategory": 323
+  },
+  {
+    "id": 329,
+    "name": "Yaksha Systems",
+    "image": "/media/subcategory_images/yakshalogobg.jpeg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 330,
+    "name": "CCTV & Security",
+    "image": "/media/subcategory_images/cctv.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 331,
+    "name": "Input Devices",
+    "image": "/media/subcategory_images/Input_Devices.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 332,
+    "name": "Monitors & Displays",
+    "image": "/media/subcategory_images/Monitors__Displays.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 333,
+    "name": "Networking Devices",
+    "image": "/media/subcategory_images/Networking_Devices.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 334,
+    "name": "Enclosures & Accessories",
+    "image": "/images/categories/electronics.png",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 335,
+    "name": "Laptops & Computers",
+    "image": "/media/subcategory_images/Laptops__Computers.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 336,
+    "name": "Printers & Projectors",
+    "image": "/media/subcategory_images/Printers__Projectors.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 337,
+    "name": "Cables & Connectors",
+    "image": "/media/subcategory_images/Cables__Connectors.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 338,
+    "name": "Power Solutions",
+    "image": "/media/subcategory_images/Power_Solutions.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 339,
+    "name": "Audio Devices",
+    "image": "/media/subcategory_images/Audio_Devices.jpg",
+    "is_active": true,
+    "category_id": 20,
+    "category": "Electronics & Gadgets",
+    "parent_subcategory_id": 329,
+    "parent_subcategory": 329
+  },
+  {
+    "id": 340,
+    "name": "Shree Kandha Ladies Tailoring",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": null,
+    "parent_subcategory": null
+  },
+  {
+    "id": 341,
+    "name": "Ladies Tailoring",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 340,
+    "parent_subcategory": 340
+  },
+  {
+    "id": 342,
+    "name": "Machine Embroidery Works",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 340,
+    "parent_subcategory": 340
+  },
+  {
+    "id": 343,
+    "name": "Aari Design Works",
+    "image": "/images/categories/fashion.png",
+    "is_active": true,
+    "category_id": 19,
+    "category": "Fashion / Clothing",
+    "parent_subcategory_id": 340,
+    "parent_subcategory": 340
+  }
+]

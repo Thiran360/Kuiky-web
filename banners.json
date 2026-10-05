@@ -1,1 +1,109 @@
-[{"id":5,"title":"Ultimate Men's Style Sale","image":"/media/banners/MEN.png","description":"From playful fashion to adorable toys, explore everything your kids love. Enjoy huge savings on top brands and make every moment special.","prize_offer":"Flat 70% OFF + Exclusive Deals on Premium Brands","start_date":"2026-03-20T00:00:00Z","end_date":"2026-04-05T23:59:59Z","is_active":true,"shop_name":null},{"id":4,"title":"Kids Mega Sale Festival","image":"/media/banners/big.png","description":"From playful fashion to adorable toys, explore everything your kids love. Enjoy huge savings on top brands and make every moment special.","prize_offer":"Flat 70% OFF + Free Gifts for Kids","start_date":"2026-03-20T00:00:00Z","end_date":"2026-04-04T23:59:59Z","is_active":true,"shop_name":null},{"id":1,"title":"Organic & Fresh","image":"/media/banners/banner_1fBlQHN.png","description":"Shop the best quality vegetables and fruits directly from farmers at unbeatable prices.","prize_offer":"20% OFF","start_date":"2026-03-12T18:30:00Z","end_date":"2026-03-26T17:30:00Z","is_active":true,"shop_name":null}]
+[
+  {
+    "id": 1,
+    "title": "Ambulance Booking",
+    "image": "/banners/ambulance_banner.jpg",
+    "description": "Emergency care, just a call away. Equipped with trained medical staff and 24/7 priority emergency lines for rapid response.",
+    "prize_offer": "🚨 24/7 EMERGENCY RESPONSE • INSTANT DISPATCH",
+    "service_type": "ambulance",
+    "theme_color": "#ef4444",
+    "cta_text": "Emergency SOS",
+    "cta_secondary": "Call SOS",
+    "cta_tel": "108",
+    "checklist": [
+      "24/7 Availability",
+      "Trained Medical Staff",
+      "24/7 Priority Emergency Line"
+    ],
+    "stats": [
+      "24/7 PRIORITY LINE",
+      "CERTIFIED MEDICAL STAFF"
+    ],
+    "is_active": true
+  },
+  {
+    "id": 2,
+    "title": "Auto Booking",
+    "image": "/banners/auto_banner.jpg",
+    "description": "Quick rides for your daily travel. Reliable, verified drivers with live GPS tracking and guaranteed affordable rates.",
+    "prize_offer": "🚖 QUICK CITY COMMUTE • ZERO SURGE PRICING",
+    "service_type": "auto",
+    "theme_color": "#f59e0b",
+    "cta_text": "Book Auto",
+    "checklist": [
+      "Affordable Rates",
+      "Verified Drivers",
+      "Live Tracking"
+    ],
+    "stats": [
+      "AFFORDABLE RATES",
+      "LIVE GPS TRACKING"
+    ],
+    "is_active": true
+  },
+  {
+    "id": 3,
+    "title": "Puncture Booking",
+    "image": "/banners/puncture_banner.jpg",
+    "description": "Get back on the road, hassle-free. Fast on-demand roadside puncture assistance, tire repairs, and mobile mechanic service.",
+    "prize_offer": "🔧 24/7 ON-ROAD ASSISTANCE • DOORSTEP SERVICE",
+    "service_type": "puncture",
+    "theme_color": "#10b981",
+    "cta_text": "Book Puncture",
+    "checklist": [
+      "On-Road Assistance",
+      "Quick Service",
+      "Trained Professionals"
+    ],
+    "stats": [
+      "ON-ROAD ASSISTANCE",
+      "CERTIFIED TECHNICIANS"
+    ],
+    "is_active": true
+  },
+  {
+    "id": 4,
+    "title": "Ultimate Men's Style Sale",
+    "image": "/media/banners/MEN.png",
+    "description": "From playful fashion to adorable toys, explore everything your kids love. Enjoy huge savings on top brands and make every moment special.",
+    "prize_offer": "✨ FLAT 70% OFF + EXCLUSIVE DEALS ON PREMIUM BRANDS",
+    "service_type": "retail",
+    "theme_color": "#fbbf24",
+    "cta_text": "Shop Now",
+    "stats": [
+      "SHIPS INSTANTLY",
+      "ELITE GRADE"
+    ],
+    "is_active": true
+  },
+  {
+    "id": 5,
+    "title": "Kids Mega Sale Festival",
+    "image": "/media/banners/big.png",
+    "description": "From playful fashion to adorable toys, explore everything your kids love. Enjoy huge savings on top brands and make every moment special.",
+    "prize_offer": "🎁 FLAT 70% OFF + FREE GIFTS FOR KIDS",
+    "service_type": "retail",
+    "theme_color": "#38bdf8",
+    "cta_text": "Shop Now",
+    "stats": [
+      "FREE GIFTS",
+      "TOP BRANDS"
+    ],
+    "is_active": true
+  },
+  {
+    "id": 6,
+    "title": "Organic & Fresh",
+    "image": "/media/banners/banner_1fBlQHN.png",
+    "description": "Shop the best quality vegetables and fruits directly from farmers at unbeatable prices.",
+    "prize_offer": "🌿 20% OFF • FARM DIRECT PRODUCE",
+    "service_type": "retail",
+    "theme_color": "#4ade80",
+    "cta_text": "Shop Now",
+    "stats": [
+      "100% ORGANIC",
+      "DIRECT FROM FARM"
+    ],
+    "is_active": true
+  }
+]

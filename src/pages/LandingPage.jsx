@@ -1,25 +1,38 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutGrid, Sparkles, ShoppingBag, TrendingUp, Package } from 'lucide-react';
+import { LayoutGrid, Sparkles, ShoppingBag, TrendingUp, Package, ChevronDown } from 'lucide-react';
 import CategoryRail from '../components/home/CategoryRail';
 import HeroBanner from '../components/home/HeroBanner';
 import ProductCard from '../components/product/ProductCard';
-import { fetchProducts } from '../api/api';
+import { fetchProducts, getCachedProductsSync } from '../api/api';
 import './LandingPage.css';
 
+const ITEMS_PER_PAGE = 24;
+
 const LandingPage = ({ searchTerm }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // ⚡ INSTANT LOAD: Initialize from sync memory/localStorage cache (< 1ms)
+  const [products, setProducts] = useState(() => getCachedProductsSync());
+  const [loading, setLoading] = useState(() => getCachedProductsSync().length === 0);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [selectedSubId, setSelectedSubId] = useState(null);
   const [isTertiarySelection, setIsTertiarySelection] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
+  // Reset pagination count on filter change
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [selectedCategory, selectedSubCategory, selectedSubId, searchTerm]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
-      setLoading(true);
+      // Only show full spinner if zero products exist in cache
+      if (products.length === 0) {
+        setLoading(true);
+      }
       setError(null);
       try {
         const productData = await fetchProducts({ 
@@ -27,15 +40,22 @@ const LandingPage = ({ searchTerm }) => {
           subcategoryId: selectedSubId, 
           search: searchTerm 
         });
-        setProducts(Array.isArray(productData) ? productData : []);
+        if (isMounted) {
+          setProducts(Array.isArray(productData) ? productData : []);
+        }
       } catch (err) {
         console.error("Products load error:", err);
-        setError("Failed to load products");
+        if (isMounted && products.length === 0) {
+          setError("Failed to load products");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     loadData();
+    return () => { isMounted = false; };
   }, [selectedCategory, selectedSubId, searchTerm]);
 
   // Sync with CategoryRail for absolute discovery
@@ -60,11 +80,14 @@ const LandingPage = ({ searchTerm }) => {
       );
     }
 
-    // 2. Filter by Category ID (Primary Sector)
+    // 2. Filter by Category ID or Name
     if (selectedCategory) {
       result = result.filter(p => {
-        const pCatId = p.category?.id || p.category_id || p.category;
-        return String(pCatId) === String(selectedCategory);
+        const pCatId = p.category?.id || p.category_id;
+        const pCatName = typeof p.category === 'string' ? p.category : p.category?.name;
+        const matchesId = pCatId && String(pCatId) === String(selectedCategory);
+        const matchesName = selectedCategoryName && pCatName && pCatName.toLowerCase() === selectedCategoryName.toLowerCase();
+        return matchesId || matchesName;
       });
     }
 
@@ -82,14 +105,19 @@ const LandingPage = ({ searchTerm }) => {
     }
 
     return result;
-  }, [products, selectedCategory, selectedSubCategory, selectedSubId, searchTerm]);
+  }, [products, selectedCategory, selectedCategoryName, selectedSubCategory, selectedSubId, searchTerm]);
+
+  // 🚀 HIGH PERFORMANCE: Progressive slice prevents mounting 1,000+ motion DOM nodes at once
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
 
   return (
     <div className="landing-container">
-      <CategoryRail onNavSelect={handleNavSelect} />
-
       {/* 🚀 ELITE DISCOVERY GUARD: Only show HeroBanner when no active filters (Category/Sub/Search) are present */}
       {(!selectedCategory && !selectedSubCategory && !searchTerm) && <HeroBanner />}
+
+      <CategoryRail onNavSelect={handleNavSelect} />
 
       <main className="page-content">
         <section className="products-section" id="products-section">
@@ -123,7 +151,7 @@ const LandingPage = ({ searchTerm }) => {
           </div>
 
           <AnimatePresence mode="wait">
-            {loading ? (
+            {loading && products.length === 0 ? (
               <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}
@@ -147,16 +175,32 @@ const LandingPage = ({ searchTerm }) => {
                 <p>{error}</p>
               </motion.div>
             ) : (
-              <motion.div
-                key="content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="prem-product-grid"
-              >
-                {filteredProducts.map((product, index) => (
-                  <ProductCard key={product.id || index} product={product} index={index} />
-                ))}
-              </motion.div>
+              <>
+                <motion.div
+                  key="content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="prem-product-grid"
+                >
+                  {displayedProducts.map((product, index) => (
+                    <ProductCard key={product.id || index} product={product} index={index} />
+                  ))}
+                </motion.div>
+
+                {/* ⚡ LOAD MORE BUTTON FOR PROGRESSIVE RENDERING */}
+                {filteredProducts.length > visibleCount && (
+                  <div className="collection-load-more-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount(prev => prev + ITEMS_PER_PAGE)}
+                      className="btn-collection-load-more"
+                    >
+                      <span>Explore More ({filteredProducts.length - visibleCount} remaining)</span>
+                      <ChevronDown size={18} />
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </AnimatePresence>
 

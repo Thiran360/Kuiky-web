@@ -429,13 +429,16 @@ const OrderHistoryPage = () => {
         </div>
     );
 
-    if (error) return (
+    if (error && (!orders || orders.length === 0)) return (
         <div className="order-history-page">
             <div className="elite-error-ecom360">
                 <AlertTriangle size={64} className="text-rose-500 mb-6" />
                 <h2>COMMUNICATION FAULT</h2>
                 <p>{error}</p>
-                <button className="btn-luxe-primary" onClick={fetchOrders}>RE-ESTABLISH HANDSHAKE</button>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+                    <button className="btn-luxe-primary" onClick={fetchOrders}>RE-ESTABLISH HANDSHAKE</button>
+                    <button className="btn-luxe-primary" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }} onClick={() => window.location.href = '/'}>CONTINUE SHOPPING</button>
+                </div>
             </div>
         </div>
     );

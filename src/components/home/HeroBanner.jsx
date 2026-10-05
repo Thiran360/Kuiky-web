@@ -1,131 +1,258 @@
-import React, { useEffect, useState, useCallback } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ShoppingCart, ArrowRight, Zap, ShieldCheck, Star, ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
+import {
+    Sparkles, ArrowRight, Zap, ShieldCheck, Star, ChevronLeft,
+    ChevronRight, PhoneCall, Check, ShoppingCart, X, CheckCircle2
+} from 'lucide-react';
 import { fetchBanners } from '../../api/api';
 import { getImageUrl } from '../../api/config';
 import './HeroBanner.css';
 
-// Import local assets as reliable fallbacks since backend images are giving 404
+// Kuiky High-Fidelity Service Banners (New)
+import imgAmbulance from '../../assets/ambulance_banner.jpg';
+import imgAuto from '../../assets/auto_banner.jpg';
+import imgPuncture from '../../assets/puncture_banner.jpg';
+
+// Retail & E-Commerce Sale Banners (Old)
 import imgMen from '../../assets/MEN.png';
 import imgBig from '../../assets/big.png';
 import imgBanner from '../../assets/banner.png';
 
-const LOCAL_BANNERS = {
+const LOCAL_FALLBACK_IMAGES = {
     'MEN.png': imgMen,
     'big.png': imgBig,
     'banner_1fBlQHN.png': imgBanner,
-    'banner': imgBanner
+    'banner': imgBanner,
+    'ambulance_banner.jpg': imgAmbulance,
+    'auto_banner.jpg': imgAuto,
+    'puncture_banner.jpg': imgPuncture
 };
 
-/** Smart image fetcher with ngrok bypass & local fallbacks */
-const useSmartBannerImage = (rawUrl) => {
-    // 1. Resolve local fallbacks synchronously to avoid flicker/404 on first render
-    const getInitialSrc = () => {
-        if (!rawUrl) return null;
-        const filename = rawUrl.split('/').pop();
-        if (LOCAL_BANNERS[filename]) return LOCAL_BANNERS[filename];
-        if (rawUrl.includes('MEN')) return imgMen;
-        if (rawUrl.includes('big')) return imgBig;
-        if (rawUrl.includes('banner')) return imgBanner;
-        return null;
-    };
-
-    const [src, setSrc] = useState(getInitialSrc);
-
-    useEffect(() => {
-        if (!rawUrl) {
-            setSrc(null);
-            return;
-        }
-
-        // Check if already set by initial state to avoid redundant work
-        const filename = rawUrl.split('/').pop();
-        if (LOCAL_BANNERS[filename]) {
-            setSrc(LOCAL_BANNERS[filename]);
-            return;
-        }
-        if (rawUrl.includes('MEN')) { setSrc(imgMen); return; }
-        if (rawUrl.includes('big')) { setSrc(imgBig); return; }
-        if (rawUrl.includes('banner')) { setSrc(imgBanner); return; }
-
-        let blobUrl = '';
-        const load = async () => {
-            try {
-                // Try fetching with CORS-friendly headers
-                const res = await fetch(rawUrl, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-                if (res.ok) {
-                    const ct = res.headers.get('content-type') || '';
-                    if (ct.startsWith('image/')) {
-                        const blob = await res.blob();
-                        blobUrl = URL.createObjectURL(blob);
-                        setSrc(blobUrl);
-                        return;
-                    }
-                }
-                // If fetch fails or not an image, use rawUrl (may still 404, handled by img tag)
-                setSrc(rawUrl);
-            } catch {
-                setSrc(rawUrl);
-            }
-        };
-        load();
-        return () => { if (blobUrl) URL.revokeObjectURL(blobUrl); };
-    }, [rawUrl]);
-
-    return src;
-};
+const ALL_DEFAULT_BANNERS = [
+    // 1. Ambulance Booking (Kuiky Service)
+    {
+        id: 'ambulance',
+        service_type: 'ambulance',
+        title: "Ambulance Booking",
+        subtitle: "Emergency care, just a call away.",
+        description: "Emergency care, just a call away. Equipped with trained medical staff, ICU support equipment, and 24/7 priority emergency lines for instant dispatch.",
+        prize_offer: "🚨 24/7 EMERGENCY RESPONSE • INSTANT DISPATCH",
+        resolvedImage: imgAmbulance,
+        theme_color: "#ef4444",
+        gradient_bg: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+        accent_glow: "rgba(239, 68, 68, 0.4)",
+        cta_text: "Emergency SOS",
+        cta_secondary: "Call SOS",
+        cta_tel: "tel:108",
+        checklist: [
+            "24/7 Availability",
+            "Trained Medical Staff",
+            "24/7 Priority Emergency Line"
+        ],
+        stats: [
+            { label: "24/7 PRIORITY LINE", icon: Zap },
+            { label: "CERTIFIED MEDICAL STAFF", icon: ShieldCheck }
+        ]
+    },
+    // 2. Auto Booking (Kuiky Service)
+    {
+        id: 'auto',
+        service_type: 'auto',
+        title: "Auto Booking",
+        subtitle: "Quick rides for your daily travel.",
+        description: "Quick rides for your daily travel. Guaranteed affordable rates, 100% verified trusted drivers, and real-time live GPS tracking for your daily commute.",
+        prize_offer: "🚖 QUICK CITY COMMUTE • ZERO SURGE PRICING",
+        resolvedImage: imgAuto,
+        theme_color: "#f59e0b",
+        gradient_bg: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+        accent_glow: "rgba(245, 158, 11, 0.4)",
+        cta_text: "Book Auto",
+        checklist: [
+            "Affordable Rates",
+            "Verified Drivers",
+            "Live Tracking"
+        ],
+        stats: [
+            { label: "AFFORDABLE RATES", icon: Zap },
+            { label: "VERIFIED DRIVERS", icon: Star }
+        ]
+    },
+    // 3. Puncture Booking (Kuiky Service)
+    {
+        id: 'puncture',
+        service_type: 'puncture',
+        title: "Puncture Booking",
+        subtitle: "Get back on the road, hassle-free.",
+        description: "Get back on the road, hassle-free. Fast on-demand roadside puncture assistance, tire repair, air filling, and doorstep mobile mechanic support.",
+        prize_offer: "🔧 24/7 ON-ROAD ASSISTANCE • DOORSTEP SERVICE",
+        resolvedImage: imgPuncture,
+        theme_color: "#10b981",
+        gradient_bg: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+        accent_glow: "rgba(16, 185, 129, 0.4)",
+        cta_text: "Book Puncture",
+        checklist: [
+            "On-Road Assistance",
+            "Quick Service",
+            "Trained Professionals"
+        ],
+        stats: [
+            { label: "ON-ROAD ASSISTANCE", icon: ShieldCheck },
+            { label: "QUICK SERVICE", icon: Zap }
+        ]
+    },
+    // 4. Ultimate Men's Style Sale (Old Slide 1)
+    {
+        id: 'men-style',
+        service_type: 'retail',
+        title: "Ultimate Men's Style Sale",
+        subtitle: "Exclusive deals on premium fashion & accessories.",
+        description: "From playful fashion to luxury menswear, explore everything you desire. Enjoy huge savings on top brands and make every moment special.",
+        prize_offer: "✨ FLAT 70% OFF + EXCLUSIVE DEALS ON PREMIUM BRANDS",
+        resolvedImage: imgMen,
+        theme_color: "#fbbf24",
+        gradient_bg: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+        accent_glow: "rgba(251, 191, 36, 0.35)",
+        cta_text: "Shop Now",
+        stats: [
+            { label: "SHIPS INSTANTLY", icon: Zap },
+            { label: "ELITE GRADE", icon: Star }
+        ]
+    },
+    // 5. Kids Mega Sale Festival (Old Slide 2)
+    {
+        id: 'kids-sale',
+        service_type: 'retail',
+        title: "Kids Mega Sale Festival",
+        subtitle: "Playful fashion, adorable toys & creative learning.",
+        description: "From playful fashion to adorable toys, explore everything your kids love. Enjoy huge savings on top brands and make every moment special.",
+        prize_offer: "🎁 FLAT 70% OFF + FREE GIFTS FOR KIDS",
+        resolvedImage: imgBig,
+        theme_color: "#38bdf8",
+        gradient_bg: "linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)",
+        accent_glow: "rgba(56, 189, 248, 0.35)",
+        cta_text: "Shop Now",
+        stats: [
+            { label: "FREE GIFTS", icon: Sparkles },
+            { label: "VERIFIED QUALITY", icon: ShieldCheck }
+        ]
+    },
+    // 6. Organic & Fresh (Old Slide 3)
+    {
+        id: 'organic-fresh',
+        service_type: 'retail',
+        title: "Organic & Fresh",
+        subtitle: "Farm-to-table fresh fruits & daily groceries.",
+        description: "Shop the best quality vegetables and fruits directly from farmers at unbeatable prices with 100% farm-fresh guarantee.",
+        prize_offer: "🌿 20% OFF • 100% FARM-FRESH ORGANIC",
+        resolvedImage: imgBanner,
+        theme_color: "#4ade80",
+        gradient_bg: "linear-gradient(135deg, #4ade80 0%, #16a34a 100%)",
+        accent_glow: "rgba(74, 222, 128, 0.35)",
+        cta_text: "Shop Now",
+        stats: [
+            { label: "100% ORGANIC", icon: ShieldCheck },
+            { label: "FARM DIRECT", icon: Zap }
+        ]
+    }
+];
 
 const HeroBanner = () => {
-    const [banners, setBanners] = useState([]);
+    const [banners, setBanners] = useState(ALL_DEFAULT_BANNERS);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [bookingModal, setBookingModal] = useState(null);
+    const [bookingSuccess, setBookingSuccess] = useState(false);
+    const [pickupLocation, setPickupLocation] = useState("");
+    const [contactPhone, setContactPhone] = useState("");
 
+    // Load extra backend banners if available while preserving the full roster
     useEffect(() => {
-        const loadBanners = async () => {
+        const loadRemote = async () => {
             try {
                 const data = await fetchBanners();
                 const rawList = Array.isArray(data) ? data : (data?.results || []);
                 if (rawList.length > 0) {
                     const activeOnes = rawList.filter(b => b.is_active === true || b.active === true);
                     const results = activeOnes.length > 0 ? activeOnes : rawList;
-                    const processed = results.map(b => {
+
+                    // Map any backend banners not already in our roster
+                    const remoteMapped = results.map(b => {
                         const rawImage = b.image || b.image_url || b.banner_image || b.img;
-                        return { ...b, resolvedImage: getImageUrl(rawImage) };
+                        const filename = (rawImage || '').split('/').pop();
+                        const resolvedImage = LOCAL_FALLBACK_IMAGES[filename] || getImageUrl(rawImage);
+                        return {
+                            id: `remote-${b.id}`,
+                            service_type: 'retail',
+                            title: b.title,
+                            description: b.description || "Unlocking the next dimension of luxury retail. Experience high-fidelity discovery.",
+                            prize_offer: b.prize_offer || "✨ EXCLUSIVE DEAL",
+                            resolvedImage,
+                            theme_color: "#fbbf24",
+                            gradient_bg: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                            accent_glow: "rgba(251, 191, 36, 0.35)",
+                            cta_text: "Shop Now",
+                            stats: [
+                                { label: "SHIPS INSTANTLY", icon: Zap },
+                                { label: "ELITE GRADE", icon: Star }
+                            ]
+                        };
                     });
-                    setBanners(processed);
+
+                    // Keep our 3 Kuiky services at front, followed by local old slides and any extra remote ones
+                    const existingTitles = new Set(ALL_DEFAULT_BANNERS.map(s => s.title.toLowerCase()));
+                    const newExtras = remoteMapped.filter(r => !existingTitles.has(r.title.toLowerCase()));
+                    setBanners([...ALL_DEFAULT_BANNERS, ...newExtras]);
                 }
             } catch (err) {
-                console.error("Banner fetch error:", err);
-            } finally {
-                setLoading(false);
+                console.warn("Could not fetch remote banners, using complete local roster:", err);
             }
         };
-        loadBanners();
+        loadRemote();
     }, []);
 
+    // Auto rotate every .8 seconds (Snappier, faster transitions)
     useEffect(() => {
         if (banners.length > 1) {
             const timer = setInterval(() => {
                 setCurrentIndex(prev => (prev + 1) % banners.length);
-            }, 8500);
+            }, 3800);
             return () => clearInterval(timer);
         }
-    }, [banners]);
+    }, [banners, currentIndex]);
 
-    const handleShopNow = () => {
-        const productsElement = document.getElementById('products-section');
-        if (productsElement) {
-            productsElement.scrollIntoView({ behavior: 'smooth' });
+    const currentSlide = banners[currentIndex] || banners[0];
+
+    const handleActionClick = (slide, isSecondary = false) => {
+        // If it's a retail slide, smooth scroll to product collection
+        if (slide.service_type === 'retail' || slide.cta_text === 'Shop Now') {
+            const productsElement = document.getElementById('products-section');
+            if (productsElement) {
+                productsElement.scrollIntoView({ behavior: 'smooth' });
+            }
+            return;
         }
+
+        // Secondary SOS phone call
+        if (isSecondary && slide.cta_tel) {
+            window.location.href = slide.cta_tel;
+            return;
+        }
+
+        // Open quick booking modal
+        setBookingModal(slide);
+        setBookingSuccess(false);
+        setPickupLocation("");
+        setContactPhone("");
     };
 
-    if (loading) return (
-        <div className="hb-skeleton">
-            <div className="hb-skeleton-shimmer"></div>
-        </div>
-    );
+    const handleConfirmBooking = (e) => {
+        e.preventDefault();
+        setBookingSuccess(true);
+        setTimeout(() => {
+            setBookingModal(null);
+            setBookingSuccess(false);
+        }, 2200);
+    };
 
     if (!banners.length) return null;
 
@@ -135,135 +262,264 @@ const HeroBanner = () => {
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentIndex}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
                         className="hb-active-vanguard"
                     >
                         <div className="hb-vanguard-inner">
-                            <BannerBackdrop url={banners[currentIndex].resolvedImage} />
-                            
+                            {/* Dynamic blurred backdrop */}
+                            <BannerBackdrop url={currentSlide.resolvedImage} />
+
                             <div className="hb-vanguard-content">
                                 <div className="hb-text-vanguard">
-                                    <motion.div 
-                                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+                                    {/* 1. Promo Pill */}
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.25, delay: 0.05 }}
                                         className="hb-promo-pill"
+                                        style={{
+                                            background: currentSlide.gradient_bg,
+                                            boxShadow: `0 0 20px ${currentSlide.accent_glow}`
+                                        }}
                                     >
-                                        <Sparkles size={12} />
-                                        <span>{banners[currentIndex].prize_offer || "LIMITED EDITION"}</span>
+                                        <Sparkles size={13} color="#fff" />
+                                        <span style={{ color: '#fff' }}>{currentSlide.prize_offer}</span>
                                     </motion.div>
 
-                                    <motion.h1 
-                                        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.6 }}
+                                    {/* 2. Main Title */}
+                                    <motion.h1
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: 0.1 }}
                                         className="hb-headline-vanguard"
                                     >
-                                        {banners[currentIndex].title}
+                                        {currentSlide.title}
                                     </motion.h1>
 
-                                    <motion.p 
-                                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                                    {/* 3. Description */}
+                                    <motion.p
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: 0.15 }}
                                         className="hb-summary-vanguard"
                                     >
-                                        {banners[currentIndex].description || "Unlocking the next dimension of luxury retail. Experience our high-fidelity discovery sectors with institution-grade logistics."}
+                                        {currentSlide.description}
                                     </motion.p>
 
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+                                    {/* 4. Service Checklist (For Kuiky Service Slides) */}
+                                    {currentSlide.checklist && currentSlide.checklist.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.25, delay: 0.2 }}
+                                            className="hb-features-checklist"
+                                        >
+                                            {currentSlide.checklist.map((item, idx) => (
+                                                <div key={idx} className="hb-check-item">
+                                                    <span className="hb-check-circle">
+                                                        <Check size={12} strokeWidth={3} color="#fff" />
+                                                    </span>
+                                                    <span className="hb-check-text">{item}</span>
+                                                </div>
+                                            ))}
+                                        </motion.div>
+                                    )}
+
+                                    {/* 5. Vanguard Action Hub */}
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.25, delay: 0.25 }}
                                         className="hb-vanguard-actions"
                                     >
-                                        <button className="hb-btn-discovery" onClick={handleShopNow}>
-                                            <ShoppingCart size={18} />
-                                            <span>Shop Now</span>
-                                            <ArrowRight size={16} className="hb-arrow-discovery" />
+                                        <button
+                                            className="hb-btn-discovery"
+                                            style={{
+                                                background: currentSlide.gradient_bg,
+                                                boxShadow: `0 12px 35px ${currentSlide.accent_glow}`
+                                            }}
+                                            onClick={() => handleActionClick(currentSlide, false)}
+                                        >
+                                            {currentSlide.service_type === 'retail' && <ShoppingCart size={18} />}
+                                            <span>{currentSlide.cta_text}</span>
+                                            <ArrowRight size={18} className="hb-arrow-discovery" />
                                         </button>
-                                        
+
+                                        {currentSlide.cta_secondary && (
+                                            <button
+                                                className="hb-btn-sos-call"
+                                                onClick={() => handleActionClick(currentSlide, true)}
+                                            >
+                                                <PhoneCall size={18} />
+                                                <span>{currentSlide.cta_secondary}</span>
+                                            </button>
+                                        )}
+
                                         <div className="hb-vanguard-stats">
-                                            <div className="stat-node"><Zap size={12} /> <span>SHIPS INSTANTLY</span></div>
-                                            <div className="stat-node"><Star size={12} fill="var(--elite-gold)" stroke="none" /> <span>ELITE GRADE</span></div>
+                                            {currentSlide.stats?.map((st, i) => {
+                                                const IconComp = st.icon;
+                                                return (
+                                                    <div key={i} className="stat-node">
+                                                        <IconComp size={13} style={{ color: currentSlide.theme_color }} />
+                                                        <span>{st.label}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </motion.div>
                                 </div>
 
-                                <motion.div 
-                                    initial={{ opacity: 0, scale: 0.9, rotate: 2 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1.2, delay: 0.3 }}
+                                {/* 6. Luxury Visual Area */}
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.35, delay: 0.05 }}
                                     className="hb-visual-vanguard"
                                 >
-                                    <div className="hb-image-hub-luxe">
-                                        <BannerProductImage url={banners[currentIndex].resolvedImage} title={banners[currentIndex].title} />
+                                    <div
+                                        className="hb-image-hub-luxe"
+                                        style={{
+                                            boxShadow: `0 25px 60px rgba(0, 0, 0, 0.6), 0 0 50px ${currentSlide.accent_glow}`,
+                                            borderColor: `${currentSlide.theme_color}44`
+                                        }}
+                                    >
+                                        <img
+                                            src={currentSlide.resolvedImage}
+                                            alt={currentSlide.title}
+                                            className="hb-product-img"
+                                        />
                                     </div>
-                                    <div className="vanguard-orb"></div>
+                                    <div
+                                        className="vanguard-orb"
+                                        style={{
+                                            background: `radial-gradient(circle, ${currentSlide.accent_glow} 0%, transparent 68%)`
+                                        }}
+                                    />
                                 </motion.div>
                             </div>
                         </div>
                     </motion.div>
                 </AnimatePresence>
 
-                {/* SIDE PEEK PROXIES — Subtle edge previews for continuity */}
-                <div className="hb-edge-peek left" onClick={() => setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length)}>
-                    <div className="edge-glass">
-                        <BannerBackdrop url={banners[(currentIndex - 1 + banners.length) % banners.length].resolvedImage} />
-                    </div>
-                </div>
+                {/* PREVIOUS / NEXT SLIDER ARROWS */}
+                <button
+                    className="hb-slider-arrow left"
+                    onClick={() => setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length)}
+                    aria-label="Previous slide"
+                    title="Previous Slide"
+                >
+                    <ChevronLeft size={22} />
+                </button>
 
-                <div className="hb-edge-peek right" onClick={() => setCurrentIndex(prev => (prev + 1) % banners.length)}>
-                    <div className="edge-glass">
-                        <BannerBackdrop url={banners[(currentIndex + 1) % banners.length].resolvedImage} />
-                    </div>
-                </div>
-
-                <div className="hb-vanguard-pagination-bar">
-                    <button className="hb-nav-arrow left" onClick={() => setCurrentIndex(prev => (prev - 1 + banners.length) % banners.length)}>
-                        <ChevronLeft size={20} />
-                    </button>
-                    
-                    <div className="hb-pag-dots">
-                        {banners.map((_, idx) => (
-                            <button 
-                                key={idx} 
-                                onClick={() => setCurrentIndex(idx)}
-                                className={`hb-pag-orb ${currentIndex === idx ? 'active' : ''}`}
-                            />
-                        ))}
-                    </div>
-
-                    <button className="hb-nav-arrow right" onClick={() => setCurrentIndex(prev => (prev + 1) % banners.length)}>
-                        <ChevronRight size={20} />
-                    </button>
-                </div>
+                <button
+                    className="hb-slider-arrow right"
+                    onClick={() => setCurrentIndex(prev => (prev + 1) % banners.length)}
+                    aria-label="Next slide"
+                    title="Next Slide"
+                >
+                    <ChevronRight size={22} />
+                </button>
             </div>
+
+            {/* Quick Interactive Booking / SOS Modal */}
+            <AnimatePresence>
+                {bookingModal && (
+                    <div className="hb-modal-overlay">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="hb-modal-backdrop"
+                            onClick={() => setBookingModal(null)}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="hb-booking-modal"
+                            style={{ borderColor: bookingModal.theme_color }}
+                        >
+                            <button className="hb-modal-close" onClick={() => setBookingModal(null)}>
+                                <X size={20} />
+                            </button>
+
+                            {bookingSuccess ? (
+                                <div className="hb-booking-success">
+                                    <div className="hb-success-icon" style={{ background: bookingModal.theme_color }}>
+                                        <CheckCircle2 size={44} color="#fff" />
+                                    </div>
+                                    <h3>Request Dispatched!</h3>
+                                    <p>Our nearest {bookingModal.title.toLowerCase()} unit is en route to your location.</p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleConfirmBooking} className="hb-booking-form">
+                                    <div className="hb-modal-header">
+                                        <div className="hb-modal-badge" style={{ background: bookingModal.theme_color }}>
+                                            {bookingModal.prize_offer.split('•')[0]}
+                                        </div>
+                                        <h2>{bookingModal.title}</h2>
+                                        <p>{bookingModal.subtitle}</p>
+                                    </div>
+
+                                    <div className="hb-form-group">
+                                        <label>Pickup / Service Location</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Enter your current address or landmark..."
+                                            value={pickupLocation}
+                                            onChange={(e) => setPickupLocation(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="hb-form-group">
+                                        <label>Contact Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            required
+                                            placeholder="+91 98765 43210"
+                                            value={contactPhone}
+                                            onChange={(e) => setContactPhone(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {bookingModal.checklist && (
+                                        <div className="hb-modal-features">
+                                            {bookingModal.checklist.map((c, i) => (
+                                                <span key={i} className="hb-modal-feat-pill">
+                                                    <Check size={12} color={bookingModal.theme_color} /> {c}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        type="submit"
+                                        className="hb-modal-submit-btn"
+                                        style={{ background: bookingModal.gradient_bg }}
+                                    >
+                                        Confirm & Request {bookingModal.title}
+                                    </button>
+                                </form>
+                            )}
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
 
 /** Blurred background backdrop */
 const BannerBackdrop = ({ url }) => {
-    const src = useSmartBannerImage(url);
     return (
         <div className="hb-backdrop-engine">
-            <div className="hb-backdrop-img" style={{ backgroundImage: src ? `url(${src})` : 'none' }} />
+            <div className="hb-backdrop-img" style={{ backgroundImage: url ? `url(${url})` : 'none' }} />
             <div className="hb-backdrop-overlay" />
         </div>
-    );
-};
-
-/** Main product image */
-const BannerProductImage = ({ url, title }) => {
-    const src = useSmartBannerImage(url);
-    const [hasError, setHasError] = useState(false);
-
-    // If we have a resolved source that isn't null, we show it
-    // If it's null (not even 404 URL yet), we don't render to avoid broken icons
-    if (!src && !url) return null;
-    if (hasError) return null;
-
-    return (
-        <img
-            src={src || url}
-            alt={title || "Banner"}
-            className="hb-product-img"
-            onError={() => setHasError(true)}
-        />
     );
 };
 

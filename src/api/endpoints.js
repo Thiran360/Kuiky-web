@@ -5,6 +5,8 @@ export const API_ENDPOINTS = {
   // Auth
   REGISTER: "register/user/",
   LOGIN: "login/",
+  SEND_OTP: "send-otp/",
+  VERIFY_OTP: "verify-otp/",
   TOKEN_REFRESH: "token/refresh/",
 
   // Users & Profiles

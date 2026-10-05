@@ -27,7 +27,18 @@ export const AddressProvider = ({ children }) => {
 
         setIsLoadingAddresses(true);
         try {
-            // Primary Strategy: Use the numeric user_id if available (most reliable)
+            const token = localStorage.getItem("accessToken") || localStorage.getItem("access_token");
+            const isCustomOtp = token && (token.startsWith("otp_") || token.startsWith("token_"));
+
+            // If the user has a custom OTP/dev token, load from local storage directly
+            if (isCustomOtp) {
+                const saved = localStorage.getItem("ecom_local_addresses");
+                const parsed = saved ? JSON.parse(saved) : [];
+                setAddresses(parsed);
+                setSelectedAddress(parsed.find(a => a.is_default) || parsed[0] || null);
+                return;
+            }
+
             const userIdString = localStorage.getItem("user_id");
             const uid = userIdString ? parseInt(userIdString, 10) : (user?.id ? parseInt(user.id, 10) : null);
             
@@ -36,7 +47,7 @@ export const AddressProvider = ({ children }) => {
                 try {
                     data = await addressService.getAll(uid);
                 } catch (err) {
-                    // Fallback to token-based if user_id failed
+                    if (err?.response?.status === 401) throw err;
                     data = await addressService.getAllTokenBased();
                 }
             } else {
@@ -45,20 +56,29 @@ export const AddressProvider = ({ children }) => {
 
             if (!Array.isArray(data)) data = [];
             setAddresses(data);
+            try {
+                localStorage.setItem("ecom_local_addresses", JSON.stringify(data));
+            } catch (e) {}
 
-            // Keep existing selection if still valid; otherwise pick default/first
             setSelectedAddress(prev => {
                 if (prev && data.some(a => a.id === prev.id)) return prev;
                 return data.find(a => a.is_default) || data[0] || null;
             });
 
         } catch (err) {
-            const status = err?.response?.status;
-            if (status === 404 || status === 400) {
-                setAddresses([]);
-            } else {
-                console.error("Failed to load addresses:", err?.response?.data || err.message || err);
-            }
+            // Fallback to locally cached addresses if backend 401/404/network error
+            try {
+                const saved = localStorage.getItem("ecom_local_addresses");
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    setAddresses(parsed);
+                    setSelectedAddress(parsed.find(a => a.is_default) || parsed[0] || null);
+                    return;
+                }
+            } catch (e) {}
+
+            setAddresses([]);
+            setSelectedAddress(null);
         } finally {
             setIsLoadingAddresses(false);
         }
@@ -92,24 +112,38 @@ export const AddressProvider = ({ children }) => {
 
         try {
             const newAddress = await addressService.add(cleanPayload);
+            const savedAddress = newAddress?.id ? newAddress : { ...cleanPayload, id: 'addr_' + Date.now() };
 
             setAddresses(prev => {
-                let updated = [...prev, newAddress];
-                if (newAddress.is_default) {
+                let updated = [...prev, savedAddress];
+                if (savedAddress.is_default) {
                     updated = updated.map(a =>
-                        a.id !== newAddress.id ? { ...a, is_default: false } : newAddress
+                        a.id !== savedAddress.id ? { ...a, is_default: false } : savedAddress
                     );
-                    setSelectedAddress(newAddress);
+                    setSelectedAddress(savedAddress);
                 } else {
-                    setSelectedAddress(s => s || newAddress);
+                    setSelectedAddress(s => s || savedAddress);
                 }
+                try { localStorage.setItem("ecom_local_addresses", JSON.stringify(updated)); } catch (e) {}
                 return updated;
             });
 
-            return newAddress;
+            return savedAddress;
         } catch (err) {
-            console.error("Failed to add address:", err?.response?.data || err);
-            throw err;
+            // Local fallback for dev/offline sessions
+            console.warn("Backend address creation failed, storing locally:", err?.response?.data || err);
+            const localAddress = {
+                ...cleanPayload,
+                id: 'local_addr_' + Date.now(),
+                is_default: cleanPayload.is_default ?? true
+            };
+            setAddresses(prev => {
+                const updated = [...prev, localAddress];
+                setSelectedAddress(s => s || localAddress);
+                try { localStorage.setItem("ecom_local_addresses", JSON.stringify(updated)); } catch (e) {}
+                return updated;
+            });
+            return localAddress;
         }
     }, [isAuthenticated]);
 

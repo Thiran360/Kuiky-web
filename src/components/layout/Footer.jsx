@@ -101,7 +101,7 @@ const FOOTER_PAGE_DETAILS = {
     color: "#8b5cf6"
   },
   "Our Story": {
-    title: "The Ecom360 Journey",
+    title: "The Kuiky Journey",
     sections: [
       { subtitle: "Inception", text: "Founded in 2023 with a mission to revolutionize the digital procurement landscape through institutional-grade technology." },
       { subtitle: "Milestones", text: "Now serving over 500k+ active patrons with 50+ localized distribution sectors." },
@@ -133,7 +133,7 @@ const FOOTER_PAGE_DETAILS = {
     title: "Media Hub",
     sections: [
       { subtitle: "Inquiries", text: "media@shopconnect.com" },
-      { subtitle: "Assets", text: "Official Ecom360 visual kits." }
+      { subtitle: "Assets", text: "Official Kuiky visual kits." }
     ],
     icon: Megaphone,
     color: "#f59e0b"
@@ -310,13 +310,6 @@ const Footer = () => {
             </AnimatePresence>
           </div>
         </div>
-
-        <div className="footer-features-bar">
-          <FeatureItem icon={Truck} title="Fast Shipping" desc="Across India" />
-          <FeatureItem icon={RotateCcw} title="Easy Returns" desc="7 Day Policy" />
-          <FeatureItem icon={CreditCard} title="Secure Pay" desc="100% Encrypted" />
-          <FeatureItem icon={ShieldCheck} title="Originals" desc="Certified Brands" />
-        </div>
       </div>
 
       <div className="footer-bottom-strip">
@@ -335,7 +328,7 @@ const Footer = () => {
             </div>
             <div className="footer-legal-copy">
               <Globe size={16} className="world-icon" />
-              <span>© 2025 ShopConnect. All rights reserved.</span>
+              <span>© 2026 Kuiky. All rights reserved.</span>
             </div>
           </div>
         </div>

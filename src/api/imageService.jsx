@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { getImageUrl } from "./config";
+import { getImageUrl, MEDIA_BASE_URL, FALLBACK_MEDIA_BASE_URL } from "./config";
 
 /**
  * 🔗 Global Singleton Cache for Blobs
- * Prevents 1,200+ redundant network requests and ensures premium UI performance.
+ * Prevents redundant network requests and ensures smooth UI performance.
  */
 const imageCache = new Map();
 const pendingRequests = new Map();
@@ -21,6 +21,13 @@ export const useSmartImage = (rawPath) => {
         }
 
         const fullUrl = getImageUrl(rawPath);
+
+        // ⚡ Direct Fast-Path: Local static assets & data URIs do not need blob fetches
+        if (fullUrl.startsWith('/') || fullUrl.startsWith('./') || fullUrl.startsWith('data:')) {
+            setSrc(fullUrl);
+            setLoaded(true);
+            return;
+        }
 
         // 🚀 Hit cache first
         if (imageCache.has(fullUrl)) {
@@ -45,10 +52,15 @@ export const useSmartImage = (rawPath) => {
             }
 
             const fetchPromise = (async () => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+
                 try {
                     const response = await fetch(fullUrl, {
+                        signal: controller.signal,
                         headers: { 'ngrok-skip-browser-warning': 'true' }
                     });
+                    clearTimeout(timeoutId);
 
                     if (response.ok) {
                         const contentType = response.headers.get('content-type') || '';
@@ -59,8 +71,30 @@ export const useSmartImage = (rawPath) => {
                             return blobUrl;
                         }
                     }
-                    throw new Error('Not an image');
+                    throw new Error('Not an image or status: ' + response.status);
                 } catch (err) {
+                    clearTimeout(timeoutId);
+                    // Fallback to production media CDN if primary URL was not already codingboss
+                    const fallbackBase = (FALLBACK_MEDIA_BASE_URL || "https://api.codingboss.in").replace(/\/$/, '');
+                    if (!fullUrl.includes("api.codingboss.in")) {
+                        try {
+                            const pathParts = fullUrl.split("/");
+                            const mediaIdx = pathParts.findIndex(p => p === "media" || p === "static");
+                            if (mediaIdx !== -1) {
+                                const rel = pathParts.slice(mediaIdx).join("/");
+                                const fallbackUrl = `${fallbackBase}/${rel}`;
+                                const fbRes = await fetch(fallbackUrl);
+                                if (fbRes.ok) {
+                                    const blob = await fbRes.blob();
+                                    const blobUrl = URL.createObjectURL(blob);
+                                    imageCache.set(fullUrl, blobUrl);
+                                    return blobUrl;
+                                }
+                            }
+                        } catch (fbErr) {
+                            // ignore and propagate original error
+                        }
+                    }
                     throw err;
                 }
             })();
@@ -71,7 +105,10 @@ export const useSmartImage = (rawPath) => {
                 const finalBlobUrl = await fetchPromise;
                 setSrc(finalBlobUrl);
             } catch (err) {
-                setSrc(fullUrl);
+                // If fetch fails (404 / missing media), fallback to clean local placeholder
+                const fallbackImg = "/images/no-image.png";
+                imageCache.set(fullUrl, fallbackImg);
+                setSrc(fallbackImg);
                 setError(true);
             } finally {
                 pendingRequests.delete(fullUrl);
@@ -84,3 +121,4 @@ export const useSmartImage = (rawPath) => {
 
     return { src, loaded, error };
 };
+

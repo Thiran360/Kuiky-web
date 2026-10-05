@@ -18,12 +18,12 @@ export const generateInvoice = (order) => {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(26);
     doc.setFont("helvetica", "bold");
-    doc.text("ECOM 360", 15, 25);
+    doc.text("KUIKY", 15, 25);
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(200, 200, 200);
-    doc.text("ELITE PROCUREMENT & GLOBAL LOGISTICS HUB", 15, 32);
+    doc.text("QUICK HELP, ANYTIME • DIGITAL LOGISTICS HUB", 15, 32);
 
     // --- MANIFEST INFO ---
     doc.setTextColor(255, 255, 255);
@@ -138,8 +138,8 @@ export const generateInvoice = (order) => {
     
     doc.setFont("helvetica", "bold");
     doc.setTextColor(...colorObsidian);
-    doc.text("THANK YOU FOR CHOOSING EXCELLENCE • ECOM360 ELITE NETWORK", 105, 288, { align: 'center' });
+    doc.text("THANK YOU FOR CHOOSING EXCELLENCE • KUIKY NETWORK", 105, 288, { align: 'center' });
 
     // Output
-    doc.save(`ECOM360_OFFICIAL_INVOICE_${(order.id || order.orderId || "TRANS").toUpperCase()}.pdf`);
+    doc.save(`KUIKY_OFFICIAL_INVOICE_${(order.id || order.orderId || "TRANS").toUpperCase()}.pdf`);
 };

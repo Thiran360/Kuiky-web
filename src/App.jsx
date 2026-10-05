@@ -40,9 +40,13 @@ import "./styles/Global.css";
 
 import { setAuthToken } from "./api/api";
 
-const token = localStorage.getItem("accessToken");
+const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+const token =
+  localStorage.getItem("accessToken") ||
+  localStorage.getItem("access_token") ||
+  localStorage.getItem("token");
 
-if (token) {
+if (isLoggedIn && token && token !== "undefined" && token !== "null") {
   setAuthToken(token);
 }
 const ProtectedRoute = ({ children }) => {

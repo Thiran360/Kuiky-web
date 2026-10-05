@@ -52,9 +52,13 @@ const Header = ({ searchTerm, setSearchTerm }) => {
                     {/* Row 1 for Mobile (Logo & Actions) */}
                     <div className="header-content-inner-top">
                         <div className="header-left-hub">
-                            <motion.div className="header-logo-luxe" onClick={() => navigateTo("/")}>
-                                <ShoppingBag className="logo-icon-luxe" size={26} />
-                                <span className="logo-text-luxe">Ecom<span>360</span></span>
+                            <motion.div 
+                                className="header-logo-kuiky header-logo-luxe" 
+                                onClick={() => navigateTo("/")}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                            >
+                                <img src="/kuiky-logo-dark.png" alt="Kuiky" className="kuiky-brand-logo-img" />
                             </motion.div>
                         </div>
 
@@ -85,60 +89,135 @@ const Header = ({ searchTerm, setSearchTerm }) => {
 
             <AnimatePresence>
                 {isMenuOpen && (
-                    <>
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mobile-overlay-luxe" onClick={() => setIsMenuOpen(false)} />
-                        <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25, mass: 0.8 }} className="mobile-drawer-luxe">
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="mobile-overlay-luxe" 
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.98 }} 
+                            animate={{ opacity: 1, scale: 1 }} 
+                            exit={{ opacity: 0, scale: 0.98 }} 
+                            transition={{ duration: 0.2, ease: "easeOut" }} 
+                            className="mobile-drawer-luxe"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="drawer-head-luxe">
-                                <span className="drawer-logo-luxe">Ecom<span>360</span></span>
-                                <button className="drawer-close-luxe" onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+                                <div className="drawer-head-inner">
+                                    <div className="drawer-logo-kuiky" onClick={() => navigateTo("/")}>
+                                        <img src="/kuiky-logo-dark.png" alt="Kuiky" className="kuiky-brand-logo-img" />
+                                    </div>
+                                    <button className="drawer-close-luxe" onClick={() => setIsMenuOpen(false)} aria-label="Close menu">
+                                        <X size={24} />
+                                    </button>
+                                </div>
                             </div>
                             <div className="drawer-body-luxe">
-                                <div className="drawer-nav-group">
-                                    <p className="drawer-label">ACCOUNT HUB</p>
-                                    <div className="drawer-user-card-luxe">
-                                        <div className="d-user-avatar-luxe">
-                                            {isAuthenticated ? userName.charAt(0).toUpperCase() : "?"}
+                                <div className="drawer-content-centered">
+                                    <div className="drawer-nav-group">
+                                        <p className="drawer-label">ACCOUNT HUB</p>
+                                        <div className="drawer-user-card-luxe">
+                                            <div className="d-user-avatar-luxe">
+                                                {isAuthenticated ? userName.charAt(0).toUpperCase() : "?"}
+                                            </div>
+                                            <div className="d-user-info-luxe">
+                                                <p className="d-welcome-luxe">{isAuthenticated ? "AUTHORIZED MEMBER" : "GUEST"}</p>
+                                                {isAuthenticated ? (
+                                                    <div className="d-auth-user-profile">
+                                                        <p className="d-username-luxe">{userName}</p>
+                                                        <span className="d-user-tier">GOLD TIER ACCESS</span>
+                                                    </div>
+                                                ) : (
+                                                    <p className="d-username-luxe">Sign In to Proceed</p>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="d-user-info-luxe">
-                                            <p className="d-welcome-luxe">{isAuthenticated ? "AUTHORIZED MEMBER" : "ELITE GUEST"}</p>
-                                            {isAuthenticated ? (
-                                                <div className="d-auth-user-profile">
-                                                    <p className="d-username-luxe">{userName}</p>
-                                                    <span className="d-user-tier">GOLD TIER ACCESS</span>
-                                                </div>
-                                            ) : (
-                                                <p className="d-username-luxe">Sign In to Proceed</p>
-                                            )}
-                                        </div>
+                                        <DrawerLink icon={User} label="Profile & Settings" onClick={() => navigateTo("/profile")} />
+                                        <DrawerLink icon={MapPin} label="Shipping Addresses" onClick={() => navigateTo("/address")} />
+                                        <DrawerLink icon={Package} label="Order History" onClick={() => navigateTo("/orders")} />
                                     </div>
-                                    <DrawerLink icon={User} label="Profile & Settings" onClick={() => navigateTo("/profile")} />
-                                    <DrawerLink icon={MapPin} label="Shipping Addresses" onClick={() => navigateTo("/address")} />
-                                    <DrawerLink icon={Package} label="Order History" onClick={() => navigateTo("/orders")} />
-                                </div>
 
-                                <div className="drawer-nav-group">
-                                    <p className="drawer-label">ESSENTIALS</p>
-                                    <DrawerLink icon={Home} label="Return Home" active={isActive("/")} onClick={() => navigateTo("/")} />
-                                    <DrawerLink icon={Heart} label="My Wishlist" count={wishlistCount} onClick={() => navigateTo("/wishlist")} />
-                                    <DrawerLink icon={ShoppingCart} label="Basket" count={cartItemCount} onClick={() => navigateTo("/cart")} />
-                                    {!isAuthenticated && (
-                                        <div className="drawer-auth-actions-group">
-                                            <div className="divider-line-gold"></div>
-                                            <DrawerLink icon={Zap} label="Login / Sign Up" onClick={() => navigateTo("/login")} className="auth-trigger-luxe" />
-                                        </div>
+                                    <div className="drawer-nav-group">
+                                        <p className="drawer-label">ESSENTIALS</p>
+                                        <DrawerLink icon={Home} label="Return Home" active={isActive("/")} onClick={() => navigateTo("/")} />
+                                        <DrawerLink icon={Heart} label="My Wishlist" count={wishlistCount} onClick={() => navigateTo("/wishlist")} />
+                                        <DrawerLink icon={ShoppingCart} label="Basket" count={cartItemCount} onClick={() => navigateTo("/cart")} />
+                                        {!isAuthenticated && (
+                                            <div className="drawer-auth-actions-group">
+                                                <div className="divider-line-gold"></div>
+                                                <DrawerLink icon={Zap} label="Login / Sign Up" onClick={() => navigateTo("/login")} className="auth-trigger-luxe" />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {isAuthenticated && (
+                                        <button className="btn-drawer-logout danger-luxe" onClick={handleLogout}>
+                                            <LogOut size={18} /> Secure Logout
+                                        </button>
                                     )}
                                 </div>
-
-                                {isAuthenticated && (
-                                    <button className="btn-drawer-logout danger-luxe" onClick={handleLogout}>
-                                        <LogOut size={18} /> Secure Logout
-                                    </button>
-                                )}
                             </div>
                         </motion.div>
-                    </>
+                    </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* 📱 NATIVE-FEELING MOBILE BOTTOM NAVIGATION DOCK */}
+            <nav className="mobile-bottom-nav-bar" aria-label="Mobile Navigation">
+                <button 
+                    type="button" 
+                    className={`m-bottom-tab ${isActive("/") ? "active" : ""}`} 
+                    onClick={() => navigateTo("/")}
+                    aria-label="Home"
+                >
+                    <Home size={20} />
+                    <span>Home</span>
+                </button>
+                <button 
+                    type="button" 
+                    className={`m-bottom-tab ${isActive("/wishlist") ? "active" : ""}`} 
+                    onClick={() => navigateTo("/wishlist")}
+                    aria-label="Wishlist"
+                >
+                    <div className="m-tab-icon-wrap">
+                        <Heart size={20} />
+                        {wishlistCount > 0 && <span className="m-tab-badge">{wishlistCount}</span>}
+                    </div>
+                    <span>Wishlist</span>
+                </button>
+                <button 
+                    type="button" 
+                    className={`m-bottom-tab ${isActive("/cart") ? "active" : ""}`} 
+                    onClick={() => navigateTo("/cart")}
+                    aria-label="Cart"
+                >
+                    <div className="m-tab-icon-wrap">
+                        <ShoppingCart size={20} />
+                        {cartItemCount > 0 && <span className="m-tab-badge">{cartItemCount}</span>}
+                    </div>
+                    <span>Cart</span>
+                </button>
+                <button 
+                    type="button" 
+                    className={`m-bottom-tab ${isActive("/orders") ? "active" : ""}`} 
+                    onClick={() => navigateTo(isAuthenticated ? "/orders" : "/login")}
+                    aria-label="Orders"
+                >
+                    <Package size={20} />
+                    <span>Orders</span>
+                </button>
+                <button 
+                    type="button" 
+                    className={`m-bottom-tab ${isMenuOpen || isActive("/profile") ? "active" : ""}`} 
+                    onClick={() => setIsMenuOpen(true)}
+                    aria-label="Menu"
+                >
+                    <Menu size={20} />
+                    <span>Menu</span>
+                </button>
+            </nav>
         </header>
     );
 };
